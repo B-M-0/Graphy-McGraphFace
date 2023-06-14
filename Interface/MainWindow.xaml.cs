@@ -1,17 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace Interface
 {
@@ -30,7 +18,10 @@ namespace Interface
             if (rect.Visibility == System.Windows.Visibility.Collapsed)
             {
                 rect.Visibility = System.Windows.Visibility.Visible;
+                Input0.Visibility = System.Windows.Visibility.Visible;
                 
+                
+
 
                 (sender as Button).Content = "<";
 
@@ -38,14 +29,53 @@ namespace Interface
             else
             {
                 rect.Visibility = System.Windows.Visibility.Collapsed;
-                
+                Input0.Visibility = System.Windows.Visibility.Collapsed;
+                Input1.Visibility = System.Windows.Visibility.Collapsed;
+                Input2.Visibility = System.Windows.Visibility.Collapsed;
+                Input3.Visibility = System.Windows.Visibility.Collapsed;
+                Input4.Visibility = System.Windows.Visibility.Collapsed;
                 (sender as Button).Content = ">";
             }
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private void InputOrdering(object sender, TextChangedEventArgs e)
         {
-
+            //foreach
         }
+        private void TextBox0_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(Input0.Text))
+            {
+                Input1.Visibility = System.Windows.Visibility.Visible;
+            }
+            else 
+            {
+                Input1.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
+        private void TextBox1_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(Input1.Text))
+            {
+                Input2.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                Input2.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
+        private void TextBox2_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            if (!string.IsNullOrWhiteSpace(Input2.Text))
+            {
+                Input3.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                Input3.Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
+       
+        
     }
 }
