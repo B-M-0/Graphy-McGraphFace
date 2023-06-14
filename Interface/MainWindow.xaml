@@ -14,34 +14,23 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20" />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="5" />
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="20"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
             <RowDefinition Height="*"/>
-            <RowDefinition Height="5" />
+            <RowDefinition Height="*"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
 
@@ -49,23 +38,23 @@
         </Grid.RowDefinitions>
         
         
-        <Rectangle Name="rect"  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3" Grid.RowSpan="21" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
+        <Rectangle Name="rect"  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Grid.RowSpan="21" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
 
-        <TextBox Name ="Input0" Grid.Column="1" Grid.Row ="1" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1" TextChanged="TextBox0_TextChanged"/>
-        <TextBox Name ="Input1" Grid.Column="1" Grid.Row ="3" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1" TextChanged="TextBox1_TextChanged"/>
-        <TextBox Name ="Input2" Grid.Column="1" Grid.Row ="5" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1" TextChanged="TextBox2_TextChanged"/>
-        <TextBox Name ="Input3" Grid.Column="1" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input4" Grid.Column="1" Grid.Row ="9" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input5" Grid.Column="1" Grid.Row ="11" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input6" Grid.Column="1" Grid.Row ="13" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input7" Grid.Column="1" Grid.Row ="15" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input8" Grid.Column="1" Grid.Row ="17" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-        <TextBox Name ="Input9" Grid.Column="1" Grid.Row ="17" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
-
-
+        <TextBox Name ="Input0" Grid.Column="1" Grid.Row ="1" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
+        <TextBox Name ="Input1" Grid.Column="1" Grid.Row ="2" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox1_TextChanged"/>
+        <TextBox Name ="Input2" Grid.Column="1" Grid.Row ="3" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox2_TextChanged"/>
+        <TextBox Name ="Input3" Grid.Column="1" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2"/>
+        <TextBox Name ="Input4" Grid.Column="1" Grid.Row ="5" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
+        <TextBox Name ="Input5" Grid.Column="1" Grid.Row ="6" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
+        <TextBox Name ="Input6" Grid.Column="1" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
+        <TextBox Name ="Input7" Grid.Column="1" Grid.Row ="8" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
+        <TextBox Name ="Input8" Grid.Column="1" Grid.Row ="9" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
+        <TextBox Name ="Input9" Grid.Column="1" Grid.Row ="10" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="1"/>
 
 
-        <Button Grid.Column="0" Grid.Row="9"  Grid.RowSpan="3" VerticalAlignment="Stretch" Style ="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  FontSize="16" Background="White" Click="Button_Click">&gt;</Button>
+
+
+        <Button Grid.Column="0" Grid.Row="5"  Grid.RowSpan="3" VerticalAlignment="Stretch" Style ="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  FontSize="16" Background="White" Click="Button_Click">&gt;</Button>
         
 
     </Grid>
