@@ -1,0 +1,83 @@
+﻿using System;
+using System.Drawing;
+using System.IO;
+using WpfMath;
+using WpfMath.Parsers;
+using XamlMath.Exceptions;
+
+
+
+namespace ConsoleApplication2
+{
+    internal class Program
+    {  
+        static void drawimage(string filename)
+        {
+
+            Bitmap image = new Bitmap(filename);
+
+            int x, y;
+            int height = image.Height;
+            int width = image.Width;
+            Console.WriteLine($"{width}, {height}");
+
+            for (y = 0; y < height; y++)
+            {
+
+
+                for (x = 0; x < width; x++)
+                {
+                    
+                    Color TruePixelColor = image.GetPixel(x, y);
+
+                    if (TruePixelColor.A == 0)
+                    {
+                        Console.ForegroundColor = ConsoleColor.White;
+                        Console.BackgroundColor = ConsoleColor.White;
+                    }
+
+                    else 
+                    {
+                        Console.ForegroundColor = ConsoleColor.Black;
+                        Console.BackgroundColor = ConsoleColor.Black;
+                    }
+          
+                    Console.Write($"* ");
+                }
+                Console.WriteLine();
+
+            }
+            Console.ReadKey();
+        }
+
+        public static Bitmap convertLatexToPng(string fileName, string latex)
+        {
+
+            fileName = @"C:\Users\User\Source\Repos\B-M-0\Interface\Console Testing ground\bin\Debug\" + fileName + ".png";
+
+            try
+            {
+                var parser = WpfTeXFormulaParser.Instance;
+                var formula = parser.Parse(latex);
+                var png_Data = formula.RenderToPng(40.0, 0.0, 0.0, "Arial"); 
+
+                File.WriteAllBytes(fileName, png_Data);
+
+                Bitmap Image = new Bitmap(fileName);
+                return Image;
+            }
+            catch (TexException e)
+            {
+                Console.Error.WriteLine("Error when parsing formula: " + e.Message);
+                return null;    
+            }
+        }
+
+
+        public static void Main(string[] args)
+        {
+            convertLatexToPng("Test1", @"e^{i \theta} = \cos(\theta) + i \sin(\theta)");
+            drawimage("Test1.png");
+        }
+    }
+}
