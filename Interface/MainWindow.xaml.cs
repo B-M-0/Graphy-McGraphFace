@@ -30,9 +30,7 @@ namespace Interface
             if (rect.Visibility == System.Windows.Visibility.Collapsed)
             {
                 rect.Visibility = System.Windows.Visibility.Visible;
-                function1.Visibility = System.Windows.Visibility.Visible;
-                function2.Visibility = System.Windows.Visibility.Visible;
-                function3.Visibility = System.Windows.Visibility.Visible;
+                
 
                 (sender as Button).Content = "<";
 
@@ -40,10 +38,7 @@ namespace Interface
             else
             {
                 rect.Visibility = System.Windows.Visibility.Collapsed;
-                function1.Visibility = System.Windows.Visibility.Collapsed;
-                function2.Visibility = System.Windows.Visibility.Collapsed;
-                function3.Visibility = System.Windows.Visibility.Collapsed;
-
+                
                 (sender as Button).Content = ">";
             }
         }

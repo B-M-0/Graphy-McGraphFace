@@ -10,16 +10,30 @@
     
     
 
-    <Grid>
+    <Grid ShowGridLines="False">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
+            <ColumnDefinition Width="20" />
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+            <ColumnDefinition Width="auto"/>
+           
+            <ColumnDefinition Width="20"/>
         </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            
+            <RowDefinition Height="20"/>
+
+
+        </Grid.RowDefinitions>
         <Rectangle Name="rect" Width="400" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
-        <Button Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}" Width="32" Height="32" FontSize="16" VerticalAlignment="Center" HorizontalAlignment="Right" Background="White" Click="Button_Click">&gt;</Button>
-        <TextBox Name="function1" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"   Height="40"  Width="380" Visibility="Collapsed" FontSize="24"/>
-        <TextBox Name="function2" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"  Height="40"  Width="380" Visibility="Collapsed" FontSize="24"/>
-        <TextBox Name="function3" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top"  Height="40"  Width="380" Visibility="Collapsed" FontSize="24"/>
+        <Button Grid.Column="1" Grid.Row="3" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  FontSize="16" Background="White" Click="Button_Click">&gt;</Button>
+        
 
     </Grid>
 </Window>
