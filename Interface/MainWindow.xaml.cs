@@ -292,7 +292,7 @@ namespace Interface
             string[] inputs;
             if (currentPage == 1)
                 inputs = function_inputs;
-            else inputs = transformation_inputs;
+            else winputs = transformation_inputs;
 
             if (bracketsBalanced(inputs[id]))
             {

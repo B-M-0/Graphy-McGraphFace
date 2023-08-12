@@ -20,7 +20,7 @@ namespace Interface
             {
                 for (int column = 0; column < list[0].Count(); column++)
                 {
-                    array[row,column] = list[row][column];    
+                    array[row, column] = list[row][column];
                 }
             }
             return array;
@@ -28,10 +28,10 @@ namespace Interface
 
         public int rows, columns;
         public Rational[,] Values;
-       
 
-      
-        public Matrix(Rational[,] MatrixElements):this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
+
+
+        public Matrix(Rational[,] MatrixElements) : this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
         {
             _2DArrayPopMtrx(MatrixElements);
         }
@@ -46,7 +46,7 @@ namespace Interface
         }
 
 
-        public Matrix(Rational MatrixElement) : this(1,1)
+        public Matrix(Rational MatrixElement) : this(1, 1)
         {
             _2DArrayPopMtrx(new Rational[1, 1] { { MatrixElement } });
         }
@@ -96,7 +96,7 @@ namespace Interface
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = MatrixElements[i,j];
+                    Values[i, j] = MatrixElements[i, j];
                 }
             }
         }
@@ -106,7 +106,7 @@ namespace Interface
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = MatrixElements[i,j];
+                    Values[i, j] = MatrixElements[i, j];
                 }
             }
         }
@@ -116,7 +116,7 @@ namespace Interface
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = Math.Round(MatrixElements[i,j],Global.decimalPlaces);
+                    Values[i, j] = Math.Round(MatrixElements[i, j], Global.decimalPlaces);
                 }
             }
         }
@@ -186,7 +186,7 @@ namespace Interface
                         double sum = 0;
                         for (int i = 0; i < A.columns; i++)
                         {
-                            sum +=(double) (A.Values[row, i] * B.Values[i, column]);
+                            sum += (double)(A.Values[row, i] * B.Values[i, column]);
                         }
                         C.Values[row, column] = sum;
                     }
@@ -257,7 +257,7 @@ namespace Interface
             int dimension = MatrixElements[0].Count();
             foreach (List<int> sets in MatrixElements)
             {
-                if (sets.Count() != dimension) 
+                if (sets.Count() != dimension)
                     throw new Exception("Invalid Format: Not all rows are the same length.");
             }
 
@@ -268,15 +268,17 @@ namespace Interface
         }
 
 
-        static public Matrix LatexToMatrix(string input = @"a&b\\c&d\\")
+        static public Matrix LatexToMatrix(string input = @"\pmatrix{a&b\\c&d\\}")
         {
-           
+
+            Console.WriteLine(input);
+
             int columns = 0;
             for (int i = 0; i < input.Length - 1; i++)
             {
                 if (input.Substring(i, 2) == @"\\")
                 {
-                    input = input.Substring(0, i) + "%" + input.Substring(i+2);
+                    input = input.Substring(0, i) + "%" + input.Substring(i + 2);
                     i = 0;
                     columns++;
                 }
@@ -284,8 +286,8 @@ namespace Interface
             string[] rows = input.Split('%');
 
 
-            Rational[,] M = new Rational[rows.Length,columns]; 
-            for (int i =0;i< rows.Length;i++)
+            Rational[,] M = new Rational[rows.Length - 1, columns];
+            for (int i = 0; i < rows.Length - 1; i++)
             {
                 string[] row = rows[i].Split('&');
                 for (int j = 0; j < row.Length; j++)
@@ -294,24 +296,24 @@ namespace Interface
                 }
             }
 
-            
-            return new Matrix(M); 
+
+            return new Matrix(M);
         }
-        public string MatrixToLatex(string ID)
+        public string MatrixToLatex()
         {
-            string Latex = "";
+            string Latex = @"\pmatrix{";
             for (int row = 0; row < this.rows; row++)
             {
                 for (int column = 0; column < this.columns - 1; columns++)
                 {
-                    Latex += this.Values[row,column].ToString() + "&";
+                    Latex += this.Values[row, column].ToString() + "&";
                 }
-                Latex += this.Values[row, this.columns-1].ToString() + @"\\";
+                Latex += this.Values[row, this.columns - 1].ToString() + @"\\";
             }
 
-            return Latex;
+            return Latex + "}";
         }
     }
 
-    
+
 }

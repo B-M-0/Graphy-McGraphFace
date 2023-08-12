@@ -5,7 +5,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace  Interface
+namespace Interface
 {
     public class SquareMatrix : Matrix
     {
@@ -25,29 +25,39 @@ namespace  Interface
                 }
             }
         }
-       
+
 
         public SquareMatrix(Rational[,] MatrixElements) : base(MatrixElements) { }
         public SquareMatrix(int[,] MatrixElements) : base(MatrixElements) { }
         public SquareMatrix(double[,] MatrixElements) : base(MatrixElements) { }
 
-        public static SquareMatrix identityMatrix(int dimension )
-        { 
+        public static SquareMatrix identityMatrix(int dimension)
+        {
             SquareMatrix I = new SquareMatrix(dimension, true);
-            for (int i = 0; i < dimension;i++ )
+            for (int i = 0; i < dimension; i++)
             {
-                I.Values[i,i] = 1;    
+                I.Values[i, i] = 1;
             }
             return I;
         }
 
-        public static Matrix operator ^(SquareMatrix A, int Power)
+        public SquareMatrix(Matrix A) : base(A.rows, A.columns)
+        {
+            if (A.rows != A.columns)
+            {
+                throw new Exception("Matrix is not Square");
+            }
+            this.Values = A.Values;
+        }
+
+
+        public static SquareMatrix operator ^(SquareMatrix A, int Power)
         {
             SquareMatrix B = A;
 
-            if(Power < -1)
+            if (Power < -1)
                 throw new ArgumentException("Powers < -1 are unsupported");
-            
+
             switch (Power)
             {
                 case -1:
@@ -57,7 +67,8 @@ namespace  Interface
                     B = identityMatrix(A.rows);
                     break;
                 default:
-                    for (int i = 1; i < Power; i++)  B = (SquareMatrix)(B * A);
+                    for (int i = 1; i < Power; i++)
+                        B = new SquareMatrix(B * A);
                     break;
             }
             return B;
@@ -114,21 +125,21 @@ namespace  Interface
                 // and multiplies it with its corresponding minor value
                 // signs to calculate the determinant properly
                 for (int i = 0; i < A.rows; i++)
-                {   
-                    det += (A.Values[0, i] * (Rational)Math.Pow(-1, i)) * A.getMinorElement(0,i);
+                {
+                    det += (A.Values[0, i] * (Rational)Math.Pow(-1, i)) * A.getMinorElement(0, i);
                 }
             }
 
             return (Rational)det;
         }
-        public  Rational getMinorElement(int minorValueMatrixRow, int minorValueMatrixColumn)
+        public Rational getMinorElement(int minorValueMatrixRow, int minorValueMatrixColumn)
         {
             SquareMatrix Minor = new SquareMatrix(this.rows - 1);
             int MinorRow = 0;
-            for (int currentRow= 0; currentRow< this.rows; currentRow++)
+            for (int currentRow = 0; currentRow < this.rows; currentRow++)
             {
                 int MinorColumn = 0;
-                if (currentRow== minorValueMatrixRow)
+                if (currentRow == minorValueMatrixRow)
                     continue;
                 for (int currentColumn = 0; currentColumn < this.columns; currentColumn++)
                 {
@@ -153,7 +164,7 @@ namespace  Interface
             {
                 for (int minorValueMatrixColumn = 0; minorValueMatrixColumn < A.columns; minorValueMatrixColumn++)
                 {
-                    MinorValueMatrix.Values[minorValueMatrixRow, minorValueMatrixColumn] = A.getMinorElement(minorValueMatrixRow,minorValueMatrixColumn);
+                    MinorValueMatrix.Values[minorValueMatrixRow, minorValueMatrixColumn] = A.getMinorElement(minorValueMatrixRow, minorValueMatrixColumn);
                 }
             }
             return MinorValueMatrix;
@@ -187,12 +198,12 @@ namespace  Interface
             return A;
         }
 
-        public (Vector,Rational) Eigen(SquareMatrix A)
+        public (Vector, Rational) Eigen(SquareMatrix A)
         {
             Vector EigenVector = new Vector(A.rows);
             Rational EigenValue = 1;
-            
-            
+
+
             return (EigenVector, EigenValue);
         }
 
@@ -203,14 +214,14 @@ namespace  Interface
             if (detA.Decimal() == 0)
                 throw new DivideByZeroException("Determinant = 0 => A is singular => no inverse.");
 
-            if (this.rows == 1)      
+            if (this.rows == 1)
             {
                 Rational[,] MatrixArr = new Rational[1, 1];
                 MatrixArr[0, 0] = detA.reciprocal();
                 SquareMatrix Inverse = new SquareMatrix(MatrixArr);
                 return Inverse;
             }
- 
+
             return (SquareMatrix)(detA.reciprocal() * (this ^ "A"));
         }
     }

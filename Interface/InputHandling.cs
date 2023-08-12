@@ -13,7 +13,7 @@ namespace Interface
     static class InputHandling
     {
         static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>() { "cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan","\\M" };
+        static List<string> FunctionCodes = new List<string>() { "cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan", "\\M" };
         public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables)
         {
             Stack<string> stack = new Stack<string>();
@@ -128,9 +128,9 @@ namespace Interface
             {
                 key += (char)random.Next(65, 91);
             }
-            if (Dictionary.ContainsKey(key)) 
+            if (Dictionary.ContainsKey(key))
                 key = GenerateKey(Dictionary);
-            
+
             return key;
         }
 
@@ -152,8 +152,12 @@ namespace Interface
                         Matrices.Add(key, NewMatrix);
                         stack.Push(key);
                         break;
+                    case "det":
+                        operand1 = stack.Pop();
+                        A = Matrices[operand1];
+                        break;
                     case "+":
-                        
+
                         operand1 = stack.Pop();
                         operand2 = stack.Pop();
                         if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
@@ -178,7 +182,7 @@ namespace Interface
                             stack.Push((operand2 + operand1).ToString());
                         }
                         else
-                        {                          
+                        {
                             A = Matrices[operand1];
                             B = Matrices[operand2];
                             C = B - A;
@@ -214,11 +218,11 @@ namespace Interface
                             Matrices.Add(key, C);
                             stack.Push(key);
                         }
-                        else 
+                        else
                         {
                             a = double.Parse(operand1);
                             b = double.Parse(operand2);
-                            stack.Push((b*a).ToString());
+                            stack.Push((b * a).ToString());
                             break;
                         }
                         break;
@@ -231,23 +235,36 @@ namespace Interface
                         break;
                     case "^":
                         operand1 = stack.Pop();
-                        operand2 = stack.Pop(); 
+                        operand2 = stack.Pop();
                         A = Matrices[operand2];
-                        int power= int.Parse(operand1);
-                        C = (SquareMatrix)(A) ^ power;
+                        int power = int.Parse(operand1);
+                        C = new SquareMatrix(A) ^ power;
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, C);
+                        stack.Push(key);
                         break;
                     default:
-                        string temp;
-                        try
-                        {
-                            if (Regex.IsMatch(element, "[a-z]+$"))
-                                temp = Variables[element].ToString();
-                            else
-                                temp = element;
+                        string temp = "";
+                        bool negative = false;
 
-                            stack.Push(temp);
+                        if (element.Contains("_"))
+                        {
+                            negative = true;
+                            temp = element.Substring(1);
                         }
-                        catch { }
+                        else
+                            temp = element;
+
+                        if (Regex.IsMatch(element, "[a-z]+$"))
+                            temp = Variables[temp].ToString();
+
+
+                        if (negative)
+                        {
+                            temp = ((-1) * double.Parse(temp)).ToString();
+                        }
+                        stack.Push(temp);
+
                         break;
                 }
 
@@ -262,61 +279,72 @@ namespace Interface
         {
             for (int i = 0; i < input.Length; i++)
             {
-                switch (input[i])
+                try
                 {
+                    switch (input[i])
+                    {
 
-                    case '\\':
-                        string function = input.Substring(i, 2);
-                        if (FunctionCodes.Contains(function))
-                        {
-                            input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
-                            i += 2;
-                        }
-                        break;
-                    case 'a':
-                        function = input.Substring(i, 4);
-                        if (FunctionCodes.Contains(function))
-                        {
-                            input = input.Substring(0, i) + function + " " + input.Substring(i + 4);
-                            i += 4;
-                        }
-                        break;
-                    case 's':
-                    case 'c':
-                    case 't':
-                    case 'e':
-                    case 'l':
-                        function = input.Substring(i, 3);
-                        if (FunctionCodes.Contains(function))
-                        {
-                            input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
-                            i += 3;
-                        }
-                        else if (FunctionCodes.Contains(function.Substring(i)))
-                        {
-                            input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
-                            i += 2;
-                        }
-                        break;
-                    case '+':
-                    case '-':
-                    case '*':
-                    case '/':
-                    case '^':
-                        char temp = input[i];
-                        input = input.Substring(0, i) + " " + temp.ToString() + " " + input.Substring(i + 1);
-                        i++;
-                        break;
-                    case '(':
-                        input = input.Substring(0, i) + "( " + input.Substring(i + 1);
-                        i++;
-                        break;
-                    case ')':
-                        input = input.Substring(0, i) + " )" + input.Substring(i + 1);
-                        i++;
-                        break;
+
+                        case '\\':
+                            string function = input.Substring(i, 2);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
+                                i += 2;
+                            }
+                            break;
+                        case 'a':
+                            function = input.Substring(i, 4);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 4);
+                                i += 4;
+                            }
+                            break;
+                        case 's':
+                        case 'c':
+                        case 't':
+                        case 'e':
+                        case 'l':
+                            function = input.Substring(i, 3);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
+                                i += 3;
+                            }
+                            else if (FunctionCodes.Contains(function.Substring(i)))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
+                                i += 2;
+                            }
+                            break;
+                        case '+':
+                        case '-':
+                        case '*':
+                        case '/':
+                        case '^':
+                            char temp = input[i];
+                            input = input.Substring(0, i) + " " + temp.ToString() + " " + input.Substring(i + 1);
+                            i++;
+                            break;
+                        case '(':
+                        case '{':
+                            input = input.Substring(0, i) + input[i] + " " + input.Substring(i + 1);
+                            i++;
+                            break;
+                        case ')':
+                        case '}':
+                            input = input.Substring(0, i) + " " + input[i] + input.Substring(i + 1);
+                            i++;
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    //Console.WriteLine(e.Message);
                 }
             }
+
             if (input[0] == ' ')
                 input = input.Substring(1);
             if (input[input.Length - 1] == ' ')
@@ -359,16 +387,16 @@ namespace Interface
             foreach (string element in infix)
             {
                 //
-                if (Regex.IsMatch(element, "[a-zA-Z0-9]+$") && !isfunction(element))
+                if (Regex.IsMatch(element, "[a-zA-Z0-9\\e]") && !isfunction(element))
                     postfix.Add(element);
-                else if (element == "(")
+                else if (element == "(" || element == "{")
                 {
                     Stack.Push(element);
                 }
-                else if (element == ")")
+                else if (element == ")" || element == "}")
                 {
 
-                    while (Stack.Count > 0 && Stack.Peek() != "(")
+                    while (Stack.Count > 0 && (Stack.Peek() != "(" && Stack.Peek() != "{"))
                         postfix.Add(Stack.Pop());
                     Stack.Pop();
                 }
