@@ -1,4 +1,4 @@
-﻿using NEA26;
+﻿
 using ScottPlot.Drawing.Colormaps;
 using System;
 using System.Collections.Generic;
@@ -39,16 +39,13 @@ namespace Interface
         int universial_range = 20;
         int universial_lower_bound = -10;
         double universial_step = 0.1;
-        string[] inputs = new string[input_count];
+
+        string[] function_inputs = new string[input_count];
+        string[] transformation_inputs = new string[input_count];
        
-
-
-
-
-
         public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
+        public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
-       
 
         public bool bracketsBalanced(string input)
         {
@@ -129,8 +126,8 @@ namespace Interface
         public MainWindow()
         {
             InitializeComponent();
-
-            inputs = new string[] { Input0.Text, Input1.Text, Input2.Text };
+            OpenMainMenu();
+            function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             for (int i = 0; i < valid.Length; i++) valid[i] = false;
 
             UpdateGraph_functions();
@@ -154,7 +151,8 @@ namespace Interface
 
         public void UpdateText()
         {
-            inputs = new string[] { Input0.Text, Input1.Text, Input2.Text };
+            function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
+            transformation_inputs = new string[] { Transformation_Input0.Text, Transformation_Input1.Text, Transformation_Input2.Text };
         }
     
         public void UpdateGraph_functions()
@@ -197,13 +195,23 @@ namespace Interface
                     Function function = functions[i];
 
 
-                    double[] xs;
-                    double[] ys;
+                    
+                      
+                    Matrix Result = function.Evaluate(Vars ,Matrices);
+                    if (Result.rows == 2)
+                    {
+                        double[] xs = new double[Result.columns];
+                        double[] ys = new double[Result.columns];
+                        for (int position = 0; position < Result.columns; position++)
+                        {
+                            xs[position] = Result.Values[0, position];
+                            ys[position] = Result.Values[1, position];
+                            Graph.Plot.AddPolygon(xs, ys, lineWidth: 2);
+                            Graph.Refresh();
+                        }
+                        
 
-                    double[] xsPrime;
-                    double[] ysPrime;
-
-                   // Graph.Plot.AddPolygon(xs, ys,lineWidth: 2);
+                    }
                 }
 
             }
@@ -213,16 +221,24 @@ namespace Interface
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            if (SideBar.Visibility == System.Windows.Visibility.Collapsed)
+            if (SideBar.Visibility == System.Windows.Visibility.Collapsed && OpenSideBar.Visibility == System.Windows.Visibility.Visible)
             {
                 SideBar.Visibility = System.Windows.Visibility.Visible;
-                Input0.Visibility = System.Windows.Visibility.Visible;
-                Input1.Visibility = System.Windows.Visibility.Visible;
-                Input2.Visibility = System.Windows.Visibility.Visible;
+                if (currentPage == 1)
+                {
+                    Function_Input0.Visibility = System.Windows.Visibility.Visible;
+                    Function_Input1.Visibility = System.Windows.Visibility.Visible;
+                    Function_Input2.Visibility = System.Windows.Visibility.Visible;
+                }
+                else if(currentPage == 2)
+                {
+                    Transformation_Input0.Visibility = System.Windows.Visibility.Visible;
+                    Transformation_Input1.Visibility = System.Windows.Visibility.Visible;
+                    Transformation_Input2.Visibility = System.Windows.Visibility.Visible;
+                }
                 Input0Render.Visibility = System.Windows.Visibility.Visible;
                 Input1Render.Visibility = System.Windows.Visibility.Visible;
-                Input2Render.Visibility = System.Windows.Visibility.Visible;
-                Input0Render.Visibility = System.Windows.Visibility.Visible;
+                Input2Render.Visibility = System.Windows.Visibility.Visible;             
                 Input0RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
                 Input1RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
                 Input2RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
@@ -242,9 +258,18 @@ namespace Interface
 
 
                 SideBar.Visibility = System.Windows.Visibility.Collapsed;
-                Input0.Visibility = System.Windows.Visibility.Collapsed;
-                Input1.Visibility = System.Windows.Visibility.Collapsed;
-                Input2.Visibility = System.Windows.Visibility.Collapsed;
+                if (currentPage == 1)
+                {
+                    Function_Input0.Visibility = System.Windows.Visibility.Collapsed;
+                    Function_Input1.Visibility = System.Windows.Visibility.Collapsed;
+                    Function_Input2.Visibility = System.Windows.Visibility.Collapsed;
+                }
+                else if(currentPage == 2)
+                {
+                    Transformation_Input0.Visibility = System.Windows.Visibility.Collapsed;
+                    Transformation_Input1.Visibility = System.Windows.Visibility.Collapsed;
+                    Transformation_Input2.Visibility = System.Windows.Visibility.Collapsed;
+                }
                 Input0Render.Visibility = System.Windows.Visibility.Collapsed;
                 Input1Render.Visibility = System.Windows.Visibility.Collapsed;
                 Input2Render.Visibility = System.Windows.Visibility.Collapsed;
@@ -264,8 +289,14 @@ namespace Interface
         public void TextChanged(int id)
         {
             UpdateText();
+            string[] inputs;
+            if (currentPage == 1)
+                inputs = function_inputs;
+            else inputs = transformation_inputs;
+
             if (bracketsBalanced(inputs[id]))
             {
+                
                 try
                 {
                     string Latex = formatLatex(inputs[id]);
@@ -289,34 +320,6 @@ namespace Interface
                 }
             }
         }
-
-
-        public void TextChanged_Transformation(int id)
-        {
-            UpdateText();
-            if (bracketsBalanced(inputs[id]))
-            {
-                try
-                {
-                    string Latex = formatLatex(inputs[id]);
-                    UpdateRender(id, BitmapToImageSource(convertLatexToPng(Latex)));
-
-                    Graph.Plot.Clear();
-                    List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(removeWhiteSpace(inputs[id])).Split(' '));
-                    foreach(string element in output)
-                    functions[id] = new Function(output);
-                    valid[id] = true;
-                    UpdateGraph_transformations();
-                }
-                catch (Exception exception)
-                {
-                    Console.Error.WriteLine("Error when parsing formula: " + exception.Message);
-                }
-            }
-        }
-
-
-
 
 
 
@@ -348,19 +351,7 @@ namespace Interface
 
         public void ShowFunctions()
         {
-            Graph.Visibility = System.Windows.Visibility.Visible;
-            SideBar.Visibility = System.Windows.Visibility.Visible;
-            Input0.Visibility = System.Windows.Visibility.Visible;
-            Input1.Visibility = System.Windows.Visibility.Visible;
-            Input2.Visibility = System.Windows.Visibility.Visible;
-            Input0Render.Visibility = System.Windows.Visibility.Visible;
-            Input1Render.Visibility = System.Windows.Visibility.Visible;
-            Input2Render.Visibility = System.Windows.Visibility.Visible;
-            Input0Render.Visibility = System.Windows.Visibility.Visible;
-            Input0RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
-            Input1RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
-            Input2RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
-            GoToMainMenu.Visibility = System.Windows.Visibility.Visible;
+            Graph.Visibility = System.Windows.Visibility.Visible;           
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
 
         }
@@ -369,9 +360,9 @@ namespace Interface
         {
             Graph.Visibility = System.Windows.Visibility.Collapsed;
             SideBar.Visibility = System.Windows.Visibility.Collapsed;
-            Input0.Visibility = System.Windows.Visibility.Collapsed;
-            Input1.Visibility = System.Windows.Visibility.Collapsed;
-            Input2.Visibility = System.Windows.Visibility.Collapsed;
+            Function_Input0.Visibility = System.Windows.Visibility.Collapsed;
+            Function_Input1.Visibility = System.Windows.Visibility.Collapsed;
+            Function_Input2.Visibility = System.Windows.Visibility.Collapsed;
             Input0Render.Visibility = System.Windows.Visibility.Collapsed;
             Input1Render.Visibility = System.Windows.Visibility.Collapsed;
             Input2Render.Visibility = System.Windows.Visibility.Collapsed;
@@ -386,19 +377,26 @@ namespace Interface
 
         public void ShowTransformations()
         {
-            Graph.Visibility = System.Windows.Visibility.Visible;
-            SideBar.Visibility = System.Windows.Visibility.Visible;
-            
-            GoToMainMenu.Visibility = System.Windows.Visibility.Visible;
+            Graph.Visibility = System.Windows.Visibility.Visible;          
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
-
+            Grid.SetColumn(Graph, 1);
+            Grid.SetColumnSpan(Graph, 4);
         }
 
         public void HideTransformations()
         {
             Graph.Visibility = System.Windows.Visibility.Collapsed;
             SideBar.Visibility = System.Windows.Visibility.Collapsed;
-            
+            Transformation_Input0.Visibility = System.Windows.Visibility.Collapsed;
+            Transformation_Input1.Visibility = System.Windows.Visibility.Collapsed;
+            Transformation_Input2.Visibility = System.Windows.Visibility.Collapsed;
+            Input0Render.Visibility = System.Windows.Visibility.Collapsed;
+            Input1Render.Visibility = System.Windows.Visibility.Collapsed;
+            Input2Render.Visibility = System.Windows.Visibility.Collapsed;
+            Input0Render.Visibility = System.Windows.Visibility.Collapsed;
+            Input0RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
+            Input1RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
+            Input2RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
             GoToMainMenu.Visibility = System.Windows.Visibility.Collapsed;
             OpenSideBar.Visibility = System.Windows.Visibility.Collapsed;
         }
@@ -413,7 +411,9 @@ namespace Interface
 
 
         public void ShowMainMenu()
-        { 
+        {
+            Grid.SetColumn(Graph, 1);
+            Grid.SetColumnSpan(Graph, 4);
             GoToFunctions.Visibility = System.Windows.Visibility.Visible;
             GoToTransformations.Visibility = System.Windows.Visibility.Visible; 
         }
@@ -435,20 +435,25 @@ namespace Interface
 
 
 
-        private void OpenMainMenu(object sender, RoutedEventArgs e)
+        private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
         {
+            currentPage = 0;
             HideFunctions();
+            HideTransformations();
             ShowMainMenu();
         }
+       
 
         private void OpenFunctions(object sender, RoutedEventArgs e)
         {
+            currentPage = 1;
             HideMainMenu();
             ShowFunctions();
         }
 
         private void OpenTransformations(object sender, RoutedEventArgs e)
         {
+            currentPage = 2;
             HideMainMenu();
             ShowTransformations();
         }

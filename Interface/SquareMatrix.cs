@@ -5,7 +5,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace  NEA26
+namespace  Interface
 {
     public class SquareMatrix : Matrix
     {

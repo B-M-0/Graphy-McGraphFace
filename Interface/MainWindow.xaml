@@ -44,9 +44,9 @@
         <WpfPlot Name="Graph" Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="4" Grid.RowSpan="10" />
 
 
-        <TextBox Name ="Input0" Grid.Column="2" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
-        <TextBox Name ="Input1" Grid.Column="2" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox1_TextChanged"/>
-        <TextBox Name ="Input2" Grid.Column="2" Grid.Row ="10" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox2_TextChanged"/>
+        <TextBox Name ="Function_Input0" Grid.Column="2" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
+        <TextBox Name ="Function_Input1" Grid.Column="2" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox1_TextChanged"/>
+        <TextBox Name ="Function_Input2" Grid.Column="2" Grid.Row ="10" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox2_TextChanged"/>
 
         <Image Name="Input0Render" Grid.Column="2" Grid.Row="2" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" />
         <Image Name="Input1Render" Grid.Column="2" Grid.Row="5" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" />
@@ -54,11 +54,14 @@
 
         <Button Name="OpenSideBar" Grid.Column="0" Grid.Row="5"  Grid.RowSpan="3" VerticalAlignment="Stretch" Style ="{StaticResource {x:Static ToolBar.ButtonStyleKey}}"  FontSize="16" Background="White" Click="Button_Click">&gt;</Button>
 
-        
-        
-        
-        
-        
+        <TextBox Name ="Transformation_Input0" Grid.Column="2" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
+        <TextBox Name ="Transformation_Input1" Grid.Column="2" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox1_TextChanged"/>
+        <TextBox Name ="Transformation_Input2" Grid.Column="2" Grid.Row ="10" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox2_TextChanged"/>
+
+
+
+
+
         <Button Name="GoToMainMenu" Content="Main Menu" Visibility="Collapsed" Grid.Column="2" Grid.Row="0"  Grid.RowSpan="2" Grid.ColumnSpan="1" VerticalAlignment="Stretch" Margin="5,10" FontSize="16" Background="White"  Click="OpenMainMenu"></Button>
 
 

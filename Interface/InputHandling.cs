@@ -8,13 +8,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-namespace NEA26
+namespace Interface
 {
     static class InputHandling
     {
         static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>() { "cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan" };
-        public static double evaluateInfix(List<string> expression, Dictionary<string, double> Variables)
+        static List<string> FunctionCodes = new List<string>() { "cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan","\\M" };
+        public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -134,7 +134,7 @@ namespace NEA26
             return key;
         }
 
-        public static Matrix evaluateInfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -253,8 +253,7 @@ namespace NEA26
 
             }
 
-            double output = double.Parse(stack.Pop());
-            return null;
+            return Matrices[stack.Pop()];
         }
 
 
@@ -265,8 +264,17 @@ namespace NEA26
             {
                 switch (input[i])
                 {
+
+                    case '\\':
+                        string function = input.Substring(i, 2);
+                        if (FunctionCodes.Contains(function))
+                        {
+                            input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
+                            i += 2;
+                        }
+                        break;
                     case 'a':
-                        string function = input.Substring(i, 4);
+                        function = input.Substring(i, 4);
                         if (FunctionCodes.Contains(function))
                         {
                             input = input.Substring(0, i) + function + " " + input.Substring(i + 4);

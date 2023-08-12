@@ -7,7 +7,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace NEA26
+namespace Interface
 {
     class Function
     {
@@ -24,10 +24,13 @@ namespace NEA26
                 Variables.Add("x", x);
             else
                 Variables["x"] = x;
-            return InputHandling.evaluateInfix(postFixFunction, Variables);
+            return InputHandling.evaluatePostfix(postFixFunction, Variables);
         }
 
-        
+        public Matrix Evaluate( Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
+        {
+            return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables,Matrices);
+        }
 
         public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, double> Variables)
         {
@@ -42,7 +45,7 @@ namespace NEA26
             {
                 Variables["x"] = x;
                 Xvals.Add(x);
-                Yvals.Add(InputHandling.evaluateInfix(postFixFunction, Variables));
+                Yvals.Add(InputHandling.evaluatePostfix(postFixFunction, Variables));
 
                 if (Yvals[index] >= (int.MaxValue - 1000000) || int.MinValue + 1000000 > Yvals[index] )
                 {
