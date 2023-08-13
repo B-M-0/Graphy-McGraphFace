@@ -273,20 +273,20 @@ namespace Interface
 
             Console.WriteLine(input);
 
-            int columns = 0;
+            int rowCount = 0;
             for (int i = 0; i < input.Length - 1; i++)
             {
                 if (input.Substring(i, 2) == @"\\")
                 {
                     input = input.Substring(0, i) + "%" + input.Substring(i + 2);
                     i = 0;
-                    columns++;
+                    rowCount++;
                 }
             }
             string[] rows = input.Split('%');
 
 
-            Rational[,] M = new Rational[rows.Length - 1, columns];
+            Rational[,] M = new Rational[rowCount, rows[0].Split('&').Length];
             for (int i = 0; i < rows.Length - 1; i++)
             {
                 string[] row = rows[i].Split('&');

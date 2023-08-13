@@ -1,6 +1,4 @@
-﻿
-using ScottPlot.Drawing.Colormaps;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -31,9 +29,16 @@ namespace Interface
         Function function1;
         Function function2;
 
-        
+        Function[] transformations = new Function[input_count];
 
-        bool[] valid = new bool[input_count];
+        Function transformation0;
+        Function transformation1;
+        Function transformation2;
+
+
+
+        bool[] valid_function = new bool[input_count];
+        bool[] valid_transformation = new bool[input_count];
 
         int currentPage = 1;
         int universial_range = 20;
@@ -42,7 +47,7 @@ namespace Interface
 
         string[] function_inputs = new string[input_count];
         string[] transformation_inputs = new string[input_count];
-       
+
         public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
@@ -91,9 +96,9 @@ namespace Interface
         {
             string temp = "";
             foreach (char element in input)
-            { 
-                if(element != ' ')
-                    temp+= element;
+            {
+                if (element != ' ')
+                    temp += element;
             }
             return temp;
         }
@@ -128,17 +133,21 @@ namespace Interface
             InitializeComponent();
             OpenMainMenu();
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
-            for (int i = 0; i < valid.Length; i++) valid[i] = false;
+            for (int i = 0; i < valid_function.Length; i++)
+            {
+                valid_function[i] = false;
+                valid_transformation[i] = false;
+            }
 
             UpdateGraph_functions();
         }
 
-        public void UpdateRender(int id, ImageSource Render)       
+        public void UpdateRender(int id, ImageSource Render)
         {
             switch (id)
             {
                 case 0:
-                     Input0Render.Source = Render;
+                    Input0Render.Source = Render;
                     break;
                 case 1:
                     Input1Render.Source = Render;
@@ -154,7 +163,7 @@ namespace Interface
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             transformation_inputs = new string[] { Transformation_Input0.Text, Transformation_Input1.Text, Transformation_Input2.Text };
         }
-    
+
         public void UpdateGraph_functions()
         {
             Graph.Plot.Clear();
@@ -166,7 +175,7 @@ namespace Interface
 
             for (int i = 0; i < input_count; i++)
             {
-                if (valid[i])
+                if (valid_function[i])
                 {
                     Function function = functions[i];
                     var func = new Func<double, double?>((x) => function.Evaluate(x, Vars));
@@ -174,7 +183,7 @@ namespace Interface
                 }
 
             }
-       
+
             Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
             Graph.Refresh();
         }
@@ -190,34 +199,37 @@ namespace Interface
 
             for (int i = 0; i < input_count; i++)
             {
-                if (valid[i])
+                if (valid_transformation[i])
                 {
                     Function function = functions[i];
 
 
-                    
-                      
-                    Matrix Result = function.Evaluate(Vars ,Matrices);
+
+                    Matrix Result = function.Evaluate(Vars, Matrices);
                     if (Result.rows == 2)
                     {
                         double[] xs = new double[Result.columns];
                         double[] ys = new double[Result.columns];
                         for (int position = 0; position < Result.columns; position++)
                         {
-                            xs[position] = Result.Values[0, position];
-                            ys[position] = Result.Values[1, position];
-                            Graph.Plot.AddPolygon(xs, ys, lineWidth: 2);
+                            try
+                            {
+                                xs[position] = Result.Values[0, position];
+                                ys[position] = Result.Values[1, position];
+                                Graph.Plot.AddScatter(xs, ys, lineWidth: 2);
+
+                            }
+                            catch (Exception e) { }
                             Graph.Refresh();
                         }
-                        
 
                     }
+
                 }
 
+                Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+                Graph.Refresh();
             }
-
-            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
-            Graph.Refresh();
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -230,7 +242,7 @@ namespace Interface
                     Function_Input1.Visibility = System.Windows.Visibility.Visible;
                     Function_Input2.Visibility = System.Windows.Visibility.Visible;
                 }
-                else if(currentPage == 2)
+                else if (currentPage == 2)
                 {
                     Transformation_Input0.Visibility = System.Windows.Visibility.Visible;
                     Transformation_Input1.Visibility = System.Windows.Visibility.Visible;
@@ -238,7 +250,7 @@ namespace Interface
                 }
                 Input0Render.Visibility = System.Windows.Visibility.Visible;
                 Input1Render.Visibility = System.Windows.Visibility.Visible;
-                Input2Render.Visibility = System.Windows.Visibility.Visible;             
+                Input2Render.Visibility = System.Windows.Visibility.Visible;
                 Input0RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
                 Input1RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
                 Input2RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
@@ -264,7 +276,7 @@ namespace Interface
                     Function_Input1.Visibility = System.Windows.Visibility.Collapsed;
                     Function_Input2.Visibility = System.Windows.Visibility.Collapsed;
                 }
-                else if(currentPage == 2)
+                else if (currentPage == 2)
                 {
                     Transformation_Input0.Visibility = System.Windows.Visibility.Collapsed;
                     Transformation_Input1.Visibility = System.Windows.Visibility.Collapsed;
@@ -290,33 +302,54 @@ namespace Interface
         {
             UpdateText();
             string[] inputs;
+            bool[] valid;
             if (currentPage == 1)
+            {
                 inputs = function_inputs;
-            else winputs = transformation_inputs;
-
+                valid = valid_function;
+            }
+            else
+            {
+                inputs = transformation_inputs;
+                valid = valid_transformation;
+            }
             if (bracketsBalanced(inputs[id]))
             {
-                
+
                 try
                 {
                     string Latex = formatLatex(inputs[id]);
                     UpdateRender(id, BitmapToImageSource(convertLatexToPng(Latex)));
-
-                    Graph.Plot.Clear();
+                }
+                catch
+                { //RenderError}   
+                }
+                Graph.Plot.Clear();
+                try
+                {
                     List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(removeWhiteSpace(inputs[id])).Split(' '));
 
                     functions[id] = new Function(output);
                     valid[id] = true;
 
-                    
-                    if(currentPage == 1)
+
+                    if (currentPage == 1)
                         UpdateGraph_functions();
-                    else if(currentPage == 2)
+                    else if (currentPage == 2)
                         UpdateGraph_transformations();
                 }
                 catch (Exception exception)
                 {
                     Console.Error.WriteLine("Error when parsing formula: " + exception.Message);
+                }
+
+                if (currentPage == 1)
+                {
+                    valid_function = valid;
+                }
+                else
+                {
+                    valid_transformation = valid;
                 }
             }
         }
@@ -351,7 +384,7 @@ namespace Interface
 
         public void ShowFunctions()
         {
-            Graph.Visibility = System.Windows.Visibility.Visible;           
+            Graph.Visibility = System.Windows.Visibility.Visible;
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
 
         }
@@ -377,7 +410,7 @@ namespace Interface
 
         public void ShowTransformations()
         {
-            Graph.Visibility = System.Windows.Visibility.Visible;          
+            Graph.Visibility = System.Windows.Visibility.Visible;
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
             Grid.SetColumn(Graph, 1);
             Grid.SetColumnSpan(Graph, 4);
@@ -415,7 +448,7 @@ namespace Interface
             Grid.SetColumn(Graph, 1);
             Grid.SetColumnSpan(Graph, 4);
             GoToFunctions.Visibility = System.Windows.Visibility.Visible;
-            GoToTransformations.Visibility = System.Windows.Visibility.Visible; 
+            GoToTransformations.Visibility = System.Windows.Visibility.Visible;
         }
         public void HideMainMenu()
         {
@@ -442,7 +475,7 @@ namespace Interface
             HideTransformations();
             ShowMainMenu();
         }
-       
+
 
         private void OpenFunctions(object sender, RoutedEventArgs e)
         {
