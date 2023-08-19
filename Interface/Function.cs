@@ -18,6 +18,11 @@ namespace Interface
 
         List<string> postFixFunction;
 
+        public List<string> GetFunction()
+        { 
+            return postFixFunction; 
+        }
+
         public double Evaluate(double x , Dictionary<string, double> Variables)
         {
             if(!Variables.ContainsKey("x"))
@@ -56,6 +61,8 @@ namespace Interface
                     index++;
 
             }
+
+            
 
             double[] xValsArr = new double[Xvals.Count()];
             double[] yValsArr = new double[Yvals.Count()];

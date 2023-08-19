@@ -196,11 +196,18 @@ namespace Interface
                         operand2 = stack.Pop();
                         if (Regex.IsMatch(operand1, "[A-Z]") && Regex.IsMatch(operand2, "[A-Z]"))
                         {
-                            A = Matrices[operand1];
-                            B = Matrices[operand2];
-                            C = B * A;
-                            Matrices.Add(operand2 + operand1, C);
-                            stack.Push(operand2 + operand1);
+                            try
+                            {
+                                A = Matrices[operand1];
+                                B = Matrices[operand2];
+                                C = B * A;
+                                Matrices.Add(operand2 + operand1, C);
+                                stack.Push(operand2 + operand1);
+                            }
+                            catch (NullReferenceException e) 
+                            {
+                               string msg = e.Message;
+                            }
                         }
                         else if (Regex.IsMatch(operand1, "[A-Z]"))
                         {
@@ -247,7 +254,7 @@ namespace Interface
                         string temp = "";
                         bool negative = false;
 
-                        if (element.Contains("_"))
+                        if (element[0]=='_' && element.Contains("\\\\") == false)
                         {
                             negative = true;
                             temp = element.Substring(1);

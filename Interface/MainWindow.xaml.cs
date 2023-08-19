@@ -51,6 +51,7 @@ namespace Interface
         public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
+        
 
         public bool bracketsBalanced(string input)
         {
@@ -89,6 +90,8 @@ namespace Interface
                         break;
                 }
             }
+            if (temp.Contains("\\M"))
+                temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
 
@@ -139,6 +142,9 @@ namespace Interface
                 valid_transformation[i] = false;
             }
 
+            Matrix UnitSquare = new Matrix(new int[2, 4] { { 0, 1, 1, 0 }, { 0, 0, 1, 1 } });
+            Matrices.Add("U", UnitSquare);
+
             UpdateGraph_functions();
         }
 
@@ -188,6 +194,24 @@ namespace Interface
             Graph.Refresh();
         }
 
+        public void PlotMatrix(Matrix M)
+        {  
+            if (M.rows == 2)
+            {
+                double[] xs = new double[M.columns];
+                double[] ys = new double[M.columns];
+                for (int position = 0; position < M.columns; position++)
+                {
+                    xs[position] = M.Values[0, position];
+                    ys[position] = M.Values[1, position];
+                    
+                    if (M.columns > 2)
+                        Graph.Plot.AddPolygon(xs, ys, lineWidth: 2);
+                    
+                    Graph.Plot.AddScatter(xs, ys, lineWidth: 0, markerSize: 7, color: System.Drawing.Color.Black);
+                }
+            }
+        }
         public void UpdateGraph_transformations()
         {
             Graph.Plot.Clear();
@@ -203,27 +227,13 @@ namespace Interface
                 {
                     Function function = functions[i];
 
-
-
                     Matrix Result = function.Evaluate(Vars, Matrices);
-                    if (Result.rows == 2)
-                    {
-                        double[] xs = new double[Result.columns];
-                        double[] ys = new double[Result.columns];
-                        for (int position = 0; position < Result.columns; position++)
-                        {
-                            try
-                            {
-                                xs[position] = Result.Values[0, position];
-                                ys[position] = Result.Values[1, position];
-                                Graph.Plot.AddScatter(xs, ys, lineWidth: 2);
+                    PlotMatrix(Result);
 
-                            }
-                            catch (Exception e) { }
-                            Graph.Refresh();
-                        }
+                    if (function.GetFunction().Contains("U"))
+                        PlotMatrix(Matrices["U"]);
 
-                    }
+                    Graph.Refresh();
 
                 }
 
@@ -259,15 +269,12 @@ namespace Interface
                 Grid.SetColumn(Graph, 3);
                 Grid.SetColumnSpan(Graph, 2);
 
-
                 (sender as Button).Content = "<";
-
             }
             else
             {
                 Grid.SetColumn(Graph, 1);
                 Grid.SetColumnSpan(Graph, 4);
-
 
                 SideBar.Visibility = System.Windows.Visibility.Collapsed;
                 if (currentPage == 1)
@@ -289,6 +296,7 @@ namespace Interface
                 Input1RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
                 Input2RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
                 GoToMainMenu.Visibility = System.Windows.Visibility.Collapsed;
+
                 (sender as Button).Content = ">";
             }
         }

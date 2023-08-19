@@ -15,7 +15,12 @@ namespace Interface
 
         public static implicit operator double(Rational A)
         {
-            return A.Decimalval = (double)A.numerator / (double)A.denominator;
+            try
+            {
+                return A.Decimalval = (double)A.numerator / (double)A.denominator;
+            }catch (NullReferenceException) {//
+                return 0;
+            }
         }
 
         public static implicit operator Rational(double A)

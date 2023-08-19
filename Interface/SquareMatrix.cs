@@ -9,6 +9,8 @@ namespace Interface
 {
     public class SquareMatrix : Matrix
     {
+
+            
         public SquareMatrix(int a = 2, bool empty = false) : base(a, a)
         {
             //Test values

@@ -175,6 +175,7 @@ namespace Interface
         public static Matrix operator *(Matrix A, Matrix B)
         {
             Matrix C;
+            
             if (A.columns == B.rows)
             {
                 C = new Matrix(A.rows, B.columns);
@@ -292,6 +293,8 @@ namespace Interface
                 string[] row = rows[i].Split('&');
                 for (int j = 0; j < row.Length; j++)
                 {
+                    if (row[j].Contains('_'))
+                        row[j] = "-" + row[j].Substring(1);
                     M[i, j] = (Rational)(double.Parse(row[j]));
                 }
             }
