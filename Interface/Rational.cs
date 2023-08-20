@@ -45,6 +45,14 @@ namespace Interface
             else
                 return $"{A.numerator}/{A.denominator}";
         }
+        public string LatexFormat()
+        {
+            Simplify();
+            if(!isInteger)
+                return $"\\frac{{{numerator}}}{{{denominator}}}";
+            else 
+                return numerator.ToString() ;
+        }
         public Rational(int numerator, int denominator = 1)
         {
             if (numerator < 0 && denominator < 0)
@@ -79,8 +87,13 @@ namespace Interface
 
             this.numerator = (int)Decimal;
             this.denominator = denominator;
-            signHandling();
 
+            
+            Rational X = this.Simplify();
+            this.numerator = X.numerator;
+            this.denominator = X.denominator;  
+            
+               
         }
 
         public Rational Simplify()
@@ -143,13 +156,13 @@ namespace Interface
         }
         public static Rational operator ^(Rational A, double power)
         {
-            Rational result = new Rational((int)Math.Pow(A.numerator, power), (int)Math.Pow(A.denominator, power));
+            Rational result = new Rational(Math.Pow(A.numerator, power)/Math.Pow(A.denominator, power));
             return result.Simplify();
         }
 
         public double Decimal()
         {
-            return Math.Round(this.Decimalval,3);
+            return Math.Round(this.Decimalval,Global.decimalPlaces);
         }
 
 
@@ -165,7 +178,7 @@ namespace Interface
 
 
         private void signHandling()
-        {
+        {   
             if (this.numerator < 0 && this.denominator < 0)
             {
                 this.numerator = Math.Abs(this.numerator);

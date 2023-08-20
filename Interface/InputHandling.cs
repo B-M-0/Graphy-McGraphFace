@@ -13,7 +13,152 @@ namespace Interface
     static class InputHandling
     {
         static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>() { "cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan", "\\M" };
+        static List<string> FunctionCodes = new List<string>() { "\\sqrt","cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan", "\\M" };
+        public static Rational evaluatePostfix(List<string> expression, Dictionary<string, Rational> Variables)
+        {
+            Stack<string> stack = new Stack<string>();
+            foreach (string element in expression)
+            {
+                string operand1Str, operand2Str;
+                Rational operand1_R, operand2_R;
+                double operand1, operand2;
+                string key;
+                switch (element)
+                {
+                    case "\\sqrt":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Sqrt(operand1)).ToString());
+                        break;                  
+                    case "exp":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Exp(operand1)).ToString());
+                        break;
+                    case "sin":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Sin(operand1)).ToString());
+                        break;
+                    case "cos":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Cos(operand1)).ToString());
+                        break;
+                    case "tan":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Tan(operand1)).ToString());
+                        break;
+                    case "asin":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Asin(operand1)).ToString());
+                        break;
+                    case "acos":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Acos(operand1)).ToString());
+                        break;              
+                    case "atan":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Atan(operand1)).ToString());
+                        break;    
+                    case "log":
+                        operand1_R = Variables[stack.Pop()];
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Log10(operand1)).ToString());
+                        break;
+                    case "ln":
+                        operand1_R = Variables[stack.Pop()];
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, operand2_R * operand1_R);
+
+                        stack.Push(key);
+                        break;
+                    case "+":
+                        operand1_R = Variables[stack.Pop()];
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, operand2_R * operand1_R);
+
+                        stack.Push(key);
+                        break;
+                    case "-":
+                        operand1_R = Variables[stack.Pop()];
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, operand2_R - operand1_R);
+
+                        stack.Push(key);
+                        break;                      
+                    case "*":
+                        operand1_R = Variables[stack.Pop()]; 
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key ,operand2_R * operand1_R);
+
+                        stack.Push(key);
+                        break;
+                    case "/":
+                        operand1_R = Variables[stack.Pop()];
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, operand2_R / operand1_R);
+
+                        stack.Push(key);
+                        break;
+                    case "^":
+                        operand1_R = Variables[stack.Pop()];
+                        operand2_R = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, operand2_R ^ operand1_R);
+
+                        stack.Push(key);
+                        break;
+                    default:
+                        Rational temp = 1;
+                        bool negative = false;
+                        if (element.Contains("_"))
+                        {
+                            temp = -1;
+                            negative = true;
+                        }
+
+
+                        try
+                        {
+                            if (Regex.IsMatch(element, "[a-z]+$") && negative)
+                                temp *= Variables[element.Substring(1)];
+                            else if (Regex.IsMatch(element, "[a-z]+$"))
+                                temp *= Variables[element];
+                            else if (negative)
+                                temp *= double.Parse(element.Substring(1));
+                            else
+                                temp *= double.Parse(element);
+                            
+                            key = GenerateKey(Variables);
+                            Variables.Add(key, temp);   
+                            stack.Push(key);
+                        }
+                        catch { }
+                        break;
+                }
+
+            }
+
+            Rational output = Variables[stack.Pop()];
+            Variables.Clear();
+            return output;
+        }
         public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables)
         {
             Stack<string> stack = new Stack<string>();
@@ -121,7 +266,7 @@ namespace Interface
         }
 
 
-        public static string GenerateKey(Dictionary<string, Matrix> Dictionary)
+        public static string GenerateKey<T>(Dictionary<string, T> Dictionary)
         {
             string key = "";
             for (int i = 0; i < 4; i++)
@@ -134,7 +279,7 @@ namespace Interface
             return key;
         }
 
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -279,6 +424,153 @@ namespace Interface
 
             return Matrices[stack.Pop()];
         }
+
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
+        {
+            Stack<string> stack = new Stack<string>();
+            foreach (string element in expression)
+            {
+                string operand1, operand2;
+                Matrix A, B, C;
+                double a, b;
+                string key;
+                switch (element)
+                {
+                    case @"\M":
+                        operand1 = stack.Pop();
+                        Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, NewMatrix);
+                        stack.Push(key);
+                        break;
+                    case "det":
+                        operand1 = stack.Pop();
+                        A = Matrices[operand1];
+                        break;
+                    case "+":
+
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
+                        {
+                            stack.Push((operand2 + operand1).ToString());
+                        }
+                        else
+                        {
+                            A = Matrices[operand1];
+                            B = Matrices[operand2];
+                            C = B + A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        break;
+                    case "-":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
+                        {
+                            stack.Push((operand2 + operand1).ToString());
+                        }
+                        else
+                        {
+                            A = Matrices[operand1];
+                            B = Matrices[operand2];
+                            C = B - A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        break;
+                    case "*":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[A-Z]") && Regex.IsMatch(operand2, "[A-Z]"))
+                        {
+                            try
+                            {
+                                A = Matrices[operand1];
+                                B = Matrices[operand2];
+                                C = B * A;
+                                Matrices.Add(operand2 + operand1, C);
+                                stack.Push(operand2 + operand1);
+                            }
+                            catch (NullReferenceException e)
+                            {
+                                string msg = e.Message;
+                            }
+                        }
+                        else if (Regex.IsMatch(operand1, "[A-Z]"))
+                        {
+                            A = Matrices[operand1];
+                            C = double.Parse(operand2) * A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        else if (Regex.IsMatch(operand2, "[A-Z]"))
+                        {
+                            B = Matrices[operand2];
+                            C = double.Parse(operand1) * B;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        else
+                        {
+                            a = double.Parse(operand1);
+                            b = double.Parse(operand2);
+                            stack.Push((b * a).ToString());
+                            break;
+                        }
+                        break;
+                    case "/":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        a = double.Parse(operand1);
+                        b = double.Parse(operand2);
+                        stack.Push((b / a).ToString());
+                        break;
+                    case "^":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand2];
+                        int power = int.Parse(operand1);
+                        C = new SquareMatrix(A) ^ power;
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, C);
+                        stack.Push(key);
+                        break;
+                    default:
+                        string temp = "";
+                        bool negative = false;
+
+                        if (element[0] == '_' && element.Contains("\\\\") == false)
+                        {
+                            negative = true;
+                            temp = element.Substring(1);
+                        }
+                        else
+                            temp = element;
+
+                        if (Regex.IsMatch(element, "[a-z]+$"))
+                            temp = Variables[temp].ToString();
+
+
+                        if (negative)
+                        {
+                            temp = ((-1) * double.Parse(temp)).ToString();
+                        }
+                        stack.Push(temp);
+
+                        break;
+                }
+
+            }
+
+            return Matrices[stack.Pop()];
+        }
+
 
 
 

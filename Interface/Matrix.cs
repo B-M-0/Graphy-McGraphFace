@@ -172,6 +172,13 @@ namespace Interface
         }
 
         //Multiplies two Matrices together and returns the result
+
+        public static explicit operator string(Matrix A)
+        {
+            return A.MatrixToLatex();
+        }
+
+        //
         public static Matrix operator *(Matrix A, Matrix B)
         {
             Matrix C;
@@ -307,11 +314,11 @@ namespace Interface
             string Latex = @"\pmatrix{";
             for (int row = 0; row < this.rows; row++)
             {
-                for (int column = 0; column < this.columns - 1; columns++)
+                for (int column = 0; column < this.columns - 1; column++)
                 {
-                    Latex += this.Values[row, column].ToString() + "&";
+                    Latex += (string)this.Values[row, column] + "&";
                 }
-                Latex += this.Values[row, this.columns - 1].ToString() + @"\\";
+                Latex += (string)this.Values[row, this.columns - 1] + @"\\";
             }
 
             return Latex + "}";

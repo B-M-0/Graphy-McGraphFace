@@ -8,7 +8,7 @@ namespace Interface
 {
     public class Global
     {
-        static public int decimalPlaces = 6;
+        static public int decimalPlaces = 7;
 
 
     }

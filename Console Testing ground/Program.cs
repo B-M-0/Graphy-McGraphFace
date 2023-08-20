@@ -35,7 +35,6 @@ namespace ConsoleApplication2
                         Console.ForegroundColor = ConsoleColor.White;
                         Console.BackgroundColor = ConsoleColor.White;
                     }
-
                     else 
                     {
                         Console.ForegroundColor = ConsoleColor.Black;
@@ -68,7 +67,7 @@ namespace ConsoleApplication2
             }
             catch (TexException e)
             {
-                Console.Error.WriteLine("Error when parsing formula: " + e.Message);
+                Console.WriteLine("Error when parsing formula: " + e.Message);
                 return null;    
             }
         }
@@ -76,8 +75,13 @@ namespace ConsoleApplication2
 
         public static void Main(string[] args)
         {
-            convertLatexToPng("Test1", @"e^{i \theta} = \cos(\theta) + i \sin(\theta)");
-            drawimage("Test1.png");
+
+            // convertLatexToPng("Test1", @"e^{i \theta} = \cos(\theta) + i \sin(\theta)");
+            //convertLatexToPng("Test1",@"\hat{ g} (f) =  \int_{ -\infty}^{\infty}g(t) e ^{ -2 \pi i f t}\, dt");
+            convertLatexToPng("Test1", "\\$$$$hat{f}_k = \\sum^{N - 1}_{n = 0} f_{n} e^{\\frac{-2 \\pi n k i }{N} }");
+        drawimage("Test1.png");
+
+        
         }
     }
 }
