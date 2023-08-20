@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -51,7 +52,7 @@ namespace Interface
         public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
-        
+
 
         public bool bracketsBalanced(string input)
         {
@@ -195,7 +196,7 @@ namespace Interface
         }
 
         public void PlotMatrix(Matrix M)
-        {  
+        {
             if (M.rows == 2)
             {
                 double[] xs = new double[M.columns];
@@ -204,10 +205,10 @@ namespace Interface
                 {
                     xs[position] = M.Values[0, position];
                     ys[position] = M.Values[1, position];
-                    
+
                     if (M.columns > 2)
                         Graph.Plot.AddPolygon(xs, ys, lineWidth: 2);
-                    
+
                     Graph.Plot.AddScatter(xs, ys, lineWidth: 0, markerSize: 7, color: System.Drawing.Color.Black);
                 }
             }
@@ -266,15 +267,15 @@ namespace Interface
                 Input2RenderBackDrop.Visibility = System.Windows.Visibility.Visible;
                 GoToMainMenu.Visibility = System.Windows.Visibility.Visible;
 
-                Grid.SetColumn(Graph, 3);
-                Grid.SetColumnSpan(Graph, 2);
+                Grid.SetColumn(Graph, 4);
+                Grid.SetColumnSpan(Graph, 4);
 
                 (sender as Button).Content = "<";
             }
             else
             {
                 Grid.SetColumn(Graph, 1);
-                Grid.SetColumnSpan(Graph, 4);
+                Grid.SetColumnSpan(Graph, 7);
 
                 SideBar.Visibility = System.Windows.Visibility.Collapsed;
                 if (currentPage == 1)
@@ -300,12 +301,7 @@ namespace Interface
                 (sender as Button).Content = ">";
             }
         }
-
-        private void InputOrdering(object sender, TextChangedEventArgs e)
-        {
-            //foreach
-        }
-
+   
         public void TextChanged(int id)
         {
             UpdateText();
@@ -394,7 +390,8 @@ namespace Interface
         {
             Graph.Visibility = System.Windows.Visibility.Visible;
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
-
+            Grid.SetColumn(Graph, 1);
+            Grid.SetColumnSpan(Graph, 7);
         }
 
         public void HideFunctions()
@@ -421,7 +418,7 @@ namespace Interface
             Graph.Visibility = System.Windows.Visibility.Visible;
             OpenSideBar.Visibility = System.Windows.Visibility.Visible;
             Grid.SetColumn(Graph, 1);
-            Grid.SetColumnSpan(Graph, 4);
+            Grid.SetColumnSpan(Graph, 7);
         }
 
         public void HideTransformations()
@@ -430,9 +427,9 @@ namespace Interface
             SideBar.Visibility = System.Windows.Visibility.Collapsed;
             Transformation_Input0.Visibility = System.Windows.Visibility.Collapsed;
             Transformation_Input1.Visibility = System.Windows.Visibility.Collapsed;
-            Transformation_Input2.Visibility = System.Windows.Visibility.Collapsed;
+            Transformation_Input2.Visibility =indows System.Windows.Visibility.Collapsed;
             Input0Render.Visibility = System.Windows.Visibility.Collapsed;
-            Input1Render.Visibility = System.Windows.Visibility.Collapsed;
+            Input1Render.Visibility = System.W.Visibility.Collapsed;
             Input2Render.Visibility = System.Windows.Visibility.Collapsed;
             Input0Render.Visibility = System.Windows.Visibility.Collapsed;
             Input0RenderBackDrop.Visibility = System.Windows.Visibility.Collapsed;
@@ -443,6 +440,15 @@ namespace Interface
         }
 
 
+        public void ShowCalculations()
+        { 
+            
+        }
+        public void OpenCalculations(object sender, RoutedEventArgs e)
+        {
+            HideMainMenu();
+            ShowCalculations();
+        }
 
 
 
@@ -457,11 +463,13 @@ namespace Interface
             Grid.SetColumnSpan(Graph, 4);
             GoToFunctions.Visibility = System.Windows.Visibility.Visible;
             GoToTransformations.Visibility = System.Windows.Visibility.Visible;
+            GoToCalculations.Visibility = System.Windows.Visibility.Visible;
         }
         public void HideMainMenu()
         {
             GoToFunctions.Visibility = System.Windows.Visibility.Collapsed;
             GoToTransformations.Visibility = System.Windows.Visibility.Collapsed;
+            GoToCalculations.Visibility = System.Windows.Visibility.Collapsed;
         }
 
 
