@@ -462,6 +462,8 @@ namespace Interface
             Calculation_InputRender0.Visibility = Visibility.Collapsed;
             Calculation_Input0.Visibility = Visibility.Collapsed;
             Calculation_InputBackDrop0.Visibility = Visibility.Collapsed;
+            Calculation_OutputRender0.Visibility = Visibility.Collapsed;
+            Calculation_OutputBackDrop0.Visibility = Visibility.Collapsed;
         }
         public void OpenCalculations(object sender, RoutedEventArgs e)
         {
