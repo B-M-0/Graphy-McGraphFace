@@ -3,6 +3,7 @@ using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography.X509Certificates;//?why
 using System.Text;
 using System.Threading.Tasks;
@@ -23,13 +24,13 @@ namespace Interface
             return postFixFunction; 
         }
 
-        public Rational Evaluate(Dictionary<string, Rational> Variables, double x = 1)
+        public Rational Evaluate(Dictionary<string, Surd> SurdVariables,Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
         {
             if(!Variables.ContainsKey("x"))
                 Variables.Add("x", x);
             else
                 Variables["x"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, Variables);
+            return InputHandling.evaluatePostfix(postFixFunction,SurdVariables, Variables, ref decimalval);
         }
         public double Evaluate(Dictionary<string, double> Variables, double x = 1)
         {
@@ -39,6 +40,16 @@ namespace Interface
                 Variables["x"] = x;
             return InputHandling.evaluatePostfix(postFixFunction, Variables);
         }
+
+        public Complex Evaluate(Dictionary<string, Complex> Variables, double x = 0)
+        {
+            if (!Variables.ContainsKey("z"))
+                Variables.Add("z", x);
+            else
+                Variables["z"] = x;
+            return InputHandling.evaluatePostfix(postFixFunction, Variables);
+        }
+
 
         public Matrix Evaluate( Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices)
         {
@@ -50,12 +61,12 @@ namespace Interface
         }
 
 
-        public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, Rational> Variables)
+        public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables)
         {
             if (!Variables.ContainsKey("x"))
                 Variables.Add("x", lower_bound);
             int index = 0;
-
+            double decval =0;
 
             List<double> Xvals = new List<double>();
             List<double> Yvals = new List<double>();
@@ -63,7 +74,7 @@ namespace Interface
             {
                 Variables["x"] = x;
                 Xvals.Add(x);
-                Yvals.Add(InputHandling.evaluatePostfix(postFixFunction, Variables));
+                Yvals.Add(InputHandling.evaluatePostfix(postFixFunction,SurdVariables, Variables, ref decval));
 
                 if (Yvals[index] >= (int.MaxValue - 1000000) || int.MinValue + 1000000 > Yvals[index] )
                 {

@@ -4,31 +4,46 @@ using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Interface
 {
+    //  \sqrt{23}
+   
+
     static class InputHandling
     {
+        
         static Random random = new Random();
         static List<string> FunctionCodes = new List<string>() { "\\sqrt","cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan", "\\M" };
-        public static Rational evaluatePostfix(List<string> expression, Dictionary<string, Rational> Variables)
+        public static Rational evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, Rational> Variables, ref double decimalval)
         {
+            Variables = Global.defineConstants();
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
             {
                 string operand1Str, operand2Str;
-                Rational operand1_R, operand2_R;
+                Rational  operand1_R, operand2_R;
+                Surd operand1_S, operand2_S;
                 double operand1, operand2;
                 string key;
+
                 switch (element)
                 {
                     case "\\sqrt":
                         operand1_R = Variables[stack.Pop()];
-                        operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Sqrt(operand1)).ToString());
+                        stack.Push(Math.Sqrt(operand1_R.Decimal()).ToString());
+
+
+                        //Surd surd = Surd.Sqrt(operand1_R);
+
+                        //key = GenerateKey(SurdVariables);
+                        //SurdVariables.Add(key, surd);
+
+                        //stack.Push(key);
                         break;                  
                     case "exp":
                         operand1_R = Variables[stack.Pop()];
@@ -72,19 +87,15 @@ namespace Interface
                         break;
                     case "ln":
                         operand1_R = Variables[stack.Pop()];
-                        operand2_R = Variables[stack.Pop()];
-
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, operand2_R * operand1_R);
-
-                        stack.Push(key);
+                        operand1 = operand1_R.Decimal();
+                        stack.Push((Math.Log(operand1)).ToString());
                         break;
-                    case "+":
+                    case "+":                      
                         operand1_R = Variables[stack.Pop()];
                         operand2_R = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key, operand2_R * operand1_R);
+                        Variables.Add(key, operand2_R + operand1_R);
 
                         stack.Push(key);
                         break;
@@ -136,9 +147,9 @@ namespace Interface
 
                         try
                         {
-                            if (Regex.IsMatch(element, "[a-z]+$") && negative)
+                            if (Regex.IsMatch(element, "[A-Za-z\\e]+$") && negative)
                                 temp *= Variables[element.Substring(1)];
-                            else if (Regex.IsMatch(element, "[a-z]+$"))
+                            else if (Regex.IsMatch(element, "[A-Za-z\\e]+$"))
                                 temp *= Variables[element];
                             else if (negative)
                                 temp *= double.Parse(element.Substring(1));
@@ -155,9 +166,20 @@ namespace Interface
 
             }
 
-            Rational output = Variables[stack.Pop()];
-            Variables.Clear();
-            return output;
+            string outputstr = stack.Pop();
+            Rational output = new Rational(1);
+            if (Regex.IsMatch(outputstr, "[A-Z]+$"))
+            {
+                output = Variables[outputstr];
+                Variables.Clear();
+                return output;
+            }
+            else
+            {
+                decimalval = double.Parse(outputstr);
+                Variables.Clear();
+                return null;
+            }            
         }
         public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables)
         {
@@ -265,11 +287,136 @@ namespace Interface
             return output;
         }
 
-
-        public static string GenerateKey<T>(Dictionary<string, T> Dictionary)
+        static public string IndentifyLoci(string input)
         {
+            var temp = input.Split('=');
+            string LHS = temp[0];
+            string RHS = temp[1];
+
+            if (LHS.Contains("mod(z") && RHS.Contains("mod(z"))
+                return "B";//bisector
+            else if (LHS.Contains("mod(z") && Regex.IsMatch(RHS, "[0-9.]"))
+                return "C";//cirlce
+            else if (LHS.Contains("arg(z") & Regex.IsMatch(RHS, "[0-9.]"))
+                return "H";//halfline
+            else
+                return "U";//undefined
+        }
+
+        public static Complex evaluatePostfix(List<string> expression, Dictionary<string, Complex> Variables)
+        {
+            Stack<string> stack = new Stack<string>();
+            foreach (string element in expression)
+            {
+                string operand1, operand2;
+                Complex A, B, C;
+                double a, b;
+                string key;
+                switch (element)
+                {
+                    case "mod":
+                        A = Variables[stack.Pop()];
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, A.Magnitude);
+
+                        stack.Push(key);
+                        break;
+                    case "arg":
+                        A = Variables[stack.Pop()];
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, A.Phase);
+
+                        stack.Push(key);
+                        break;
+                    case @"\C":
+                        A = Variables[stack.Pop()];
+                        B = Variables[stack.Pop()];
+                        Complex ComplexNumber = new Complex(B.Real, A.Real);
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, ComplexNumber);
+                        stack.Push(key);
+                        break;
+                    case "+":
+                        A = Variables[stack.Pop()];
+                        B = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, B + A);
+
+                        stack.Push(key);
+                        break;
+                    case "-":
+                        A = Variables[stack.Pop()];
+                        B = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, B - A);
+
+                        stack.Push(key);
+                        break;
+                    case "*":
+                        A = Variables[stack.Pop()];
+                        B = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, B * A);
+
+                        stack.Push(key);
+                        break;
+                    case "/":
+                        A = Variables[stack.Pop()];
+                        B = Variables[stack.Pop()];
+
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, B / A);
+
+                        stack.Push(key);
+                        break;
+                    default:
+                        Complex temp = 1;
+                        bool negative = false;
+                        if (element.Contains("_"))
+                        {
+                            temp = -1;
+                            negative = true;
+                        }
+
+
+                        try
+                        {
+                            if (Regex.IsMatch(element, "[A-Za-z\\e]") && negative)
+                                temp *= Variables[element.Substring(1)];
+                            else if (Regex.IsMatch(element, "[A-Za-z\\e]"))
+                                temp *= Variables[element];
+                            else if (negative)
+                                temp *= double.Parse(element.Substring(1));
+                            else
+                                temp *= double.Parse(element);
+
+                            key = GenerateKey(Variables);
+                            Variables.Add(key, temp);
+                            stack.Push(key);
+                        }
+                        catch { }
+                        break;
+
+                }
+
+            }
+
+            return Variables[stack.Pop()];
+
+        }
+        public static  string GenerateKey<T>(Dictionary<string, T> Dictionary)
+        {
+            int a = 0;
+            if (typeof(T).FullName == "Surd")
+            {
+                a = 5;
+            }
+            else a = 4;
             string key = "";
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < a; i++)
             {
                 key += (char)random.Next(65, 91);
             }
@@ -576,6 +723,7 @@ namespace Interface
 
         public static string formatInput(string input)
         {
+            string function;
             for (int i = 0; i < input.Length; i++)
             {
                 try
@@ -585,11 +733,15 @@ namespace Interface
 
 
                         case '\\':
-                            string function = input.Substring(i, 2);
-                            if (FunctionCodes.Contains(function))
+                             if (input.Substring(i,2) == "\\M")
                             {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
+                                input = input.Substring(0, i) + "\\M" + " " + input.Substring(i + 2);
                                 i += 2;
+                            }
+                            else if (input.Substring(i,5) == "\\sqrt")
+                            {
+                                input = input.Substring(0, i) + "\\sqrt" + " " + input.Substring(i + 5);
+                                i += 5;
                             }
                             break;
                         case 'a':
@@ -619,6 +771,7 @@ namespace Interface
                             break;
                         case '+':
                         case '-':
+                        case '=':
                         case '*':
                         case '/':
                         case '^':

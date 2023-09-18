@@ -1,10 +1,11 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.IO;
 using WpfMath;
 using WpfMath.Parsers;
 using XamlMath.Exceptions;
-
+using System.Numerics;
 
 
 namespace ConsoleApplication2
@@ -54,6 +55,10 @@ namespace ConsoleApplication2
 
             fileName = @"C:\Users\User\Source\Repos\B-M-0\Interface\Console Testing ground\bin\Debug\" + fileName + ".png";
 
+
+            var a = new Complex(5, 5) * 3;
+
+            Console.ReadKey();
             try
             {
                 var parser = WpfTeXFormulaParser.Instance;

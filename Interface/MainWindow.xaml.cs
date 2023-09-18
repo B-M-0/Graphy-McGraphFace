@@ -40,6 +40,7 @@ namespace Interface
 
         bool[] valid_function = new bool[input_count];
         bool[] valid_transformation = new bool[input_count];
+        bool[] valid_complex = new bool[input_count];
 
         int currentPage = 1;
         int universial_range = 20;
@@ -48,13 +49,17 @@ namespace Interface
 
         string[] function_inputs = new string[input_count];
         string[] transformation_inputs = new string[input_count];
+        string[] complex_inputs = new string[input_count];
 
-        public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
+        public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces)} };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
-        public Dictionary<string, Rational> RationalVars = new Dictionary<string, Rational>() { { "e", Math.E }, { "\\pi", Math.PI } };
+        public Dictionary<string, Rational> RationalVars = new Dictionary<string, Rational>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
         public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
 
+      
+
+        public Dictionary<string, Surd> SurdVars = new Dictionary<string, Surd>();
 
 
         public bool bracketsBalanced(string input)
@@ -176,6 +181,7 @@ namespace Interface
         {
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             transformation_inputs = new string[] { Transformation_Input0.Text, Transformation_Input1.Text, Transformation_Input2.Text };
+            complex_inputs = new string[] { Complex_Input0.Text, Complex_Input1.Text, Complex_Input2.Text };
         }
 
         public void UpdateGraph_functions()
@@ -214,7 +220,7 @@ namespace Interface
                     ys[position] = M.Values[1, position];
 
                     if (M.columns > 2)
-                        Graph.Plot.AddPolygon(xs, ys, lineWidth: 2);
+                        Graph.Plot.AddPolygon(xs, ys, Graph.Plot.GetNextColor(.3), lineWidth: 2);
 
                     Graph.Plot.AddScatter(xs, ys, lineWidth: 0, markerSize: 7, color: System.Drawing.Color.Black);
                 }
@@ -228,7 +234,7 @@ namespace Interface
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
+            bool UPlotted = false;
             for (int i = 0; i < input_count; i++)
             {
                 if (valid_transformation[i])
@@ -236,18 +242,32 @@ namespace Interface
                     Function function = functions[i];
 
                     Matrix Result = function.Evaluate(Vars, Matrices);
-                    PlotMatrix(Result);
-
-                    if (function.GetFunction().Contains("U"))
-                        PlotMatrix(Matrices["U"]);
 
                     Graph.Refresh();
+                    PlotMatrix(Result);
+
+                    if (function.GetFunction().Contains("U") && !UPlotted)
+                    {
+                        PlotMatrix(Matrices["U"]);
+                        UPlotted = true;
+                    }
+
+
 
                 }
 
                 Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
                 Graph.Refresh();
             }
+        }
+
+        public void UpdateGraph_ComplexLoci()
+        {
+            Graph.Plot.Clear();
+
+            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
+            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
+
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -266,12 +286,21 @@ namespace Interface
                     Transformation_Input1.Visibility = Visibility.Visible;
                     Transformation_Input2.Visibility = Visibility.Visible;
                 }
+                else if (currentPage == 4)
+                {
+                    Complex_Input0.Visibility = Visibility.Visible;
+                    Complex_Input1.Visibility = Visibility.Visible;
+                    Complex_Input2.Visibility = Visibility.Visible; 
+                }
+
+
                 Input0Render.Visibility = Visibility.Visible;
                 Input1Render.Visibility = Visibility.Visible;
                 Input2Render.Visibility = Visibility.Visible;
                 Input0RenderBackDrop.Visibility = Visibility.Visible;
                 Input1RenderBackDrop.Visibility = Visibility.Visible;
                 Input2RenderBackDrop.Visibility = Visibility.Visible;
+
                 GoToMainMenu.Visibility = Visibility.Visible;
 
                 Grid.SetColumn(Graph, 4);
@@ -297,12 +326,25 @@ namespace Interface
                     Transformation_Input1.Visibility = Visibility.Collapsed;
                     Transformation_Input2.Visibility = Visibility.Collapsed;
                 }
+                else if (currentPage == 4)
+                {
+                    Complex_Input0.Visibility = Visibility.Collapsed;
+                    Complex_Input1.Visibility = Visibility.Collapsed;
+                    Complex_Input2.Visibility = Visibility.Collapsed;
+                   
+                }
+
+
                 Input0Render.Visibility = Visibility.Collapsed;
                 Input1Render.Visibility = Visibility.Collapsed;
                 Input2Render.Visibility = Visibility.Collapsed;
                 Input0RenderBackDrop.Visibility = Visibility.Collapsed;
                 Input1RenderBackDrop.Visibility = Visibility.Collapsed;
                 Input2RenderBackDrop.Visibility = Visibility.Collapsed;
+
+
+
+
                 GoToMainMenu.Visibility = Visibility.Collapsed;
 
                 (sender as Button).Content = ">";
@@ -319,11 +361,17 @@ namespace Interface
                 inputs = function_inputs;
                 valid = valid_function;
             }
-            else
+            else if (currentPage == 2)
             {
                 inputs = transformation_inputs;
                 valid = valid_transformation;
             }
+            else
+            {
+                inputs = complex_inputs;
+                valid = valid_complex;
+            }
+
             if (bracketsBalanced(inputs[id]))
             {
 
@@ -348,6 +396,9 @@ namespace Interface
                         UpdateGraph_functions();
                     else if (currentPage == 2)
                         UpdateGraph_transformations();
+                    else if (currentPage == 4)
+                        UpdateGraph_ComplexLoci();
+
                 }
                 catch (Exception exception)
                 {
@@ -447,6 +498,33 @@ namespace Interface
         }
 
 
+        public void ShowComplexPlane()
+        {
+            Graph.Visibility = Visibility.Visible;
+            OpenSideBar.Visibility = Visibility.Visible;
+            Grid.SetColumn(Graph, 1);
+            Grid.SetColumnSpan(Graph, 7);
+        }
+
+        public void HideComplexPlane()
+        {
+            Graph.Visibility = Visibility.Collapsed;
+            SideBar.Visibility = Visibility.Collapsed;
+            Complex_Input0.Visibility = Visibility.Collapsed;
+            Complex_Input1.Visibility = Visibility.Collapsed;
+            Complex_Input2.Visibility = Visibility.Collapsed;
+            Input0Render.Visibility = Visibility.Collapsed;
+            Input1Render.Visibility = Visibility.Collapsed;
+            Input2Render.Visibility = Visibility.Collapsed;
+            Input0Render.Visibility = Visibility.Collapsed;
+            Input0RenderBackDrop.Visibility = Visibility.Collapsed;
+            Input1RenderBackDrop.Visibility = Visibility.Collapsed;
+            Input2RenderBackDrop.Visibility = Visibility.Collapsed;
+            GoToMainMenu.Visibility = Visibility.Collapsed;
+            OpenSideBar.Visibility = Visibility.Collapsed;
+        }
+
+
         public void ShowCalculations()
         {
             GoToMainMenu.Visibility = Visibility.Visible;
@@ -456,6 +534,8 @@ namespace Interface
             Calculation_OutputRender0.Visibility = Visibility.Visible;
             Calculation_OutputBackDrop0.Visibility = Visibility.Visible;
         }
+
+       
         public void HideCalculations()
         {
             GoToMainMenu.Visibility = Visibility.Collapsed;
@@ -465,11 +545,7 @@ namespace Interface
             Calculation_OutputRender0.Visibility = Visibility.Collapsed;
             Calculation_OutputBackDrop0.Visibility = Visibility.Collapsed;
         }
-        public void OpenCalculations(object sender, RoutedEventArgs e)
-        {
-             HideMainMenu();
-            ShowCalculations();
-        }
+
 
 
 
@@ -485,15 +561,17 @@ namespace Interface
             GoToFunctions.Visibility = Visibility.Visible;
             GoToTransformations.Visibility = Visibility.Visible;
             GoToCalculations.Visibility = Visibility.Visible;
+            GoToComplexPlane.Visibility = Visibility.Visible;
         }
         public void HideMainMenu()
         {
             GoToFunctions.Visibility = Visibility.Collapsed;
             GoToTransformations.Visibility = Visibility.Collapsed;
             GoToCalculations.Visibility = Visibility.Collapsed;
+            GoToComplexPlane.Visibility = Visibility.Collapsed;
         }
 
-
+        
 
 
 
@@ -511,6 +589,7 @@ namespace Interface
             HideFunctions();
             HideTransformations();
             HideCalculations();
+            HideComplexPlane();
             ShowMainMenu();
         }
 
@@ -527,6 +606,20 @@ namespace Interface
             currentPage = 2;
             HideMainMenu();
             ShowTransformations();
+        }
+
+        public void OpenCalculations(object sender, RoutedEventArgs e)
+        {
+            currentPage = 3;
+            HideMainMenu();
+            ShowCalculations();
+        }
+
+        private void OpenComplexNumbers(object sender, RoutedEventArgs e)
+        {
+            currentPage = 4;
+            HideMainMenu();
+            ShowComplexPlane();
         }
 
         private void Calculation0_TextChanged(object sender, TextChangedEventArgs e)
@@ -549,19 +642,26 @@ namespace Interface
                 }
                 else
                 {
-                    Rational resultVAl = f.Evaluate(RationalVars) ;
-                    if (resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000)
+                    double decimalVAl = 0;
+                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVAl);
+
+
+                    if (resultVAl == null)
+                        result = Math.Round(decimalVAl, Global.decimalPlaces).ToString();
+                    else if ((resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000))
                         result = resultVAl.Decimal().ToString();
-                    else if(resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
+                    else if (resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
                         result = resultVAl.LatexFormat() + "=" + resultVAl.Decimal();
                     else
                         result = resultVAl.LatexFormat();
                 }
-                    Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
+                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
             }
             catch
             { //RenderError}   
             }
         }
+
+
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Interface
 { 
-    public class Rational //:INumber
+    public class Rational 
     {
         public bool isInteger = false;
         private int numerator ;
