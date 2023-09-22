@@ -596,6 +596,7 @@ namespace Interface
 
         private void OpenFunctions(object sender, RoutedEventArgs e)
         {
+            OpenSideBar.Content = ">";
             currentPage = 1;
             HideMainMenu();
             ShowFunctions();
@@ -603,6 +604,7 @@ namespace Interface
 
         private void OpenTransformations(object sender, RoutedEventArgs e)
         {
+            OpenSideBar.Content = ">";
             currentPage = 2;
             HideMainMenu();
             ShowTransformations();
@@ -610,6 +612,7 @@ namespace Interface
 
         public void OpenCalculations(object sender, RoutedEventArgs e)
         {
+          
             currentPage = 3;
             HideMainMenu();
             ShowCalculations();
@@ -617,6 +620,7 @@ namespace Interface
 
         private void OpenComplexNumbers(object sender, RoutedEventArgs e)
         {
+            OpenSideBar.Content = ">";
             currentPage = 4;
             HideMainMenu();
             ShowComplexPlane();
@@ -658,7 +662,7 @@ namespace Interface
                 Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
             }
             catch
-            { //RenderError}   
+            { //RenderErrorlhudyugywgygey}   
             }
         }
 
