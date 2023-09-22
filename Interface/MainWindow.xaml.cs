@@ -446,6 +446,7 @@ namespace Interface
 
         public void ShowFunctions()
         {
+            Graph.Plot.ResetLayout();
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 1);
@@ -473,12 +474,13 @@ namespace Interface
 
         public void ShowTransformations()
         {
+            Graph.Plot.ResetLayout();
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 1);
             Grid.SetColumnSpan(Graph, 7);
         }
-
+        //sa
         public void HideTransformations()
         {
             Graph.Visibility = Visibility.Collapsed;
