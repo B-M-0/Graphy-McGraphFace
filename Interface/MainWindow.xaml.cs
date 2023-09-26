@@ -53,6 +53,7 @@ namespace Interface
 
         public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces)} };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
+        public Dictionary<string, Vector> Vectors = new Dictionary<string, Vector>();
 
         public Dictionary<string, Rational> RationalVars = new Dictionary<string, Rational>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
         public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
@@ -189,6 +190,7 @@ namespace Interface
             Graph.Plot.Clear();
 
             //Update();
+            Graph.Reset();
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
@@ -229,7 +231,7 @@ namespace Interface
         public void UpdateGraph_transformations()
         {
             Graph.Plot.Clear();
-
+            Graph.Reset();
             //Update();
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
@@ -241,8 +243,17 @@ namespace Interface
                 {
                     Function function = functions[i];
 
-                    Matrix Result = function.Evaluate(Vars, Matrices);
-
+                    Matrix Result = function.Evaluate(Vars, Matrices, Vectors);
+                    for (int ResultRow = 0; ResultRow < Result.rows; ResultRow++)
+                    {
+                        for (int ResultColumn= 0; ResultColumn < Result.columns; ResultColumn++)
+                        {
+                            if (Result.Values[ResultRow, ResultColumn] == null)
+                            {
+                                return;
+                            }
+                        }
+                    }
                     Graph.Refresh();
                     PlotMatrix(Result);
 
@@ -264,7 +275,7 @@ namespace Interface
         public void UpdateGraph_ComplexLoci()
         {
             Graph.Plot.Clear();
-
+            Graph.Reset();
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
@@ -598,6 +609,7 @@ namespace Interface
 
         private void OpenFunctions(object sender, RoutedEventArgs e)
         {
+            Graph.Reset();
             OpenSideBar.Content = ">";
             currentPage = 1;
             HideMainMenu();
@@ -606,6 +618,7 @@ namespace Interface
 
         private void OpenTransformations(object sender, RoutedEventArgs e)
         {
+            Graph.Reset();
             OpenSideBar.Content = ">";
             currentPage = 2;
             HideMainMenu();
@@ -614,7 +627,7 @@ namespace Interface
 
         public void OpenCalculations(object sender, RoutedEventArgs e)
         {
-          
+            Graph.Reset();  
             currentPage = 3;
             HideMainMenu();
             ShowCalculations();
@@ -622,6 +635,7 @@ namespace Interface
 
         private void OpenComplexNumbers(object sender, RoutedEventArgs e)
         {
+            Graph.Reset();
             OpenSideBar.Content = ">";
             currentPage = 4;
             HideMainMenu();
@@ -642,7 +656,7 @@ namespace Interface
                 string result = "error";
                 if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
                 {
-                    Matrix Alfa = f.Evaluate(Vars, Matrices);
+                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors);
                     result = Alfa.MatrixToLatex();
                     var beta = 1 + 2;
                 }

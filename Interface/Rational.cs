@@ -15,14 +15,12 @@ namespace Interface
 
         public static implicit operator double(Rational A)
         {
-            try
-            {
-                return A.Decimalval = (double)A.numerator / (double)A.denominator;
-            }catch (NullReferenceException) {//
+            if(A == null)
                 return 0;
-            }
+            return A.Decimalval = (double)A.numerator / (double)A.denominator;
+           
         }
-
+        //as
         public static implicit operator Rational(double A)
         {
             double B = Math.Round(A,Global.decimalPlaces);
@@ -40,10 +38,11 @@ namespace Interface
 
         public static implicit operator string(Rational A)
         {
-            if (A.isInteger)
-                return $"{A.numerator}";
-            else
-                return $"{A.numerator}/{A.denominator}";
+            
+               if (A.isInteger)
+                    return $"{A.numerator}";
+                else
+                    return $"{A.numerator}/{A.denominator}";    
         }
         public string LatexFormat()
         {
@@ -147,6 +146,8 @@ namespace Interface
         }
         public static Rational operator *(Rational A, Rational B)
         {
+            if (A == null | B == null)
+                return null;
             Rational result = new Rational(A.numerator * B.numerator, A.denominator * B.denominator);
             return result.Simplify();
         }

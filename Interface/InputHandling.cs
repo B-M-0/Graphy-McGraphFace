@@ -437,6 +437,7 @@ namespace Interface
                 string key;
                 switch (element)
                 {
+                    
                     case @"\M":
                         operand1 = stack.Pop();
                         Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
@@ -572,7 +573,7 @@ namespace Interface
             return Matrices[stack.Pop()];
         }
 
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -718,7 +719,7 @@ namespace Interface
             return Matrices[stack.Pop()];
         }
 
-
+        
 
 
         public static string formatInput(string input)

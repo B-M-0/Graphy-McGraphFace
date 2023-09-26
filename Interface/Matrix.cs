@@ -311,13 +311,19 @@ namespace Interface
         }
         public string MatrixToLatex()
         {
+
+          
             string Latex = @"\pmatrix{";
             for (int row = 0; row < this.rows; row++)
             {
                 for (int column = 0; column < this.columns - 1; column++)
                 {
+                    if(this.Values[row, column] == null)    
+                        return "format error";
                     Latex += (string)this.Values[row, column] + "&";
                 }
+                if (this.Values[row, this.columns-1] == null)
+                    return "format error";
                 Latex += (string)this.Values[row, this.columns - 1] + @"\\";
             }
 

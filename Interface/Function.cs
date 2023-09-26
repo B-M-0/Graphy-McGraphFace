@@ -24,14 +24,15 @@ namespace Interface
             return postFixFunction; 
         }
 
-        public Rational Evaluate(Dictionary<string, Surd> SurdVariables,Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
+        public Rational Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
         {
-            if(!Variables.ContainsKey("x"))
+            if (!Variables.ContainsKey("x"))
                 Variables.Add("x", x);
             else
                 Variables["x"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction,SurdVariables, Variables, ref decimalval);
+            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
         }
+
         public double Evaluate(Dictionary<string, double> Variables, double x = 1)
         {
             if (!Variables.ContainsKey("x"))
@@ -51,14 +52,17 @@ namespace Interface
         }
 
 
-        public Matrix Evaluate( Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices)
+        public Matrix Evaluate(Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors)
+        {
+            return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors);
+        }
+
+        public Matrix Evaluate( Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors)
         {
             return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables,Matrices);
         }
-        public Matrix Evaluate(Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices)
-        {
-            return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices);
-        }
+
+       
 
 
         public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables)
