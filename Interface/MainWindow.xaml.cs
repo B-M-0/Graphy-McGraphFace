@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -51,7 +52,7 @@ namespace Interface
         string[] transformation_inputs = new string[input_count];
         string[] complex_inputs = new string[input_count];
 
-        public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces)} };
+        static public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces)} };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
 
         public Dictionary<string, Rational> RationalVars = new Dictionary<string, Rational>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
@@ -107,16 +108,7 @@ namespace Interface
             return temp;
         }
 
-        public string removeWhiteSpace(string input)
-        {
-            string temp = "";
-            foreach (char element in input)
-            {
-                if (element != ' ')
-                    temp += element;
-            }
-            return temp;
-        }
+        
 
 
         public static Bitmap convertLatexToPng(string latex)
@@ -146,6 +138,8 @@ namespace Interface
         public MainWindow()
         {
             InitializeComponent();
+            Title.Source = BitmapToImageSource(convertLatexToPng("Graphy McGraphFace"));
+            
             OpenMainMenu();
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             for (int i = 0; i < valid_function.Length; i++)
@@ -154,9 +148,10 @@ namespace Interface
                 valid_transformation[i] = false;
             }
 
-            Matrix UnitSquare = new Matrix(new int[2, 4] { { 0, 1, 1, 0 }, { 0, 0, 1, 1 } });
+            Matrix UnitSquare = new Matrix(new double[2, 4] { { 0, 1, 1, 0 }, { 0, 0, 1, 1 } });
+            Matrix UnitTriangle = new Matrix(new double[2, 3] { { 0, 1, 0.5 }, { 0, 0, Math.Sqrt(3)/2 } });
             Matrices.Add("U", UnitSquare);
-
+            Matrices.Add("T", UnitTriangle);
             UpdateGraph_functions();
         }
 
@@ -301,6 +296,7 @@ namespace Interface
                 Input1RenderBackDrop.Visibility = Visibility.Visible;
                 Input2RenderBackDrop.Visibility = Visibility.Visible;
 
+                ResetGraph.Visibility = Visibility.Visible;
                 GoToMainMenu.Visibility = Visibility.Visible;
 
                 Grid.SetColumn(Graph, 4);
@@ -344,7 +340,7 @@ namespace Interface
 
 
 
-
+                ResetGraph.Visibility = Visibility.Collapsed;
                 GoToMainMenu.Visibility = Visibility.Collapsed;
 
                 (sender as Button).Content = ">";
@@ -374,7 +370,6 @@ namespace Interface
 
             if (bracketsBalanced(inputs[id]))
             {
-
                 try
                 {
                     string Latex = formatLatex(inputs[id]);
@@ -386,7 +381,7 @@ namespace Interface
                 Graph.Plot.Clear();
                 try
                 {
-                    List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(removeWhiteSpace(inputs[id])).Split(' '));
+                    List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace(inputs[id])).Split(' '));
 
                     functions[id] = new Function(output);
                     valid[id] = true;
@@ -417,7 +412,7 @@ namespace Interface
         }
 
 
-
+        
 
         private void TextBox0_TextChanged(object sender, TextChangedEventArgs e)
         {
@@ -446,7 +441,6 @@ namespace Interface
 
         public void ShowFunctions()
         {
-            Graph.Plot.ResetLayout();
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 1);
@@ -467,6 +461,7 @@ namespace Interface
             Input0RenderBackDrop.Visibility = Visibility.Collapsed;
             Input1RenderBackDrop.Visibility = Visibility.Collapsed;
             Input2RenderBackDrop.Visibility = Visibility.Collapsed;
+            ResetGraph.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
@@ -474,7 +469,6 @@ namespace Interface
 
         public void ShowTransformations()
         {
-            Graph.Plot.ResetLayout();
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 1);
@@ -495,6 +489,7 @@ namespace Interface
             Input0RenderBackDrop.Visibility = Visibility.Collapsed;
             Input1RenderBackDrop.Visibility = Visibility.Collapsed;
             Input2RenderBackDrop.Visibility = Visibility.Collapsed;
+            ResetGraph.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
@@ -523,6 +518,7 @@ namespace Interface
             Input1RenderBackDrop.Visibility = Visibility.Collapsed;
             Input2RenderBackDrop.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
+            ResetGraph.Visibility = Visibility.Collapsed;
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
@@ -530,6 +526,7 @@ namespace Interface
         public void ShowCalculations()
         {
             GoToMainMenu.Visibility = Visibility.Visible;
+            
             Calculation_InputRender0.Visibility = Visibility.Visible;
             Calculation_Input0.Visibility = Visibility.Visible;
             Calculation_InputBackDrop0.Visibility = Visibility.Visible;
@@ -540,6 +537,7 @@ namespace Interface
        
         public void HideCalculations()
         {
+            ResetGraph.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
             Calculation_InputRender0.Visibility = Visibility.Collapsed;
             Calculation_Input0.Visibility = Visibility.Collapsed;
@@ -567,6 +565,8 @@ namespace Interface
         }
         public void HideMainMenu()
         {
+            Title.Visibility = Visibility.Collapsed;    
+            TitleBackDrop.Visibility = Visibility.Collapsed;
             GoToFunctions.Visibility = Visibility.Collapsed;
             GoToTransformations.Visibility = Visibility.Collapsed;
             GoToCalculations.Visibility = Visibility.Collapsed;
@@ -588,6 +588,11 @@ namespace Interface
         private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
         {
             currentPage = 0;
+            
+            Title.Visibility = Visibility.Visible;
+            TitleBackDrop.Visibility = Visibility.Visible;  
+            
+
             HideFunctions();
             HideTransformations();
             HideCalculations();
@@ -636,7 +641,7 @@ namespace Interface
                 string Latex = formatLatex(inputText, "c");
                 Calculation_InputRender0.Source = BitmapToImageSource(convertLatexToPng(Latex));
 
-                List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(removeWhiteSpace((sender as TextBox).Text)).Split(' '));
+                List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace((sender as TextBox).Text)).Split(' '));
 
                 Function f = new Function(output);
                 string result = "error";
@@ -668,6 +673,15 @@ namespace Interface
             }
         }
 
+        private void ResetGraph_Clicked(object sender, RoutedEventArgs e)
+        {
+       
 
+            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
+            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
+           
+            Graph.Refresh();
+        }
     }
 }

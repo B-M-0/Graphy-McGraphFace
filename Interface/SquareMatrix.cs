@@ -113,7 +113,7 @@ namespace Interface
 
             if (A.rows == 2)
             {
-                // Calculates the determinant if the order of the matrix is 2x2
+                // Calculates the determinant if the matrix is 2x2
                 det = (A.Values[0, 0] * A.Values[1, 1]) - (A.Values[1, 0] * A.Values[0, 1]);
             }
             else if (A.rows == 1)

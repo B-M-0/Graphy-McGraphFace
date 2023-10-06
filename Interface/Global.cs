@@ -9,6 +9,18 @@ namespace Interface
 {
     public class Global
     {
+        static public string removeWhiteSpace(string input)
+        {
+            string temp = "";
+            foreach (char element in input)
+            {
+                if (element != ' ')
+                    temp += element;
+            }
+            return temp;
+        }
+
+
         static public int decimalPlaces = 7;
         static public Dictionary<string,Rational> defineConstants()
         {
