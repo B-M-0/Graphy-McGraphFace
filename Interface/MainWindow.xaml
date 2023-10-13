@@ -36,7 +36,17 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="20"/>
         </Grid.RowDefinitions>
-    
+
+
+        <Rectangle Name="TitleBackDrop" Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="2" Grid.RowSpan="5" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke" />
+
+        <Image Name="Title" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="3" Visibility="Collapsed" Margin="50,2" />
+        
+
+
+
+
+
         <Rectangle Name="SideBar"  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="21" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
 
         <Rectangle Name="Input0RenderBackDrop" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke" />
@@ -76,11 +86,12 @@
         <TextBox Name ="Complex_Input0" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
         <TextBox Name ="Complex_Input1" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row ="7" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox1_TextChanged"/>
         <TextBox Name ="Complex_Input2" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row ="10" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox2_TextChanged"/>
-        
 
 
 
 
+
+        <Button Name="ResetGraph" Content="Reset Graph" Visibility="Collapsed" Grid.Column="3" Grid.Row="0"  Grid.RowSpan="2" Grid.ColumnSpan="1" VerticalAlignment="Stretch" Margin="5,10" FontSize="16" Background="White"  Click="ResetGraph_Clicked"></Button>
 
         <Button Name="GoToMainMenu" Content="Main Menu" Visibility="Collapsed" Grid.Column="2" Grid.Row="0"  Grid.RowSpan="2" Grid.ColumnSpan="1" VerticalAlignment="Stretch" Margin="5,10" FontSize="16" Background="White"  Click="OpenMainMenu"></Button>
 

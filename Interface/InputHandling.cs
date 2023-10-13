@@ -731,10 +731,8 @@ namespace Interface
                 {
                     switch (input[i])
                     {
-
-
                         case '\\':
-                             if (input.Substring(i,2) == "\\M")
+                            if (input.Substring(i,2) == "\\M")
                             {
                                 input = input.Substring(0, i) + "\\M" + " " + input.Substring(i + 2);
                                 i += 2;
@@ -759,15 +757,19 @@ namespace Interface
                         case 'e':
                         case 'l':
                             function = input.Substring(i, 3);
+                            
                             if (FunctionCodes.Contains(function))
                             {
                                 input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
                                 i += 3;
+                                break;
                             }
-                            else if (FunctionCodes.Contains(function.Substring(i)))
+                            function = input.Substring(i, 2);
+                            if (FunctionCodes.Contains(function))
                             {
                                 input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
                                 i += 2;
+                                break;
                             }
                             break;
                         case '+':
@@ -812,7 +814,7 @@ namespace Interface
             {
                 return operator_ == "^" || operator_ == "*" || operator_ == "/" || operator_ == "+" || operator_ == "-";
             }
-            bool isfunction(string function_)
+            bool isFunction(string function_)
             {
                 return FunctionCodes.Contains(function_);
             }
@@ -829,7 +831,7 @@ namespace Interface
                     case "^":
                         return 3;
                     default:
-                        if (isfunction(operator_))
+                        if (isFunction(operator_))
                             return 3;
                         else
                             return 0;
@@ -840,7 +842,7 @@ namespace Interface
             foreach (string element in infix)
             {
                 //
-                if (Regex.IsMatch(element, "[a-zA-Z0-9\\e]") && !isfunction(element))
+                if (Regex.IsMatch(element, "[a-zA-Z0-9\\e]") && !isFunction(element))
                     postfix.Add(element);
                 else if (element == "(" || element == "{")
                 {
