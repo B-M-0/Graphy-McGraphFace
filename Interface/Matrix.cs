@@ -5,8 +5,6 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Diagnostics;
-using System.Text.RegularExpressions;
-using System.Windows.Controls;
 
 namespace Interface
 {
@@ -302,14 +300,8 @@ namespace Interface
                 string[] row = rows[i].Split('&');
                 for (int j = 0; j < row.Length; j++)
                 {
-
-                    if (!Regex.IsMatch(row[j], "[0-9]$"))
-                    {
-                        List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace(row[j])).Split(' '));
-                        Function f = new Function(output);
-                        row[j] = InputHandling.evaluatePostfix(output, Variables: MainWindow.Vars).ToString();
-
-                    }
+                    if (row[j].Contains('_'))
+                        row[j] = "-" + row[j].Substring(1);
                     M[i, j] = (Rational)(double.Parse(row[j]));
                 }
             }
