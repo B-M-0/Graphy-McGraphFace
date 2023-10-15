@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using XamlMath.Utils;
 
 namespace Interface
 {
@@ -18,7 +19,13 @@ namespace Interface
     {
         
         static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>() { "\\sqrt","cos", "sin", "tan", "exp", "log", "ln", "acos", "asin", "atan", "\\M" };
+        static List<string> FunctionCodes = new List<string>() 
+        { 
+            "\\sqrt","cos", "sin", "tan",
+            "exp", "log", "ln",
+            "acos", "asin", "atan",
+            "\\M" , "\\V", "det" ,"dot","cross"
+        };
         public static Rational evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, Rational> Variables, ref double decimalval)
         {
             Variables = Global.defineConstants();
@@ -426,7 +433,8 @@ namespace Interface
             return key;
         }
 
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices)
+        
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -573,13 +581,15 @@ namespace Interface
             return Matrices[stack.Pop()];
         }
 
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors)
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
             {
                 string operand1, operand2;
                 Matrix A, B, C;
+                SquareMatrix sqA;
+                Vector V1, V2, V3;
                 double a, b;
                 string key;
                 switch (element)
@@ -591,9 +601,34 @@ namespace Interface
                         Matrices.Add(key, NewMatrix);
                         stack.Push(key);
                         break;
+                    case "cross":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand1];
+                        B = Matrices[operand2];
+                        V1 = new Vector(A.Values);
+                        V2 = new Vector(B.Values);
+                        V3 = V2 + V1;
+                        C = new Matrix(V3.Values);
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, C);
+                        stack.Push(key);
+                        break;
+                    case "dot":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand1];
+                        B = Matrices[operand2];
+                        V1 = new Vector(A.Values);
+                        V2 = new Vector(B.Values);
+                        a = V2 * V1;
+                        stack.Push(a.ToString());
+                        break;
                     case "det":
                         operand1 = stack.Pop();
                         A = Matrices[operand1];
+                        sqA = new SquareMatrix(A);
+                        stack.Push(((double)SquareMatrix.determinant(sqA)).ToString());
                         break;
                     case "+":
 
@@ -716,7 +751,24 @@ namespace Interface
 
             }
 
-            return Matrices[stack.Pop()];
+       
+            string outputstr = stack.Pop();
+            Matrix output;
+            if (Regex.IsMatch(outputstr, "[A-Z]+$"))
+            {
+                output = Matrices[outputstr];
+                Variables.Clear();
+                return output;
+            }
+            else
+            {
+                DecimalVal = double.Parse(outputstr);
+                Variables.Clear();
+                return null;
+            }
+
+
+
         }
 
         
@@ -751,13 +803,27 @@ namespace Interface
                                 i += 4;
                             }
                             break;
+                        case 'd':
+                            function = input.Substring(i, 3);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
+                                i += 3;
+                            }
+                            break;
                         case 's':
                         case 'c':
                         case 't':
                         case 'e':
                         case 'l':
+                            function = input.Substring(i, 5);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 5);
+                                i += 5;
+                                break;
+                            }
                             function = input.Substring(i, 3);
-                            
                             if (FunctionCodes.Contains(function))
                             {
                                 input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
@@ -771,6 +837,7 @@ namespace Interface
                                 i += 2;
                                 break;
                             }
+                            
                             break;
                         case '+':
                         case '-':

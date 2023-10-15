@@ -8,10 +8,21 @@ namespace Interface
 {
     public class Vector : Matrix
     {
+        Rational[] Values;
         public Vector(int Dimensions) : base(Dimensions, 1)
         {
             if (Dimensions != 2 || Dimensions != 3)
-                throw new ArgumentException("Error: Stupid Dimensions Exception.");    
+                throw new ArgumentException("Error: Stupid Dimensions Exception.");   
+            Values = new Rational[Dimensions];  
+        }
+
+        public Vector(Rational[,] Values) : base(Values.GetLength(0), 1)
+        {
+            this.Values = new Rational[Values.GetLength(0)];
+            for (int i = 0; i < Values.GetLength(0); i++)
+            {
+                this.Values[i] = Values[i, 0];
+            }
         }
 
 
@@ -27,17 +38,25 @@ namespace Interface
             double sum = 0;
             for (int i = 0; i < A.rows;i++)
             { 
-                sum += (double)(A.Values[i,0] * B.Values[i, 0]);
+                sum += (double)(A.Values[i] * B.Values[i]);
             }  
 
             return sum;
         }
 
         // returns the cross product of two vectors
-        public static double operator ^(Vector A, Vector B)
+        public static Vector operator +(Vector A, Vector B)
         {
-            double sum = 0;
-            return sum;
+            Vector C = new Vector(3);
+            if (A.rows == 3 && B.rows == 3)
+            {
+                C.Values[0] = A.Values[1] * B.Values[2] - A.Values[2] * B.Values[1];
+                C.Values[1] = A.Values[2] * B.Values[0] - A.Values[0] * B.Values[2];
+                C.Values[2] = A.Values[0] * B.Values[1] - A.Values[1] * B.Values[0];
+                return C;
+            }
+
+            return null;
         }
 
 

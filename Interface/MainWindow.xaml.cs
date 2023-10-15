@@ -237,8 +237,8 @@ namespace Interface
                 if (valid_transformation[i])
                 {
                     Function function = functions[i];
-
-                    Matrix Result = function.Evaluate(Vars, Matrices, Vectors);
+                    double d = 0;
+                    Matrix Result = function.Evaluate(Vars, Matrices, Vectors, ref d);
                     for (int ResultRow = 0; ResultRow < Result.rows; ResultRow++)
                     {
                         for (int ResultColumn= 0; ResultColumn < Result.columns; ResultColumn++)
@@ -661,18 +661,22 @@ namespace Interface
                 string result = "error";
                 if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
                 {
-                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors);
-                    result = Alfa.MatrixToLatex();
+                    double decialVal = 0;
+                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors, ref decialVal);
+                    if (Alfa is null)
+                        result = decialVal.ToString();
+                    else
+                        result = Alfa.MatrixToLatex();
                     var beta = 1 + 2;
                 }
                 else
                 {
-                    double decimalVAl = 0;
-                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVAl);
+                    double decimalVal = 0;
+                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal);
 
 
                     if (resultVAl == null)
-                        result = Math.Round(decimalVAl, Global.decimalPlaces).ToString();
+                        result = Math.Round(decimalVal, Global.decimalPlaces).ToString();
                     else if ((resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000))
                         result = resultVAl.Decimal().ToString();
                     else if (resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
