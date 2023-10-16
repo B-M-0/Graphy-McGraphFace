@@ -45,6 +45,21 @@ namespace Interface
             _2DArrayPopMtrx(MatrixElements);
         }
 
+        public Matrix(Rational[] VectorElements) : this(VectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.Values[i, 0] = VectorElements[i];
+        }
+        public Matrix(double[] VectorElements) : this(VectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.Values[i, 0] = VectorElements[i];
+        }
+        public Matrix(int[] VectorElements) : this(VectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.Values[i, 0] = VectorElements[i];
+        }
 
         public Matrix(Rational MatrixElement) : this(1, 1)
         {

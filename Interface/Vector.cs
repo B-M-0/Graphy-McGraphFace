@@ -9,11 +9,14 @@ namespace Interface
     public class Vector : Matrix
     {
         Rational[] Values;
+
+        public Rational[] GetValues() { return Values; }    
+
         public Vector(int Dimensions) : base(Dimensions, 1)
         {
-            if (Dimensions != 2 || Dimensions != 3)
+            if (Dimensions != 2 && Dimensions != 3)
                 throw new ArgumentException("Error: Stupid Dimensions Exception.");   
-            Values = new Rational[Dimensions];  
+            this.Values = new Rational[Dimensions];  
         }
 
         public Vector(Rational[,] Values) : base(Values.GetLength(0), 1)
@@ -47,9 +50,10 @@ namespace Interface
         // returns the cross product of two vectors
         public static Vector operator +(Vector A, Vector B)
         {
-            Vector C = new Vector(3);
+           
             if (A.rows == 3 && B.rows == 3)
             {
+                Vector C = new Vector(3);
                 C.Values[0] = A.Values[1] * B.Values[2] - A.Values[2] * B.Values[1];
                 C.Values[1] = A.Values[2] * B.Values[0] - A.Values[0] * B.Values[2];
                 C.Values[2] = A.Values[0] * B.Values[1] - A.Values[1] * B.Values[0];

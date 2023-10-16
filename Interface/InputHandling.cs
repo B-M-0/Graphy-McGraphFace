@@ -609,7 +609,7 @@ namespace Interface
                         V1 = new Vector(A.Values);
                         V2 = new Vector(B.Values);
                         V3 = V2 + V1;
-                        C = new Matrix(V3.Values);
+                        C = new Matrix(V3.GetValues());
                         key = GenerateKey(Matrices);
                         Matrices.Add(key, C);
                         stack.Push(key);
@@ -845,6 +845,7 @@ namespace Interface
                         case '*':
                         case '/':
                         case '^':
+                        case ',':
                             char temp = input[i];
                             input = input.Substring(0, i) + " " + temp.ToString() + " " + input.Substring(i + 1);
                             i++;
@@ -879,7 +880,7 @@ namespace Interface
         {
             bool isOperator(string operator_)
             {
-                return operator_ == "^" || operator_ == "*" || operator_ == "/" || operator_ == "+" || operator_ == "-";
+                return operator_ == "^" || operator_ == "*" || operator_ == "/" || operator_ == "+" || operator_ == "-" || operator_ == ",";
             }
             bool isFunction(string function_)
             {
@@ -896,6 +897,7 @@ namespace Interface
                     case "/":
                         return 2;
                     case "^":
+                    case ",":
                         return 3;
                     default:
                         if (isFunction(operator_))
@@ -933,9 +935,13 @@ namespace Interface
             }
             while (Stack.Count() > 0)
             {
-                postfix.Add(Stack.Pop());
+                string element = Stack.Pop();
+                if(element != ",")
+                    postfix.Add(element);
             }
 
+            //cross(\M{3\\5\\1\\},\M{32\\4\\4\\})
+            while (postfix.Remove(",")) ;
 
             return postfix;
         }
