@@ -40,62 +40,86 @@ namespace Interface
 
                 switch (element)
                 {
+
                     case "\\sqrt":
                         operand1_R = Variables[stack.Pop()];
-                        stack.Push(Math.Sqrt(operand1_R.Decimal()).ToString());
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Sqrt(operand1)));
 
-
-                        //Surd surd = Surd.Sqrt(operand1_R);
-
-                        //key = GenerateKey(SurdVariables);
-                        //SurdVariables.Add(key, surd);
-
-                        //stack.Push(key);
+                        stack.Push(key);
                         break;                  
                     case "exp":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Exp(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Exp(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "sin":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Sin(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Sin(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "cos":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Cos(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Cos(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "tan":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Tan(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Tan(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "asin":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Asin(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Asin(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "acos":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Acos(operand1)).ToString());
-                        break;              
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Acos(operand1)));
+
+                        stack.Push(key);
+                        break;
                     case "atan":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Atan(operand1)).ToString());
-                        break;    
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Atan(operand1)));
+
+                        stack.Push(key);
+                        break;
                     case "log":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Log10(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Log10(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "ln":
                         operand1_R = Variables[stack.Pop()];
                         operand1 = operand1_R.Decimal();
-                        stack.Push((Math.Log(operand1)).ToString());
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Log(operand1)));
+
+                        stack.Push(key);
                         break;
                     case "+":                      
                         operand1_R = Variables[stack.Pop()];
@@ -188,106 +212,116 @@ namespace Interface
                 return null;
             }            
         }
-        public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables)
+        public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables, ref bool validinput)
         {
+            validinput = true;
             Stack<string> stack = new Stack<string>();
-            foreach (string element in expression)
+            for(int iterator = 0; iterator < expression.Count() && validinput;iterator++)
             {
-
-                double operand1, operand2;
-                switch (element)
+                string element = expression[iterator];
+                try
                 {
-                    case "exp":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Exp(operand1)).ToString());
-                        break;
-                    case "sin":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Sin(operand1)).ToString());
-                        break;
-                    case "cos":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Cos(operand1)).ToString());
-                        break;
-                    case "tan":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Tan(operand1)).ToString());
-                        break;
-                    case "asin":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Asin(operand1)).ToString());
-                        break;
-                    case "acos":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Acos(operand1)).ToString());
-                        break;
-                    case "atan":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Atan(operand1)).ToString());
-                        break;
-                    case "log":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Log10(operand1)).ToString());
-                        break;
-                    case "ln":
-                        operand1 = double.Parse(stack.Pop());
-                        stack.Push((Math.Log(operand1)).ToString());
-                        break;
-                    case "+":
-                        operand1 = double.Parse(stack.Pop());
-                        operand2 = double.Parse(stack.Pop());
-                        stack.Push((operand2 + operand1).ToString());
-                        break;
-                    case "-":
-                        operand1 = double.Parse(stack.Pop());
-                        operand2 = double.Parse(stack.Pop());
-                        stack.Push((operand2 - operand1).ToString());
-                        break;
-                    case "*":
-                        operand1 = double.Parse(stack.Pop());
-                        operand2 = double.Parse(stack.Pop());
-                        stack.Push((operand2 * operand1).ToString());
-                        break;
-                    case "/":
-                        operand1 = double.Parse(stack.Pop());
-                        operand2 = double.Parse(stack.Pop());
-                        if (operand1 == 0)
-                            stack.Push("0");
-                        else
-                            stack.Push((operand2 / operand1).ToString());
-                        break;
-                    case "^":
-                        operand1 = double.Parse(stack.Pop());
-                        operand2 = double.Parse(stack.Pop());
-                        stack.Push((Math.Pow(operand2, operand1)).ToString());
-                        break;
-                    default:
-                        double temp = 1;
-                        bool negative = false;
-                        if (element.Contains("_"))
-                        {
-                            temp = -1;
-                            negative = true;
-                        }
-
-
-                        try
-                        {
-                            if (Regex.IsMatch(element, "[a-z]+$") && negative)
-                                temp *= Variables[element.Substring(1)];
-                            else if (Regex.IsMatch(element, "[a-z]+$"))
-                                temp *= Variables[element];
-                            else if (negative)
-                                temp *= double.Parse(element.Substring(1));
+                    double operand1, operand2;
+                    switch (element)
+                    {
+                        case "exp":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Exp(operand1)).ToString());
+                            break;
+                        case "sin":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Sin(operand1)).ToString());
+                            break;
+                        case "cos":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Cos(operand1)).ToString());
+                            break;
+                        case "tan":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Tan(operand1)).ToString());
+                            break;
+                        case "asin":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Asin(operand1)).ToString());
+                            break;
+                        case "acos":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Acos(operand1)).ToString());
+                            break;
+                        case "atan":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Atan(operand1)).ToString());
+                            break;
+                        case "log":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Log10(operand1)).ToString());
+                            break;
+                        case "ln":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Log(operand1)).ToString());
+                            break;
+                        case "+":
+                            operand1 = double.Parse(stack.Pop());
+                            operand2 = double.Parse(stack.Pop());
+                            stack.Push((operand2 + operand1).ToString());
+                            break;
+                        case "-":
+                            operand1 = double.Parse(stack.Pop());
+                            operand2 = double.Parse(stack.Pop());
+                            stack.Push((operand2 - operand1).ToString());
+                            break;
+                        case "*":
+                            operand1 = double.Parse(stack.Pop());
+                            operand2 = double.Parse(stack.Pop());
+                            stack.Push((operand2 * operand1).ToString());
+                            break;
+                        case "/":
+                            operand1 = double.Parse(stack.Pop());
+                            operand2 = double.Parse(stack.Pop());
+                            if (operand1 == 0)
+                                stack.Push("0");
                             else
-                                temp *= double.Parse(element);
+                                stack.Push((operand2 / operand1).ToString());
+                            break;
+                        case "^":
+                            operand1 = double.Parse(stack.Pop());
+                            operand2 = double.Parse(stack.Pop());
+                            stack.Push((Math.Pow(operand2, operand1)).ToString());
+                            break;
+                        default:
+                            double temp = 1;
+                            bool negative = false;
+                            if (element.Contains("_"))
+                            {
+                                temp = -1;
+                                negative = true;
+                            }
 
-                            stack.Push(temp.ToString());
-                        }
-                        catch { }
-                        break;
+
+                            try
+                            {
+                                if (Regex.IsMatch(element, "[a-z]+$") && negative)
+                                    temp *= Variables[element.Substring(1)];
+                                else if (Regex.IsMatch(element, "[a-z]+$"))
+                                    temp *= Variables[element];
+                                else if (negative)
+                                    temp *= double.Parse(element.Substring(1));
+                                else
+                                    temp *= double.Parse(element);
+
+                                stack.Push(temp.ToString());
+                            }
+                            catch 
+                            {
+                                validinput = false;
+                            }
+                            break;
+                    }
                 }
-
+                catch (Exception error)
+                { 
+                    validinput = false;
+                }
             }
 
             double output = double.Parse(stack.Pop());
@@ -781,8 +815,24 @@ namespace Interface
             {
                 try
                 {
-                    switch (input[i])
+                    char character = input[i]; 
+                    switch (character)
                     {
+                        case 'x':
+                            int maxlen = 5;
+                            if (i < 5)
+                                maxlen = i;
+                            for (int coefficentlen = maxlen; coefficentlen > 0 ; coefficentlen--)
+                            {
+                                string coefficient = input.Substring(i - coefficentlen, coefficentlen);
+                                if (Regex.IsMatch(coefficient, "[0-9]+$"))
+                                {
+                                    input = input.Substring(0, i - coefficentlen) + coefficient + " * " + input.Substring(i);
+                                    coefficentlen = -1;
+                                    i += 3;
+                                }
+                            }
+                            break;
                         case '\\':
                             if (input.Substring(i,2) == "\\M")
                             {
@@ -816,12 +866,19 @@ namespace Interface
                         case 't':
                         case 'e':
                         case 'l':
-                            function = input.Substring(i, 5);
-                            if (FunctionCodes.Contains(function))
+                            try
                             {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 5);
-                                i += 5;
-                                break;
+                                function = input.Substring(i, 5);
+                                if (FunctionCodes.Contains(function))
+                                {
+                                    input = input.Substring(0, i) + function + " " + input.Substring(i + 5);
+                                    i += 5;
+                                    break;
+                                }
+                            }
+                            catch (Exception e)
+                            { 
+                                //Error
                             }
                             function = input.Substring(i, 3);
                             if (FunctionCodes.Contains(function))

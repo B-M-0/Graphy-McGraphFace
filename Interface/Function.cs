@@ -26,6 +26,7 @@ namespace Interface
 
         public Rational Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
         {
+            
             if (!Variables.ContainsKey("x"))
                 Variables.Add("x", x);
             else
@@ -33,13 +34,15 @@ namespace Interface
             return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
         }
 
-        public double Evaluate(Dictionary<string, double> Variables, double x = 1)
+        public double Evaluate(Dictionary<string, double> Variables, ref bool validinput ,  double x = 1)
         {
             if (!Variables.ContainsKey("x"))
                 Variables.Add("x", x);
             else
                 Variables["x"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, Variables);
+            if (validinput == false)
+                return 0;
+            return InputHandling.evaluatePostfix(postFixFunction, Variables, ref validinput);
         }
 
         public Complex Evaluate(Dictionary<string, Complex> Variables, double x = 0)
