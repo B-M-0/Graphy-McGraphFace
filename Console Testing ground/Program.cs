@@ -53,7 +53,7 @@ namespace ConsoleApplication2
         public static Bitmap convertLatexToPng(string fileName, string latex)
         {
 
-            fileName = @"C:\Users\User\Source\Repos\B-M-0\Interface\Console Testing ground\bin\Debug\" + fileName + ".png";
+            fileName =  fileName + ".png";
 
 
             var a = new Complex(5, 5) * 3;

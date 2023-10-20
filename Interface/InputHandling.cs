@@ -21,7 +21,8 @@ namespace Interface
         static Random random = new Random();
         static List<string> FunctionCodes = new List<string>() 
         { 
-            "\\sqrt","cos", "sin", "tan",
+            "\\sqrt","abs",
+            "cos", "sin", "tan",
             "exp", "log", "ln",
             "acos", "asin", "atan",
             "\\M" , "\\V", "det" ,"dot","cross"
@@ -224,6 +225,11 @@ namespace Interface
                     double operand1, operand2;
                     switch (element)
                     {
+
+                        case "abs":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Abs(operand1)).ToString());
+                            break;
                         case "exp":
                             operand1 = double.Parse(stack.Pop());
                             stack.Push((Math.Exp(operand1)).ToString());
@@ -851,8 +857,17 @@ namespace Interface
                             {
                                 input = input.Substring(0, i) + function + " " + input.Substring(i + 4);
                                 i += 4;
+                                break;
+                            }
+                            function = input.Substring(i, 3);
+                            if (FunctionCodes.Contains(function))
+                            {
+                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
+                                i += 3;
                             }
                             break;
+
+                            
                         case 'd':
                             function = input.Substring(i, 3);
                             if (FunctionCodes.Contains(function))
