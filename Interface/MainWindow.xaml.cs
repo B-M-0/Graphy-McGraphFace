@@ -681,8 +681,8 @@ namespace Interface
 
                     if (resultVAl == null)
                         result = Math.Round(decimalVal, Global.decimalPlaces).ToString();
-                    else if ((resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000))
-                        result = resultVAl.Decimal().ToString();
+                    else if ((resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000) || (resultVAl.Denominator() > 1000000 && resultVAl.Denominator() > 1000000))
+                        result = "\\approx"+resultVAl.Decimal().ToString();
                     else if (resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
                         result = resultVAl.LatexFormat() + "=" + resultVAl.Decimal();
                     else
