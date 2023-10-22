@@ -11,6 +11,8 @@ namespace Interface
     {
 
 
+
+        public static int ThemeIndex = 6;
         public static int angleFormatIndex= 0;
         public static double InputAngleConversion(double input)
         {

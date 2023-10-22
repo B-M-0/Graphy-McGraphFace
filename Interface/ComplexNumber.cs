@@ -18,6 +18,31 @@ namespace Interface
             this.imaginary = imaginary;
         }
 
+        public static double Abs(ComplexNumber A)
+        { 
+            return Math.Sqrt(A.real^2 + A.imaginary^2);  
+        }
+
+        public static double Arg(ComplexNumber A)
+        {
+            double angle = Math.Atan(Math.Abs(A.imaginary) / Math.Abs(A.real));
+            if (A.real > 0 && A.imaginary == 0)
+                return 0;
+            else if (A.real > 0 && A.imaginary > 0)
+                return angle;
+            else if (A.real == 0 && A.imaginary > 0)
+                return Math.PI / 2;
+            else if (A.real < 0 && A.imaginary > 0)
+                return 2 * Math.PI - angle;
+            else if (A.real < 0 && A.imaginary ==0)
+                return Math.PI;
+            else if (A.real > 0 && A.imaginary < 0)
+                return (-1) * angle;    
+            else if(A.real == 0 && A.imaginary < 0 )
+                return (-1) * Math.PI/2;
+            else 
+                return angle - Math.PI;   
+        }
 
         public ComplexNumber Conjugate()
         { 

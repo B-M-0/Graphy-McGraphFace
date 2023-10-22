@@ -97,11 +97,22 @@
 
         <Label Name="ThemeLabel"  Content="Theme:" Grid.Column="2" Grid.Row="4" FontSize="22" Margin="0,0,0,20" Visibility="Collapsed"/>
         <ComboBox  Name="Theme" SelectionChanged="Theme_SelectionChanged" Grid.Column="2" Grid.Row="4" Visibility="Collapsed" FontSize="18" Margin="0,30,0,0" Height="30" >
-            <ComboBoxItem Content="Light"/>
-            <ComboBoxItem Content="Grey"/>
-            <ComboBoxItem Content="Control"/>
             <ComboBoxItem Content="Black"/>
-            <ComboBoxItem Content="Blue"/>
+            <ComboBoxItem Content="Blue1"/>
+            <ComboBoxItem Content="Blue2"/>
+            <ComboBoxItem Content="Blue3"/>
+            <ComboBoxItem Content="Burgundy"/>
+            <ComboBoxItem Content="Control"/>
+            <ComboBoxItem Content="Default"/>
+            <ComboBoxItem Content="Earth"/>
+            <ComboBoxItem Content="Grey1"/>
+            <ComboBoxItem Content="Grey2"/>
+            <ComboBoxItem Content="Hazel"/>
+            <ComboBoxItem Content="Light1"/>
+            <ComboBoxItem Content="Light2"/>
+            <ComboBoxItem Content="Monospace"/>
+            <ComboBoxItem Content="Pink"/>
+            <ComboBoxItem Content="SeaBorn"/>
         </ComboBox>
 
 

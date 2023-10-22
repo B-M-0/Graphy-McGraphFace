@@ -22,10 +22,13 @@ namespace Interface
         static Random random = new Random();
         static List<string> FunctionCodes = new List<string>() 
         { 
-            "\\sqrt","abs",
+            "\\sqrt","abs", 
+            "mod", "arg",
             "cos", "sin", "tan",
+            "cosh", "sinh", "tanh",
             "exp", "log", "ln",
-            "acos", "asin", "atan",
+            "arccos", "arcsin", "arctan",
+            "arccosh", "arcsinh", "arctanh",
             "\\M" , "\\V", "det" ,"dot","cross"
         };
         public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, ComplexNumber> Variables, ref double decimalval)
@@ -43,11 +46,18 @@ namespace Interface
 
                 switch (element)
                 {
-                    case "abs":
-                        operand1_R = Variables[stack.Pop()].real;
-                        operand1 = operand1_R.Decimal();
+                    case "arg":
+                        operand1_C = Variables[stack.Pop()];
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Abs(operand1)));
+                        Variables.Add(key, new Rational(ComplexNumber.Arg(operand1_C)));
+
+                        stack.Push(key);
+                        break;
+                    case "abs":
+                    case "mod":
+                        operand1_C = Variables[stack.Pop()];
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(ComplexNumber.Abs(operand1_C)));
 
                         stack.Push(key);
                         break;
@@ -91,7 +101,31 @@ namespace Interface
 
                         stack.Push(key);
                         break;
-                    case "asin":
+                    case "sinh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Sinh(Global.InputAngleConversion(operand1))));
+
+                        stack.Push(key);
+                        break;
+                    case "cosh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Cosh(Global.InputAngleConversion(operand1))));
+
+                        stack.Push(key);
+                        break;
+                    case "tanh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Tanh(Global.InputAngleConversion(operand1))));
+
+                        stack.Push(key);
+                        break;
+                    case "arcsin":
                         operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
@@ -99,18 +133,40 @@ namespace Interface
 
                         stack.Push(key);
                         break;
-                    case "acos":
+                    case "arccos":
                         operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Acos(operand1))));
                         stack.Push(key);
                         break;
-                    case "atan":
+                    case "arctan":
                         operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Atan(operand1))));
+                        stack.Push(key);
+                        break;
+                    case "arcsinh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Asinh(operand1))));
+
+                        stack.Push(key);
+                        break;
+                    case "arccosh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Acosh(operand1))));
+                        stack.Push(key);
+                        break;
+                    case "arctanh":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Atanh(operand1))));
                         stack.Push(key);
                         break;
                     case "log":
@@ -175,7 +231,7 @@ namespace Interface
                         stack.Push(key);
                         break;
                     default:
-                        Rational temp = 1;
+                        ComplexNumber temp = 1;
                         bool negative = false;
                         if (element.Contains("_"))
                         {
@@ -186,7 +242,11 @@ namespace Interface
 
                         try
                         {
-                            if (Regex.IsMatch(element, "[A-Za-z\\e]+$") && negative)
+                            if (Regex.IsMatch(element, "[0-9]*i$"))
+                            {
+                                temp *= new ComplexNumber(0, double.Parse(element.Substring(0, element.Length - 1)));
+                            }
+                            else if (Regex.IsMatch(element, "[A-Za-z\\e]+$") && negative)
                                 temp *= Variables[element.Substring(1)].real;
                             else if (Regex.IsMatch(element, "[A-Za-z\\e]+$"))
                                 temp *= Variables[element].real;
@@ -257,17 +317,41 @@ namespace Interface
                             operand1 = double.Parse(stack.Pop());
                             stack.Push((Math.Tan(Global.InputAngleConversion(operand1))).ToString());
                             break;
-                        case "asin":
+                        case "sinh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Sinh(Global.InputAngleConversion(operand1))).ToString());
+                            break;
+                        case "cosh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Cosh(Global.InputAngleConversion(operand1))).ToString());
+                            break;
+                        case "tanh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Tanh(Global.InputAngleConversion(operand1))).ToString());
+                            break;
+                        case "arcsin":
                             operand1 = double.Parse(stack.Pop());
                             stack.Push(Global.OutputAngleConversion(Math.Asin(operand1)).ToString());
                             break;
-                        case "acos":
+                        case "arccos":
                             operand1 = double.Parse(stack.Pop());
                             stack.Push(Global.OutputAngleConversion(Math.Acos(operand1)).ToString());
                             break;
-                        case "atan":
+                        case "arctan":
                             operand1 = double.Parse(stack.Pop());
                             stack.Push(Global.OutputAngleConversion(Math.Atan(operand1)).ToString());
+                            break;
+                        case "arcsinh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push(Global.OutputAngleConversion(Math.Asinh(operand1)).ToString());
+                            break;
+                        case "arccosh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push(Global.OutputAngleConversion(Math.Acosh(operand1)).ToString());
+                            break;
+                        case "arctanh":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push(Global.OutputAngleConversion(Math.Atanh(operand1)).ToString());
                             break;
                         case "log":
                             operand1 = double.Parse(stack.Pop());
@@ -362,111 +446,6 @@ namespace Interface
         }
 
 
-        /*
-        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, ComplexNumber> Variables)
-        {
-            Stack<string> stack = new Stack<string>();
-            foreach (string element in expression)
-            {
-                string operand1, operand2;
-                Complex A, B, C;
-                double a, b;
-                string key;
-                switch (element)
-                {
-                    case "mod":
-                        A = Variables[stack.Pop()];
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, A.Magnitude);
-
-                        stack.Push(key);
-                        break;
-                    case "arg":
-                        A = Variables[stack.Pop()];
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, A.Phase);
-
-                        stack.Push(key);
-                        break;
-                    case @"\C":
-                        A = Variables[stack.Pop()];
-                        B = Variables[stack.Pop()];
-                        Complex ComplexNumber = new Complex(B.Real, A.Real);
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, ComplexNumber);
-                        stack.Push(key);
-                        break;
-                    case "+":
-                        A = Variables[stack.Pop()];
-                        B = Variables[stack.Pop()];
-
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, B + A);
-
-                        stack.Push(key);
-                        break;
-                    case "-":
-                        A = Variables[stack.Pop()];
-                        B = Variables[stack.Pop()];
-
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, B - A);
-
-                        stack.Push(key);
-                        break;
-                    case "*":
-                        A = Variables[stack.Pop()];
-                        B = Variables[stack.Pop()];
-
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, B * A);
-
-                        stack.Push(key);
-                        break;
-                    case "/":
-                        A = Variables[stack.Pop()];
-                        B = Variables[stack.Pop()];
-
-                        key = GenerateKey(Variables);
-                        Variables.Add(key, B / A);
-
-                        stack.Push(key);
-                        break;
-                    default:
-                        Complex temp = 1;
-                        bool negative = false;
-                        if (element.Contains("_"))
-                        {
-                            temp = -1;
-                            negative = true;
-                        }
-
-
-                        try
-                        {
-                            if (Regex.IsMatch(element, "[A-Za-z\\e]") && negative)
-                                temp *= Variables[element.Substring(1)];
-                            else if (Regex.IsMatch(element, "[A-Za-z\\e]"))
-                                temp *= Variables[element];
-                            else if (negative)
-                                temp *= double.Parse(element.Substring(1));
-                            else
-                                temp *= double.Parse(element);
-
-                            key = GenerateKey(Variables);
-                            Variables.Add(key, temp);
-                            stack.Push(key);
-                        }
-                        catch { }
-                        break;
-
-                }
-
-            }
-
-            return Variables[stack.Pop()];
-
-        }*/
         public static  string GenerateKey<T>(Dictionary<string, T> Dictionary)
         {
             int a = 0;
@@ -633,7 +612,6 @@ namespace Interface
 
             return Matrices[stack.Pop()];
         }
-
         public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
         {
             Stack<string> stack = new Stack<string>();
@@ -819,13 +797,7 @@ namespace Interface
                 Variables.Clear();
                 return null;
             }
-
-
-
         }
-
-        
-
 
         public static string formatInput(string input)
         {
@@ -851,78 +823,32 @@ namespace Interface
                                     i += 3;
                                 }
                             }
-                            break;
+                            break;                     
                         case '\\':
-                            if (input.Substring(i,2) == "\\M")
-                            {
-                                input = input.Substring(0, i) + "\\M" + " " + input.Substring(i + 2);
-                                i += 2;
-                            }
-                            else if (input.Substring(i,5) == "\\sqrt")
-                            {
-                                input = input.Substring(0, i) + "\\sqrt" + " " + input.Substring(i + 5);
-                                i += 5;
-                            }
-                            break;
                         case 'a':
-                            function = input.Substring(i, 4);
-                            if (FunctionCodes.Contains(function))
-                            {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 4);
-                                i += 4;
-                                break;
-                            }
-                            function = input.Substring(i, 3);
-                            if (FunctionCodes.Contains(function))
-                            {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
-                                i += 3;
-                            }
-                            break;
-
-                            
                         case 'd':
-                            function = input.Substring(i, 3);
-                            if (FunctionCodes.Contains(function))
-                            {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
-                                i += 3;
-                            }
-                            break;
                         case 's':
                         case 'c':
                         case 't':
                         case 'e':
                         case 'l':
-                            try
+                            for (int k = 7; k > 1; k--)
                             {
-                                function = input.Substring(i, 5);
-                                if (FunctionCodes.Contains(function))
+                                try
                                 {
-                                    input = input.Substring(0, i) + function + " " + input.Substring(i + 5);
-                                    i += 5;
-                                    break;
+                                    function = input.Substring(i, k);
+                                    if (FunctionCodes.Contains(function))
+                                    {
+                                        input = input.Substring(0, i) + function + " " + input.Substring(i + k);
+                                        i += k;
+                                        break;
+                                    }
                                 }
-                            }
-                            catch (Exception e)
-                            { 
-                                //Error
-                            }
-                            function = input.Substring(i, 3);
-                            if (FunctionCodes.Contains(function))
-                            {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 3);
-                                i += 3;
-                                break;
-                            }
-                            function = input.Substring(i, 2);
-                            if (FunctionCodes.Contains(function))
-                            {
-                                input = input.Substring(0, i) + function + " " + input.Substring(i + 2);
-                                i += 2;
-                                break;
-                            }
-                            
+                                catch (Exception e)
+                                { 
+                                  k = input.Length; 
+                                }
+                            }              
                             break;
                         case '+':
                         case '-':
@@ -1058,8 +984,5 @@ namespace Interface
             }
 
         }
-
-
-
     }
 }

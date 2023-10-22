@@ -73,9 +73,6 @@ namespace Interface
         /// </summary>
         public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
         public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
-
-
-
         public Dictionary<string, Surd> SurdVars = new Dictionary<string, Surd>();
 
 
@@ -97,7 +94,6 @@ namespace Interface
             }
             return openCount == closedCount;
         }
-
         public string formatLatex(string input, string Mode = "f")
         {
             //Modes f ==> functions, c ==> calcuations
@@ -123,10 +119,6 @@ namespace Interface
                 temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
-
-
-
-
         public static Bitmap convertLatexToPng(string latex)
         {
             var parser = WpfTeXFormulaParser.Instance;
@@ -140,15 +132,12 @@ namespace Interface
             }
             return Image;
         }
-
-
         ImageSource BitmapToImageSource(Bitmap bitmap)
         {
             BitmapSource bitmapsource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             //^ this line is stolen         
             return bitmapsource;
         }
-
 
 
         public MainWindow()
@@ -198,21 +187,24 @@ namespace Interface
         public void UpdateGraph_functions()
         {
             Graph.Plot.Clear();
+            UpdateText();
+            ResetGraph_Clicked();
 
-            //Update();
-            Graph.Reset();
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
             for (int i = 0; i < input_count; i++)
             {
-                if (valid_function[i])
+                if (valid_function[i] && function_inputs[i] != "")
                 {
                     bool validinput = true;
                     Function function = functions[i];
                     var func = new Func<double, double?>((x) => function.Evaluate(Vars, ref validinput, x));
-                    Graph.Plot.AddFunction(func, lineWidth: 2);
+                    valid_function[i] = validinput;
+                    if(validinput)
+                        Graph.Plot.AddFunction(func, lineWidth: 2);
                 }
 
             }
@@ -242,8 +234,10 @@ namespace Interface
         public void UpdateGraph_transformations()
         {
             Graph.Plot.Clear();
-            Graph.Reset();
+            ResetGraph_Clicked();
             //Update();
+
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
@@ -286,7 +280,12 @@ namespace Interface
         public void UpdateGraph_ComplexLoci()
         {
             Graph.Plot.Clear();
-            Graph.Reset();
+            ResetGraph_Clicked();
+
+
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+
+
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
@@ -442,9 +441,6 @@ namespace Interface
             }
         }
 
-
-
-
         private void TextBox0_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextChanged(0);
@@ -453,21 +449,10 @@ namespace Interface
         {
             TextChanged(1);
         }
-
         private void TextBox2_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextChanged(2);
         }
-
-
-
-
-
-
-
-
-
-
 
 
         public void ShowFunctions()
@@ -497,7 +482,6 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-
         public void ShowTransformations()
         {
             Graph.Visibility = Visibility.Visible;
@@ -525,12 +509,11 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-
         public void ShowComplexPlane()
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
-           Grid.SetColumn(Graph, 2);
+            Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
 
@@ -553,7 +536,6 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-
         public void ShowCalculations()
         {
             GoToMainMenu.Visibility = Visibility.Visible;
@@ -564,7 +546,6 @@ namespace Interface
             Calculation_OutputRender0.Visibility = Visibility.Visible;
             Calculation_OutputBackDrop0.Visibility = Visibility.Visible;
         }
-
 
         public void HideCalculations()
         {
@@ -577,17 +558,9 @@ namespace Interface
             Calculation_OutputBackDrop0.Visibility = Visibility.Collapsed;
         }
 
-
-
-
-
-
-
-
-
         public void ShowMainMenu()
         {
-           Grid.SetColumn(Graph, 2);
+            Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 4);
             GoToFunctions.Visibility = Visibility.Visible;
             GoToTransformations.Visibility = Visibility.Visible;
@@ -603,18 +576,6 @@ namespace Interface
             GoToCalculations.Visibility = Visibility.Collapsed;
             GoToComplexPlane.Visibility = Visibility.Collapsed;
         }
-
-
-
-
-
-
-
-
-
-
-
-
 
         private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
         {
@@ -632,10 +593,9 @@ namespace Interface
             ShowMainMenu();
         }
 
-
         private void OpenFunctions(object sender = null, RoutedEventArgs e = null)
         {
-            Graph.Reset();
+            ResetGraph_Clicked();
             OpenSideBar.Content = ">";
             currentPage = 1;
             HideMainMenu();
@@ -644,7 +604,7 @@ namespace Interface
 
         private void OpenTransformations(object sender = null, RoutedEventArgs e = null)
         {
-            Graph.Reset();
+            ResetGraph_Clicked();
             OpenSideBar.Content = ">";
             currentPage = 2;
             HideMainMenu();
@@ -653,7 +613,7 @@ namespace Interface
 
         public void OpenCalculations(object sender = null, RoutedEventArgs e = null)
         {
-            Graph.Reset();
+            ResetGraph_Clicked();
             currentPage = 3;
             HideMainMenu();
             ShowCalculations();
@@ -661,7 +621,7 @@ namespace Interface
 
         private void OpenComplexNumbers(object sender = null, RoutedEventArgs e = null)
         {
-            Graph.Reset();
+            ResetGraph_Clicked();
             OpenSideBar.Content = ">";
             currentPage = 4;
             HideMainMenu();
@@ -712,11 +672,14 @@ namespace Interface
             }
         }
 
-        private void ResetGraph_Clicked(object sender, RoutedEventArgs e)
+        private void ResetGraph_Clicked(object sender =null, RoutedEventArgs e = null)
         {
             Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
+
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+                
             Graph.Refresh();
         }
 
@@ -737,9 +700,8 @@ namespace Interface
 
             ReturnFromSettings.Visibility = Visibility.Visible;
             GoToMainMenu.Visibility = Visibility.Visible;
-            
         }
-
+        
         public void HideSettings()
         {
             GoToMainMenu.Visibility = Visibility.Collapsed;
@@ -781,28 +743,8 @@ namespace Interface
 
         private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            switch (Theme.SelectedIndex)
-            {
-                case 0:
-                    Graph.Plot.Style(ScottPlot.Style.Default);
-                    break;
-                case 1:
-                    Graph.Plot.Style(ScottPlot.Style.Gray1);
-                    break;
-                case 2:
-                    Graph.Plot.Style(ScottPlot.Style.Control);
-                    break;
-                case 3:
-                    Graph.Plot.Style(ScottPlot.Style.Black);
-                    break;
-                case 4:
-                    Graph.Plot.Style(ScottPlot.Style.Blue2);
-                    break;
-
-            }
-
-            var a  = ScottPlot.Style.GetStyles;
-            return ;
+            Global.ThemeIndex = Theme.SelectedIndex;
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
         }
     }
 }
