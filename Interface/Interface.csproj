@@ -8,10 +8,57 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Images\**" />
+    <EmbeddedResource Remove="Images\**" />
+    <None Remove="Images\**" />
+    <Page Remove="Images\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="cog.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="bin\Debug\net6.0-windows\Interface.deps.json" />
+    <Content Include="bin\Debug\net6.0-windows\Interface.runtimeconfig.json" />
+    <Content Include="bin\Release\net6.0-windows\Interface.deps.json" />
+    <Content Include="bin\Release\net6.0-windows\Interface.runtimeconfig.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0-windows\Interface.dll" />
+    <None Include="bin\Debug\net6.0-windows\Interface.exe" />
+    <None Include="bin\Debug\net6.0-windows\Interface.pdb" />
+    <None Include="bin\Debug\net6.0-windows\Microsoft.Win32.SystemEvents.dll" />
+    <None Include="bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll" />
+    <None Include="bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Drawing.Common.dll" />
+    <None Include="bin\Debug\net6.0-windows\ScottPlot.dll" />
+    <None Include="bin\Debug\net6.0-windows\ScottPlot.WPF.dll" />
+    <None Include="bin\Debug\net6.0-windows\System.Drawing.Common.dll" />
+    <None Include="bin\Debug\net6.0-windows\WpfMath.dll" />
+    <None Include="bin\Debug\net6.0-windows\XamlMath.Shared.dll" />
+    <None Include="bin\Release\net6.0-windows\Interface.dll" />
+    <None Include="bin\Release\net6.0-windows\Interface.exe" />
+    <None Include="bin\Release\net6.0-windows\Interface.pdb" />
+    <None Include="bin\Release\net6.0-windows\Microsoft.Win32.SystemEvents.dll" />
+    <None Include="bin\Release\net6.0-windows\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll" />
+    <None Include="bin\Release\net6.0-windows\runtimes\win\lib\net6.0\System.Drawing.Common.dll" />
+    <None Include="bin\Release\net6.0-windows\ScottPlot.dll" />
+    <None Include="bin\Release\net6.0-windows\ScottPlot.WPF.dll" />
+    <None Include="bin\Release\net6.0-windows\System.Drawing.Common.dll" />
+    <None Include="bin\Release\net6.0-windows\WpfMath.dll" />
+    <None Include="bin\Release\net6.0-windows\XamlMath.Shared.dll" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="ScottPlot" Version="4.1.65" />
     <PackageReference Include="ScottPlot.WPF" Version="4.1.65" />
     <PackageReference Include="System.Drawing.Common" Version="7.0.0" />
     <PackageReference Include="WpfMath" Version="2.1.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="cog.jpg" />
   </ItemGroup>
 
 </Project>

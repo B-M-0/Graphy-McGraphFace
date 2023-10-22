@@ -8,6 +8,7 @@ using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using XamlMath.Utils;
 
 namespace Interface
@@ -27,7 +28,7 @@ namespace Interface
             "acos", "asin", "atan",
             "\\M" , "\\V", "det" ,"dot","cross"
         };
-        public static Rational evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, Rational> Variables, ref double decimalval)
+        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, ComplexNumber> Variables, ref double decimalval)
         {
             Variables = Global.defineConstants();
             Stack<string> stack = new Stack<string>();
@@ -35,15 +36,23 @@ namespace Interface
             {
                 string operand1Str, operand2Str;
                 Rational  operand1_R, operand2_R;
+                ComplexNumber operand1_C, operand2_C;
                 Surd operand1_S, operand2_S;
                 double operand1, operand2;
                 string key;
 
                 switch (element)
                 {
+                    case "abs":
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand1 = operand1_R.Decimal();
+                        key = GenerateKey(Variables);
+                        Variables.Add(key, new Rational(Math.Abs(operand1)));
 
+                        stack.Push(key);
+                        break;
                     case "\\sqrt":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Math.Sqrt(operand1)));
@@ -51,7 +60,7 @@ namespace Interface
                         stack.Push(key);
                         break;                  
                     case "exp":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Math.Exp(operand1)));
@@ -59,55 +68,53 @@ namespace Interface
                         stack.Push(key);
                         break;
                     case "sin":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Sin(operand1)));
+                        Variables.Add(key, new Rational(Math.Sin(Global.InputAngleConversion(operand1))));
 
                         stack.Push(key);
                         break;
                     case "cos":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Cos(operand1)));
+                        Variables.Add(key, new Rational(Math.Cos(Global.InputAngleConversion(operand1))));
 
                         stack.Push(key);
                         break;
                     case "tan":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Tan(operand1)));
+                        Variables.Add(key, new Rational(Math.Tan(Global.InputAngleConversion(operand1))));
 
                         stack.Push(key);
                         break;
                     case "asin":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Asin(operand1)));
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Asin(operand1))));
 
                         stack.Push(key);
                         break;
                     case "acos":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Acos(operand1)));
-
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Acos(operand1))));
                         stack.Push(key);
                         break;
                     case "atan":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
-                        Variables.Add(key, new Rational(Math.Atan(operand1)));
-
+                        Variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Atan(operand1))));
                         stack.Push(key);
                         break;
                     case "log":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Math.Log10(operand1)));
@@ -115,7 +122,7 @@ namespace Interface
                         stack.Push(key);
                         break;
                     case "ln":
-                        operand1_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Math.Log(operand1)));
@@ -123,44 +130,44 @@ namespace Interface
                         stack.Push(key);
                         break;
                     case "+":                      
-                        operand1_R = Variables[stack.Pop()];
-                        operand2_R = Variables[stack.Pop()];
+                        operand1_C = Variables[stack.Pop()];
+                        operand2_C = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key, operand2_R + operand1_R);
+                        Variables.Add(key, operand2_C + operand1_C);
 
                         stack.Push(key);
                         break;
                     case "-":
-                        operand1_R = Variables[stack.Pop()];
-                        operand2_R = Variables[stack.Pop()];
+                        operand1_C = Variables[stack.Pop()];
+                        operand2_C = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key, operand2_R - operand1_R);
+                        Variables.Add(key, operand2_C - operand1_C);
 
                         stack.Push(key);
                         break;                      
                     case "*":
-                        operand1_R = Variables[stack.Pop()]; 
-                        operand2_R = Variables[stack.Pop()];
+                        operand1_C = Variables[stack.Pop()]; 
+                        operand2_C = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key ,operand2_R * operand1_R);
+                        Variables.Add(key ,operand2_C * operand1_C);
 
                         stack.Push(key);
                         break;
                     case "/":
-                        operand1_R = Variables[stack.Pop()];
-                        operand2_R = Variables[stack.Pop()];
+                        operand1_C = Variables[stack.Pop()];
+                        operand2_C = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key, operand2_R / operand1_R);
+                        Variables.Add(key, operand2_C / operand1_C);
 
                         stack.Push(key);
                         break;
                     case "^":
-                        operand1_R = Variables[stack.Pop()];
-                        operand2_R = Variables[stack.Pop()];
+                        operand1_R = Variables[stack.Pop()].real;
+                        operand2_R = Variables[stack.Pop()].real;
 
                         key = GenerateKey(Variables);
                         Variables.Add(key, operand2_R ^ operand1_R);
@@ -180,9 +187,9 @@ namespace Interface
                         try
                         {
                             if (Regex.IsMatch(element, "[A-Za-z\\e]+$") && negative)
-                                temp *= Variables[element.Substring(1)];
+                                temp *= Variables[element.Substring(1)].real;
                             else if (Regex.IsMatch(element, "[A-Za-z\\e]+$"))
-                                temp *= Variables[element];
+                                temp *= Variables[element].real;
                             else if (negative)
                                 temp *= double.Parse(element.Substring(1));
                             else
@@ -202,7 +209,7 @@ namespace Interface
             Rational output = new Rational(1);
             if (Regex.IsMatch(outputstr, "[A-Z]+$"))
             {
-                output = Variables[outputstr];
+                output = Variables[outputstr].real ;
                 Variables.Clear();
                 return output;
             }
@@ -230,33 +237,37 @@ namespace Interface
                             operand1 = double.Parse(stack.Pop());
                             stack.Push((Math.Abs(operand1)).ToString());
                             break;
+                        case "\\sqrt":
+                            operand1 = double.Parse(stack.Pop());
+                            stack.Push((Math.Sqrt(operand1)).ToString());
+                            break;
                         case "exp":
                             operand1 = double.Parse(stack.Pop());
                             stack.Push((Math.Exp(operand1)).ToString());
                             break;
                         case "sin":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Sin(operand1)).ToString());
+                            stack.Push((Math.Sin(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "cos":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Cos(operand1)).ToString());
+                            stack.Push((Math.Cos(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "tan":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Tan(operand1)).ToString());
+                            stack.Push((Math.Tan(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "asin":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Asin(operand1)).ToString());
+                            stack.Push(Global.OutputAngleConversion(Math.Asin(operand1)).ToString());
                             break;
                         case "acos":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Acos(operand1)).ToString());
+                            stack.Push(Global.OutputAngleConversion(Math.Acos(operand1)).ToString());
                             break;
                         case "atan":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Atan(operand1)).ToString());
+                            stack.Push(Global.OutputAngleConversion(Math.Atan(operand1)).ToString());
                             break;
                         case "log":
                             operand1 = double.Parse(stack.Pop());
@@ -350,7 +361,9 @@ namespace Interface
                 return "U";//undefined
         }
 
-        public static Complex evaluatePostfix(List<string> expression, Dictionary<string, Complex> Variables)
+
+        /*
+        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, ComplexNumber> Variables)
         {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
@@ -453,7 +466,7 @@ namespace Interface
 
             return Variables[stack.Pop()];
 
-        }
+        }*/
         public static  string GenerateKey<T>(Dictionary<string, T> Dictionary)
         {
             int a = 0;

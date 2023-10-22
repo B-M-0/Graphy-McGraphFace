@@ -9,6 +9,7 @@ namespace Interface
     public class Rational 
     {
         public bool isInteger = false;
+        public bool isFloat = false;
         private int numerator ;
         private int denominator;
         private double Decimalval;
@@ -74,30 +75,48 @@ namespace Interface
         public Rational(double Decimal)
         {
             // truncates to (k)dp
-            this.Decimalval = Decimal;
-            Decimal = Math.Round(Decimal, Global.decimalPlaces) ;
-
-            int denominator = 1;
-            while (Decimal % 1 != 0)
+            this.Decimalval = Math.Round(Decimal,Global.decimalPlaces + 5);
+            if (!Decimal.ToString().Contains('.'))
             {
-                Decimal = Math.Round(Decimal*10, Global.decimalPlaces);
-                denominator *= 10;
+                this.isInteger = true;
+                numerator = (int)Decimal;
+                denominator = 1; 
             }
+            else if (Decimalval.ToString().Split('.')[1].Length > Global.decimalPlaces)
+            {
+                isFloat = true;
+                numerator = 0;
+                denominator = 0;
+            }
+            else
+            {
+                Decimal = Math.Round(Decimal, Global.decimalPlaces);
 
-            this.numerator = (int)Decimal;
-            this.denominator = denominator;
+                int denominator = 1;
+                while (Decimal % 1 != 0)
+                {
+                    Decimal = Math.Round(Decimal * 10, Global.decimalPlaces);
+                    denominator *= 10;
+                }
 
-            
-            Rational X = this.Simplify();
-            this.numerator = X.numerator;
-            this.denominator = X.denominator;  
-            
+                this.numerator = (int)Decimal;
+                this.denominator = denominator;
+
+
+                Rational X = this.Simplify();
+                this.numerator = X.numerator;
+                this.denominator = X.denominator;
+            }
                
         }
 
         public Rational Simplify()
         {
-            Rational result = new Rational(numerator, denominator);
+            Rational result = this;
+            if (isFloat)
+            {
+                return result;
+            }
             int end = Math.Abs(Math.Min(numerator, denominator));
             // the condition is the truncated root of the smaller number.
             for (int i = 2; i <= end; i++)
@@ -121,7 +140,9 @@ namespace Interface
         public static Rational operator +(Rational A, Rational B)
         {
             Rational result;
-            if (A.denominator == B.denominator)
+            if (A.isFloat || B.isFloat)
+                result = new Rational(A.Decimalval + B.Decimalval);
+            else if (A.denominator == B.denominator)
                 result = new Rational(A.numerator + B.numerator, A.denominator);
             else
                 result = new Rational((A.numerator * B.denominator) + (B.numerator * A.denominator), A.denominator * B.denominator);
@@ -131,14 +152,13 @@ namespace Interface
         public static Rational operator -(Rational A, Rational B)
         {
             Rational result;
-            if (A.denominator == B.denominator)
-            {
+
+            if(A.isFloat || B.isFloat)
+                result = new Rational(A.Decimalval - B.Decimalval);
+            else if (A.denominator == B.denominator)
                 result = new Rational(A.numerator - B.numerator, A.denominator);
-            }
             else
-            {
                 result = new Rational((A.numerator * B.denominator) - (B.numerator * A.denominator), A.denominator * B.denominator);
-            }
 
             return result.Simplify();
 
@@ -146,14 +166,22 @@ namespace Interface
         }
         public static Rational operator *(Rational A, Rational B)
         {
-            if (A == null | B == null)
+            if (A == null || B == null)
                 return null;
-            Rational result = new Rational(A.numerator * B.numerator, A.denominator * B.denominator);
-            return result.Simplify();
+            if (A.isFloat || B.isFloat)
+                return A.Decimalval * B.Decimalval;
+            else
+            {
+                Rational result = new Rational(A.numerator * B.numerator, A.denominator * B.denominator);
+                return result.Simplify();
+            }
         }
         public static Rational operator /(Rational A, Rational B)
         {
-            return A * B.reciprocal();
+            if(A.isFloat|| B.isFloat)
+                return A.Decimalval / B.Decimalval; 
+            else
+                return A * B.reciprocal();
         }
         public static Rational operator ^(Rational A, double power)
         {
@@ -163,7 +191,7 @@ namespace Interface
 
         public double Decimal()
         {
-            return Math.Round(this.Decimalval,Global.decimalPlaces);
+            return Math.Round(Decimalval,Global.decimalPlaces);
         }
 
 

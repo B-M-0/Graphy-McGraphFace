@@ -23,7 +23,7 @@ namespace Interface
         { 
             return postFixFunction; 
         }
-
+        /*
         public Rational Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
         {
             
@@ -32,7 +32,7 @@ namespace Interface
             else
                 Variables["x"] = x;
             return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
-        }
+        }*/
 
         public double Evaluate(Dictionary<string, double> Variables, ref bool validinput ,  double x = 1)
         {
@@ -45,13 +45,13 @@ namespace Interface
             return InputHandling.evaluatePostfix(postFixFunction, Variables, ref validinput);
         }
 
-        public Complex Evaluate(Dictionary<string, Complex> Variables, double x = 0)
+        public ComplexNumber Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, double x = 1)
         {
             if (!Variables.ContainsKey("z"))
                 Variables.Add("z", x);
             else
                 Variables["z"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, Variables);
+            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
         }
 
 
@@ -67,7 +67,7 @@ namespace Interface
 
        
 
-
+        /*
         public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables)
         {
             if (!Variables.ContainsKey("x"))
@@ -92,7 +92,6 @@ namespace Interface
                     index++;
 
             }
-
             
 
             double[] xValsArr = new double[Xvals.Count()];
@@ -103,7 +102,7 @@ namespace Interface
                 yValsArr[i] = Yvals[i];
             }
             return (xValsArr, yValsArr);
-        }
+        }*/
     }
 
 }

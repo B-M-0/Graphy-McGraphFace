@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -18,6 +19,16 @@ namespace Interface
     /// </summary>
     /// 
 
+
+    class AngleTypes : ObservableCollection<string>
+    {
+        public AngleTypes()
+        {
+            Add("Radians"); 
+            Add("Degrees");
+            Add("Gradians");
+        }
+    }
 
     public partial class MainWindow : Window
     {
@@ -55,7 +66,12 @@ namespace Interface
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
         public Dictionary<string, Vector> Vectors = new Dictionary<string, Vector>();
 
-        public Dictionary<string, Rational> RationalVars = new Dictionary<string, Rational>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+
+
+        /// <summary>
+        /// reffactor later
+        /// </summary>
+        public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
         public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
 
 
@@ -317,8 +333,8 @@ namespace Interface
             }
             else
             {
-                Grid.SetColumn(Graph, 1);
-                Grid.SetColumnSpan(Graph, 7);
+                Grid.SetColumn(Graph, 2);
+                Grid.SetColumnSpan(Graph, 6);
 
                 SideBar.Visibility = Visibility.Collapsed;
                 if (currentPage == 1)
@@ -458,8 +474,8 @@ namespace Interface
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
-            Grid.SetColumn(Graph, 1);
-            Grid.SetColumnSpan(Graph, 7);
+            Grid.SetColumn(Graph, 2);
+            Grid.SetColumnSpan(Graph, 6);
         }
 
         public void HideFunctions()
@@ -486,8 +502,8 @@ namespace Interface
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
-            Grid.SetColumn(Graph, 1);
-            Grid.SetColumnSpan(Graph, 7);
+            Grid.SetColumn(Graph, 2);
+            Grid.SetColumnSpan(Graph, 6);
         }
         //sa
         public void HideTransformations()
@@ -514,8 +530,8 @@ namespace Interface
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
-            Grid.SetColumn(Graph, 1);
-            Grid.SetColumnSpan(Graph, 7);
+           Grid.SetColumn(Graph, 2);
+            Grid.SetColumnSpan(Graph, 6);
         }
 
         public void HideComplexPlane()
@@ -571,7 +587,7 @@ namespace Interface
 
         public void ShowMainMenu()
         {
-            Grid.SetColumn(Graph, 1);
+           Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 4);
             GoToFunctions.Visibility = Visibility.Visible;
             GoToTransformations.Visibility = Visibility.Visible;
@@ -607,16 +623,17 @@ namespace Interface
             Title.Visibility = Visibility.Visible;
             TitleBackDrop.Visibility = Visibility.Visible;
 
-
+            HideSettings();
             HideFunctions();
             HideTransformations();
             HideCalculations();
             HideComplexPlane();
+            
             ShowMainMenu();
         }
 
 
-        private void OpenFunctions(object sender, RoutedEventArgs e)
+        private void OpenFunctions(object sender = null, RoutedEventArgs e = null)
         {
             Graph.Reset();
             OpenSideBar.Content = ">";
@@ -625,7 +642,7 @@ namespace Interface
             ShowFunctions();
         }
 
-        private void OpenTransformations(object sender, RoutedEventArgs e)
+        private void OpenTransformations(object sender = null, RoutedEventArgs e = null)
         {
             Graph.Reset();
             OpenSideBar.Content = ">";
@@ -634,7 +651,7 @@ namespace Interface
             ShowTransformations();
         }
 
-        public void OpenCalculations(object sender, RoutedEventArgs e)
+        public void OpenCalculations(object sender = null, RoutedEventArgs e = null)
         {
             Graph.Reset();
             currentPage = 3;
@@ -642,7 +659,7 @@ namespace Interface
             ShowCalculations();
         }
 
-        private void OpenComplexNumbers(object sender, RoutedEventArgs e)
+        private void OpenComplexNumbers(object sender = null, RoutedEventArgs e = null)
         {
             Graph.Reset();
             OpenSideBar.Content = ">";
@@ -676,12 +693,12 @@ namespace Interface
                 else
                 {
                     double decimalVal = 0;
-                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal);
+                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal).real;
 
 
                     if (resultVAl == null)
                         result = Math.Round(decimalVal, Global.decimalPlaces).ToString();
-                    else if ((resultVAl.Numerator() > 1000000 && resultVAl.Numerator() > 1000000) || (resultVAl.Denominator() > 1000000 && resultVAl.Denominator() > 1000000))
+                    else if ((resultVAl.Numerator() > 100000 && resultVAl.Numerator() > 100000) || (resultVAl.Denominator() > 100000 && resultVAl.Denominator() > 100000) || resultVAl.isFloat)
                         result = "\\approx"+resultVAl.Decimal().ToString();
                     else if (resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
                         result = resultVAl.LatexFormat() + "=" + resultVAl.Decimal();
@@ -697,13 +714,95 @@ namespace Interface
 
         private void ResetGraph_Clicked(object sender, RoutedEventArgs e)
         {
-
-
             Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
             Graph.Refresh();
+        }
+
+        private void OpenSettings(object sender, RoutedEventArgs e)
+        {
+            GoToSettings.Visibility = Visibility.Collapsed;
+
+            HideCalculations();
+            HideTransformations();
+            HideFunctions();
+            HideComplexPlane();
+            HideMainMenu();
+
+            AngleMeasurementLabel.Visibility = Visibility.Visible;
+            AngleMeasurement.Visibility = Visibility.Visible;
+            Theme.Visibility = Visibility.Visible;
+            ThemeLabel.Visibility = Visibility.Visible;
+
+            ReturnFromSettings.Visibility = Visibility.Visible;
+            GoToMainMenu.Visibility = Visibility.Visible;
+            
+        }
+
+        public void HideSettings()
+        {
+            GoToMainMenu.Visibility = Visibility.Collapsed;
+            ReturnFromSettings.Visibility = Visibility.Collapsed;
+            GoToSettings.Visibility = Visibility.Visible;
+            AngleMeasurement.Visibility = Visibility.Collapsed;
+            AngleMeasurementLabel.Visibility = Visibility.Collapsed;
+            Theme.Visibility = Visibility.Collapsed;
+            ThemeLabel.Visibility = Visibility.Collapsed;
+        }
+
+        private void ExitSettings(object sender, RoutedEventArgs e)
+        {
+            HideSettings();
+            switch (currentPage)
+            { 
+                case 1:
+                    OpenFunctions();
+                    break;
+                case 2:
+                    OpenTransformations();
+                    break;
+                case 3:
+                    OpenCalculations();
+                    break;
+                case 4: 
+                    OpenComplexNumbers();
+                    break;
+                default:
+                    OpenMainMenu();
+                    break;
+            }
+        }
+
+        private void AngleMeasurement_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            Global.angleFormatIndex = AngleMeasurement.SelectedIndex;   
+        }
+
+        private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            switch (Theme.SelectedIndex)
+            {
+                case 0:
+                    Graph.Plot.Style(ScottPlot.Style.Default);
+                    break;
+                case 1:
+                    Graph.Plot.Style(ScottPlot.Style.Gray1);
+                    break;
+                case 2:
+                    Graph.Plot.Style(ScottPlot.Style.Control);
+                    break;
+                case 3:
+                    Graph.Plot.Style(ScottPlot.Style.Black);
+                    break;
+                case 4:
+                    Graph.Plot.Style(ScottPlot.Style.Blue2);
+                    break;
+
+            }
+
+            var a  = ScottPlot.Style.GetStyles;
+            return ;
         }
     }
 }

@@ -9,6 +9,41 @@ namespace Interface
 {
     public class Global
     {
+
+
+        public static int angleFormatIndex= 0;
+        public static double InputAngleConversion(double input)
+        {
+            switch (angleFormatIndex)
+            {
+                case 0:
+                    return input;
+                case 1:
+                    return input * Math.PI / 180;
+                case 2:
+                    return input * Math.PI / 200;
+                default:
+                    return input;
+            }
+        }
+        public static double OutputAngleConversion(double input)
+        {
+            switch (angleFormatIndex)
+            {
+                case 0:
+                    return input;
+                case 1:
+                    return input * 180 / Math.PI;
+                case 2:
+                    return input * 200/Math.PI;
+                default:
+                    return input;
+            }
+        }
+
+
+
+
         static public string removeWhiteSpace(string input)
         {
             string temp = "";
@@ -22,10 +57,15 @@ namespace Interface
 
 
         static public int decimalPlaces = 7;
-        static public Dictionary<string,Rational> defineConstants()
+        /*static public Dictionary<string,Rational> defineConstants()
         {
             return new Dictionary<string, Rational> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+        }*/
+        static public Dictionary<string, ComplexNumber> defineConstants()
+        {
+            return new Dictionary<string, ComplexNumber> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
         }
+
         static public Dictionary<string, double> defineConstants<T>()
         {
            return new Dictionary<string, double> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
