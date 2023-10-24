@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,18 +13,80 @@ namespace Interface
     {
         public Rational real;
         public Rational imaginary;
-
         public ComplexNumber(Rational real, Rational imaginary)
         {
             this.real = real;
             this.imaginary = imaginary;
         }
+        
+        public string LatexFormat_float()
+        {
+            if (real == 0 && imaginary == 0)
+                return "0";
+            string sign = "+";
+            string temp = "";
+            if (imaginary < 0 || real == 0)
+                sign = "";
+  
+            if (real != 0)
+                temp = real.Decimal().ToString();
 
-        public static double Abs(ComplexNumber A)
-        { 
-            return Math.Sqrt(A.real^2 + A.imaginary^2);  
+            if (imaginary == 0)
+                return temp;
+            else if (imaginary == 1)
+                return temp += sign + " i";
+            else
+                return temp += sign + imaginary.Decimal() + " i";
+        }
+        public string LatexFormat_frac()
+        {
+            if (real == 0 && imaginary == 0)
+                return "0";
+            string sign = "+";
+            string temp = "";
+            if (imaginary < 0 || real == 0)
+                sign = "";
+
+            if (real != 0)
+                temp += real.LatexFormat();
+
+            if (imaginary == 0)
+                return temp;
+            else if (imaginary == 1)
+                return temp += sign + " i";
+            else
+                return temp += sign + imaginary.LatexFormat()+ " i";
         }
 
+        public bool isComplex()
+        { 
+            if(imaginary != 0 && real != 9)
+                return true;
+            else 
+                return false;
+        }
+        public bool isImag()
+        {
+            if (imaginary != 0 && real ==0) 
+                return true;
+            else 
+                return false;
+        }
+        public bool isReal()
+        {
+            if (imaginary == 0 && real !=0)
+                return true;
+            else
+                return false;
+        }
+
+       
+
+        public static double Abs(ComplexNumber A)
+        {
+            double temp = (A.real ^ 2) + (A.imaginary ^ 2);
+            return Math.Sqrt(temp);  
+        }
         public static double Arg(ComplexNumber A)
         {
             double angle = Math.Atan(Math.Abs(A.imaginary) / Math.Abs(A.real));
@@ -43,7 +107,6 @@ namespace Interface
             else 
                 return angle - Math.PI;   
         }
-
         public ComplexNumber Conjugate()
         { 
             return new ComplexNumber(real, (-1) * imaginary);  

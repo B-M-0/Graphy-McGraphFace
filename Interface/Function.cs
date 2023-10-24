@@ -23,16 +23,6 @@ namespace Interface
         { 
             return postFixFunction; 
         }
-        /*
-        public Rational Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables, ref double decimalval, double x = 1)
-        {
-            
-            if (!Variables.ContainsKey("x"))
-                Variables.Add("x", x);
-            else
-                Variables["x"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
-        }*/
 
         public double Evaluate(Dictionary<string, double> Variables, ref bool validinput ,  double x = 1)
         {
@@ -64,45 +54,5 @@ namespace Interface
         {
             return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors, ref decimalval);
         }
-
-       
-
-        /*
-        public (double[], double[]) Evaluate(int lower_bound, int range, double step, Dictionary<string, Surd> SurdVariables, Dictionary<string, Rational> Variables)
-        {
-            if (!Variables.ContainsKey("x"))
-                Variables.Add("x", lower_bound);
-            int index = 0;
-            double decval =0;
-
-            List<double> Xvals = new List<double>();
-            List<double> Yvals = new List<double>();
-            for (double x = lower_bound; x <= lower_bound + range; x += step)
-            {
-                Variables["x"] = x;
-                Xvals.Add(x);
-                Yvals.Add(InputHandling.evaluatePostfix(postFixFunction,SurdVariables, Variables, ref decval));
-
-                if (Yvals[index] >= (int.MaxValue - 1000000) || int.MinValue + 1000000 > Yvals[index] )
-                {
-                    Yvals.RemoveAt(index);
-                    Xvals.RemoveAt(index);
-                }
-                else
-                    index++;
-
-            }
-            
-
-            double[] xValsArr = new double[Xvals.Count()];
-            double[] yValsArr = new double[Yvals.Count()];
-            for (int i = 0; i < Xvals.Count(); i++)
-            {
-                xValsArr[i] = Xvals[i];
-                yValsArr[i] = Yvals[i];
-            }
-            return (xValsArr, yValsArr);
-        }*/
     }
-
 }

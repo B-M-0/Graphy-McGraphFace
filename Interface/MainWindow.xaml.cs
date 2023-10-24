@@ -24,7 +24,7 @@ namespace Interface
     {
         public AngleTypes()
         {
-            Add("Radians"); 
+            Add("Radians");
             Add("Degrees");
             Add("Gradians");
         }
@@ -102,6 +102,9 @@ namespace Interface
             {
                 switch (character)
                 {
+                    case 'i':
+                        temp += " i ";
+                        break;
                     case ' ':
                     case '*':
                         if (Mode == "c")
@@ -203,7 +206,7 @@ namespace Interface
                     Function function = functions[i];
                     var func = new Func<double, double?>((x) => function.Evaluate(Vars, ref validinput, x));
                     valid_function[i] = validinput;
-                    if(validinput)
+                    if (validinput)
                         Graph.Plot.AddFunction(func, lineWidth: 2);
                 }
 
@@ -373,6 +376,50 @@ namespace Interface
             }
         }
 
+        private void Calculation0_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            try
+            {
+                string inputText = (sender as TextBox).Text;
+                string Latex = formatLatex(inputText, "c");
+                Calculation_InputRender0.Source = BitmapToImageSource(convertLatexToPng(Latex));
+
+                List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace((sender as TextBox).Text)).Split(' '));
+
+                Function f = new Function(output);
+                string result = "=";
+                if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
+                {
+                    double decialVal = 0;
+                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors, ref decialVal);
+                    if (Alfa is null)
+                        result += decialVal.ToString();
+                    else
+                        result += Alfa.MatrixToLatex();
+                    var beta = 1 + 2;
+                }
+                else
+                {
+                    double decimalVal = 0;
+                    ComplexNumber resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal);
+
+                    if (resultVAl == null)
+                        result += Math.Round(decimalVal, Global.decimalPlaces).ToString();
+                    else if (resultVAl.imaginary.isFloat || resultVAl.real.isFloat)
+                        result = "\\approx" + resultVAl.LatexFormat_float();
+                    else if (resultVAl.LatexFormat_frac() != resultVAl.LatexFormat_float())
+                        result += resultVAl.LatexFormat_frac() + "=" + resultVAl.LatexFormat_float();
+                    else
+                        result += resultVAl.LatexFormat_frac();
+
+                }
+                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
+            }
+            catch
+            { //RenderErrorlhudyugywgygey}   
+            }
+        }
+
         public void TextChanged(int id)
         {
             UpdateText();
@@ -462,7 +509,6 @@ namespace Interface
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-
         public void HideFunctions()
         {
             Graph.Visibility = Visibility.Collapsed;
@@ -489,7 +535,6 @@ namespace Interface
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-        //sa
         public void HideTransformations()
         {
             Graph.Visibility = Visibility.Collapsed;
@@ -516,7 +561,6 @@ namespace Interface
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-
         public void HideComplexPlane()
         {
             Graph.Visibility = Visibility.Collapsed;
@@ -546,7 +590,6 @@ namespace Interface
             Calculation_OutputRender0.Visibility = Visibility.Visible;
             Calculation_OutputBackDrop0.Visibility = Visibility.Visible;
         }
-
         public void HideCalculations()
         {
             ResetGraph.Visibility = Visibility.Collapsed;
@@ -577,6 +620,29 @@ namespace Interface
             GoToComplexPlane.Visibility = Visibility.Collapsed;
         }
 
+        private void ShowSettings()
+        {
+            GoToSettings.Visibility = Visibility.Collapsed;
+
+            AngleMeasurementLabel.Visibility = Visibility.Visible;
+            AngleMeasurement.Visibility = Visibility.Visible;
+            Theme.Visibility = Visibility.Visible;
+            ThemeLabel.Visibility = Visibility.Visible;
+
+            ReturnFromSettings.Visibility = Visibility.Visible;
+            GoToMainMenu.Visibility = Visibility.Visible;
+        }
+        public void HideSettings()
+        {
+            GoToMainMenu.Visibility = Visibility.Collapsed;
+            ReturnFromSettings.Visibility = Visibility.Collapsed;
+            GoToSettings.Visibility = Visibility.Visible;
+            AngleMeasurement.Visibility = Visibility.Collapsed;
+            AngleMeasurementLabel.Visibility = Visibility.Collapsed;
+            Theme.Visibility = Visibility.Collapsed;
+            ThemeLabel.Visibility = Visibility.Collapsed;
+        }
+
         private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
         {
             currentPage = 0;
@@ -589,10 +655,9 @@ namespace Interface
             HideTransformations();
             HideCalculations();
             HideComplexPlane();
-            
+
             ShowMainMenu();
         }
-
         private void OpenFunctions(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
@@ -601,7 +666,6 @@ namespace Interface
             HideMainMenu();
             ShowFunctions();
         }
-
         private void OpenTransformations(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
@@ -610,15 +674,13 @@ namespace Interface
             HideMainMenu();
             ShowTransformations();
         }
-
-        public void OpenCalculations(object sender = null, RoutedEventArgs e = null)
+        private void OpenCalculations(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
             currentPage = 3;
             HideMainMenu();
             ShowCalculations();
         }
-
         private void OpenComplexNumbers(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
@@ -627,97 +689,32 @@ namespace Interface
             HideMainMenu();
             ShowComplexPlane();
         }
-
-        private void Calculation0_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            try
-            {
-                string inputText = (sender as TextBox).Text;
-                string Latex = formatLatex(inputText, "c");
-                Calculation_InputRender0.Source = BitmapToImageSource(convertLatexToPng(Latex));
-
-                List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace((sender as TextBox).Text)).Split(' '));
-
-                Function f = new Function(output);
-                string result = "error";
-                if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
-                {
-                    double decialVal = 0;
-                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors, ref decialVal);
-                    if (Alfa is null)
-                        result = decialVal.ToString();
-                    else
-                        result = Alfa.MatrixToLatex();
-                    var beta = 1 + 2;
-                }
-                else
-                {
-                    double decimalVal = 0;
-                    Rational resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal).real;
-
-
-                    if (resultVAl == null)
-                        result = Math.Round(decimalVal, Global.decimalPlaces).ToString();
-                    else if ((resultVAl.Numerator() > 100000 && resultVAl.Numerator() > 100000) || (resultVAl.Denominator() > 100000 && resultVAl.Denominator() > 100000) || resultVAl.isFloat)
-                        result = "\\approx"+resultVAl.Decimal().ToString();
-                    else if (resultVAl.LatexFormat() != resultVAl.Decimal().ToString())
-                        result = resultVAl.LatexFormat() + "=" + resultVAl.Decimal();
-                    else
-                        result = resultVAl.LatexFormat();
-                }
-                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
-            }
-            catch
-            { //RenderErrorlhudyugywgygey}   
-            }
-        }
-
-        private void ResetGraph_Clicked(object sender =null, RoutedEventArgs e = null)
-        {
-            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
-            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
-            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
-                
-            Graph.Refresh();
-        }
-
         private void OpenSettings(object sender, RoutedEventArgs e)
         {
-            GoToSettings.Visibility = Visibility.Collapsed;
-
             HideCalculations();
             HideTransformations();
             HideFunctions();
             HideComplexPlane();
             HideMainMenu();
 
-            AngleMeasurementLabel.Visibility = Visibility.Visible;
-            AngleMeasurement.Visibility = Visibility.Visible;
-            Theme.Visibility = Visibility.Visible;
-            ThemeLabel.Visibility = Visibility.Visible;
-
-            ReturnFromSettings.Visibility = Visibility.Visible;
-            GoToMainMenu.Visibility = Visibility.Visible;
+            ShowSettings();
         }
-        
-        public void HideSettings()
+
+        private void ResetGraph_Clicked(object sender = null, RoutedEventArgs e = null)
         {
-            GoToMainMenu.Visibility = Visibility.Collapsed;
-            ReturnFromSettings.Visibility = Visibility.Collapsed;
-            GoToSettings.Visibility = Visibility.Visible;
-            AngleMeasurement.Visibility = Visibility.Collapsed;
-            AngleMeasurementLabel.Visibility = Visibility.Collapsed;
-            Theme.Visibility = Visibility.Collapsed;
-            ThemeLabel.Visibility = Visibility.Collapsed;
-        }
+            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
+            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+
+            Graph.Refresh();
+        }
         private void ExitSettings(object sender, RoutedEventArgs e)
         {
             HideSettings();
             switch (currentPage)
-            { 
+            {
                 case 1:
                     OpenFunctions();
                     break;
@@ -727,7 +724,7 @@ namespace Interface
                 case 3:
                     OpenCalculations();
                     break;
-                case 4: 
+                case 4:
                     OpenComplexNumbers();
                     break;
                 default:
@@ -738,9 +735,8 @@ namespace Interface
 
         private void AngleMeasurement_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            Global.angleFormatIndex = AngleMeasurement.SelectedIndex;   
+            Global.angleFormatIndex = AngleMeasurement.SelectedIndex;
         }
-
         private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Global.ThemeIndex = Theme.SelectedIndex;

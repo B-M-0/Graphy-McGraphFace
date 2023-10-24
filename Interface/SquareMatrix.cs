@@ -10,7 +10,7 @@ namespace Interface
     public class SquareMatrix : Matrix
     {
 
-            
+        //For Testing
         public SquareMatrix(int a = 2, bool empty = false) : base(a, a)
         {
             //Test values
@@ -27,22 +27,11 @@ namespace Interface
                 }
             }
         }
-
+        //
 
         public SquareMatrix(Rational[,] MatrixElements) : base(MatrixElements) { }
         public SquareMatrix(int[,] MatrixElements) : base(MatrixElements) { }
         public SquareMatrix(double[,] MatrixElements) : base(MatrixElements) { }
-
-        public static SquareMatrix identityMatrix(int dimension)
-        {
-            SquareMatrix I = new SquareMatrix(dimension, true);
-            for (int i = 0; i < dimension; i++)
-            {
-                I.Values[i, i] = 1;
-            }
-            return I;
-        }
-
         public SquareMatrix(Matrix A) : base(A.rows, A.columns)
         {
             if (A.rows != A.columns)
@@ -51,6 +40,18 @@ namespace Interface
             }
             this.Values = A.Values;
         }
+        //Identity Matrix
+        public static SquareMatrix I(int dimension)
+        {
+            SquareMatrix I = new SquareMatrix(dimension, true);
+            for (int i = 0; i < dimension; i++)
+            {
+                I.Values[i, i] = 1;
+            }
+            return I;
+        }
+        //
+        
 
 
         public static SquareMatrix operator ^(SquareMatrix A, int Power)
@@ -66,7 +67,7 @@ namespace Interface
                     B = A.Inverse();
                     break;
                 case 0:
-                    B = identityMatrix(A.rows);
+                    B = I(A.rows);
                     break;
                 default:
                     for (int i = 1; i < Power; i++)
@@ -200,6 +201,7 @@ namespace Interface
             return A;
         }
 
+        //fix this
         public (Vector, Rational) Eigen(SquareMatrix A)
         {
             Vector EigenVector = new Vector(A.rows);

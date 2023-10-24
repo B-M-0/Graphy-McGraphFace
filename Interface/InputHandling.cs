@@ -1,28 +1,21 @@
 ﻿using ScottPlot;
-using ScottPlot.Drawing.Colormaps;
-using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows.Input;
-using XamlMath.Utils;
 
 namespace Interface
 {
     //  \sqrt{23}
-   
+
 
     static class InputHandling
     {
-        
+
         static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>() 
-        { 
-            "\\sqrt","abs", 
+        static List<string> FunctionCodes = new List<string>()
+        {
+            "\\sqrt","abs",
             "mod", "arg",
             "cos", "sin", "tan",
             "cosh", "sinh", "tanh",
@@ -31,14 +24,14 @@ namespace Interface
             "arccosh", "arcsinh", "arctanh",
             "\\M" , "\\V", "det" ,"dot","cross"
         };
-        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables,Dictionary<string, ComplexNumber> Variables, ref double decimalval)
+        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval)
         {
             Variables = Global.defineConstants();
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
             {
                 string operand1Str, operand2Str;
-                Rational  operand1_R, operand2_R;
+                Rational operand1_R, operand2_R;
                 ComplexNumber operand1_C, operand2_C;
                 Surd operand1_S, operand2_S;
                 double operand1, operand2;
@@ -68,7 +61,7 @@ namespace Interface
                         Variables.Add(key, new Rational(Math.Sqrt(operand1)));
 
                         stack.Push(key);
-                        break;                  
+                        break;
                     case "exp":
                         operand1_R = Variables[stack.Pop()].real;
                         operand1 = operand1_R.Decimal();
@@ -185,7 +178,7 @@ namespace Interface
 
                         stack.Push(key);
                         break;
-                    case "+":                      
+                    case "+":
                         operand1_C = Variables[stack.Pop()];
                         operand2_C = Variables[stack.Pop()];
 
@@ -196,19 +189,19 @@ namespace Interface
                         break;
                     case "-":
                         operand1_C = Variables[stack.Pop()];
-                        operand2_C = Variables[stack.Pop()];
-
+                        try { operand2_C = Variables[stack.Pop()]; }
+                        catch { operand2_C = 0; }
                         key = GenerateKey(Variables);
                         Variables.Add(key, operand2_C - operand1_C);
 
                         stack.Push(key);
-                        break;                      
+                        break;
                     case "*":
-                        operand1_C = Variables[stack.Pop()]; 
+                        operand1_C = Variables[stack.Pop()];
                         operand2_C = Variables[stack.Pop()];
 
                         key = GenerateKey(Variables);
-                        Variables.Add(key ,operand2_C * operand1_C);
+                        Variables.Add(key, operand2_C * operand1_C);
 
                         stack.Push(key);
                         break;
@@ -242,9 +235,12 @@ namespace Interface
 
                         try
                         {
-                            if (Regex.IsMatch(element, "[0-9]*i$"))
+                            if (Regex.IsMatch(element, "[0-9]*i"))
                             {
-                                temp *= new ComplexNumber(0, double.Parse(element.Substring(0, element.Length - 1)));
+                                if (element == "i")
+                                    temp *= new ComplexNumber(0, 1);
+                                else
+                                    temp *= new ComplexNumber(0, double.Parse(element.Substring(0, element.Length - 1)));
                             }
                             else if (Regex.IsMatch(element, "[A-Za-z\\e]+$") && negative)
                                 temp *= Variables[element.Substring(1)].real;
@@ -254,9 +250,9 @@ namespace Interface
                                 temp *= double.Parse(element.Substring(1));
                             else
                                 temp *= double.Parse(element);
-                            
+
                             key = GenerateKey(Variables);
-                            Variables.Add(key, temp);   
+                            Variables.Add(key, temp);
                             stack.Push(key);
                         }
                         catch { }
@@ -266,10 +262,10 @@ namespace Interface
             }
 
             string outputstr = stack.Pop();
-            Rational output = new Rational(1);
+            ComplexNumber output = new ComplexNumber(1, 0);
             if (Regex.IsMatch(outputstr, "[A-Z]+$"))
             {
-                output = Variables[outputstr].real ;
+                output = Variables[outputstr];
                 Variables.Clear();
                 return output;
             }
@@ -278,13 +274,13 @@ namespace Interface
                 decimalval = double.Parse(outputstr);
                 Variables.Clear();
                 return null;
-            }            
+            }
         }
         public static double evaluatePostfix(List<string> expression, Dictionary<string, double> Variables, ref bool validinput)
         {
             validinput = true;
             Stack<string> stack = new Stack<string>();
-            for(int iterator = 0; iterator < expression.Count() && validinput;iterator++)
+            for (int iterator = 0; iterator < expression.Count() && validinput; iterator++)
             {
                 string element = expression[iterator];
                 try
@@ -368,7 +364,10 @@ namespace Interface
                             break;
                         case "-":
                             operand1 = double.Parse(stack.Pop());
-                            operand2 = double.Parse(stack.Pop());
+                            if (stack.Count() == 0)
+                                operand2 = 0;
+                            else
+                                operand2 = double.Parse(stack.Pop());
                             stack.Push((operand2 - operand1).ToString());
                             break;
                         case "*":
@@ -412,7 +411,7 @@ namespace Interface
 
                                 stack.Push(temp.ToString());
                             }
-                            catch 
+                            catch
                             {
                                 validinput = false;
                             }
@@ -420,7 +419,7 @@ namespace Interface
                     }
                 }
                 catch (Exception error)
-                { 
+                {
                     validinput = false;
                 }
             }
@@ -429,7 +428,7 @@ namespace Interface
             return output;
         }
 
-        static public string IndentifyLoci(string input)
+        static public string IdentifyLoci(string input)
         {
             var temp = input.Split('=');
             string LHS = temp[0];
@@ -445,8 +444,7 @@ namespace Interface
                 return "U";//undefined
         }
 
-
-        public static  string GenerateKey<T>(Dictionary<string, T> Dictionary)
+        public static string GenerateKey<T>(Dictionary<string, T> Dictionary)
         {
             int a = 0;
             if (typeof(T).FullName == "Surd")
@@ -465,7 +463,6 @@ namespace Interface
             return key;
         }
 
-        
         public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
         {
             Stack<string> stack = new Stack<string>();
@@ -477,7 +474,7 @@ namespace Interface
                 string key;
                 switch (element)
                 {
-                    
+
                     case @"\M":
                         operand1 = stack.Pop();
                         Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
@@ -537,9 +534,9 @@ namespace Interface
                                 Matrices.Add(operand2 + operand1, C);
                                 stack.Push(operand2 + operand1);
                             }
-                            catch (NullReferenceException e) 
+                            catch (NullReferenceException e)
                             {
-                               string msg = e.Message;
+                                string msg = e.Message;
                             }
                         }
                         else if (Regex.IsMatch(operand1, "[A-Z]"))
@@ -587,7 +584,7 @@ namespace Interface
                         string temp = "";
                         bool negative = false;
 
-                        if (element[0]=='_' && element.Contains("\\\\") == false)
+                        if (element[0] == '_' && element.Contains("\\\\") == false)
                         {
                             negative = true;
                             temp = element.Substring(1);
@@ -782,7 +779,7 @@ namespace Interface
 
             }
 
-       
+
             string outputstr = stack.Pop();
             Matrix output;
             if (Regex.IsMatch(outputstr, "[A-Z]+$"))
@@ -806,14 +803,14 @@ namespace Interface
             {
                 try
                 {
-                    char character = input[i]; 
+                    char character = input[i];
                     switch (character)
                     {
                         case 'x':
                             int maxlen = 5;
                             if (i < 5)
                                 maxlen = i;
-                            for (int coefficentlen = maxlen; coefficentlen > 0 ; coefficentlen--)
+                            for (int coefficentlen = maxlen; coefficentlen > 0; coefficentlen--)
                             {
                                 string coefficient = input.Substring(i - coefficentlen, coefficentlen);
                                 if (Regex.IsMatch(coefficient, "[0-9]+$"))
@@ -823,7 +820,7 @@ namespace Interface
                                     i += 3;
                                 }
                             }
-                            break;                     
+                            break;
                         case '\\':
                         case 'a':
                         case 'd':
@@ -845,10 +842,10 @@ namespace Interface
                                     }
                                 }
                                 catch (Exception e)
-                                { 
-                                  k = input.Length; 
+                                {
+
                                 }
-                            }              
+                            }
                             break;
                         case '+':
                         case '-':
@@ -947,7 +944,7 @@ namespace Interface
             while (Stack.Count() > 0)
             {
                 string element = Stack.Pop();
-                if(element != ",")
+                if (element != ",")
                     postfix.Add(element);
             }
 

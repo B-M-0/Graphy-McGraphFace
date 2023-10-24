@@ -48,10 +48,15 @@ namespace Interface
         public string LatexFormat()
         {
             Simplify();
-            if(!isInteger)
-                return $"\\frac{{{numerator}}}{{{denominator}}}";
+            string sign = "";
+            if (numerator < 0) sign = "-";
+            
+            if(isInteger)
+                return numerator.ToString();
+            else if(isFloat)
+                return this.Decimal().ToString();  
             else 
-                return numerator.ToString() ;
+                return $"{sign}\\frac{{{Math.Abs(numerator)}}}{{{denominator}}}";
         }
         public Rational(int numerator, int denominator = 1)
         {
@@ -185,7 +190,7 @@ namespace Interface
         }
         public static Rational operator ^(Rational A, double power)
         {
-            Rational result = new Rational(Math.Pow(A.numerator, power)/Math.Pow(A.denominator, power));
+            Rational result = new Rational((int)Math.Pow(A.numerator, power),(int)Math.Pow(A.denominator, power));
             return result.Simplify();
         }
 
