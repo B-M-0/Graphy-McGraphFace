@@ -6,12 +6,8 @@ using System.Text.RegularExpressions;
 
 namespace Interface
 {
-    //  \sqrt{23}
-
-
     static class InputHandling
     {
-
         static Random random = new Random();
         static List<string> FunctionCodes = new List<string>()
         {
@@ -24,7 +20,7 @@ namespace Interface
             "arccosh", "arcsinh", "arctanh",
             "\\M" , "\\V", "det" ,"dot","cross"
         };
-       
+
         public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval)
         {
             Variables = Global.defineConstants();
@@ -471,17 +467,42 @@ namespace Interface
             return output;
         }
 
+
+        public static Tuple<ComplexNumber , Rational > ComplexLociParse_H(List<string> LHS, List<string> RHS)
+        {
+            LHS.Remove("arg");
+            double decimalval = 0;  
+            Surd placeholderSurd = 0;   
+            Function LHS_exp = new Function(LHS);
+            Function RHS_exp = new Function(RHS);
+            ComplexNumber Angle = RHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd);
+            ComplexNumber Center = LHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd, 0);
+            return Tuple.Create(Center, Angle.real);
+        }
+        public static Tuple<ComplexNumber, Rational> ComplexLociParse_C(List<string> LHS, List<string> RHS)
+        {
+            LHS.Remove("mod");
+            double decimalval = 0;
+            Surd placeholderSurd = 0;
+            Function LHS_exp = new Function(LHS);
+            Function RHS_exp = new Function(RHS);
+            ComplexNumber Radius = RHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd);
+            ComplexNumber Center = LHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd, 0);
+            return Tuple.Create(Center, Radius.real);
+        }
+
+
         static public string IdentifyLoci(string input)
         {
             var temp = input.Split('=');
             string LHS = temp[0];
             string RHS = temp[1];
 
-            if (LHS.Contains("mod(z") && RHS.Contains("mod(z"))
+            if (LHS.Contains("mod") && RHS.Contains("mod"))
                 return "B";//bisector
-            else if (LHS.Contains("mod(z") && Regex.IsMatch(RHS, "[0-9.]"))
+            else if (LHS.Contains("mod") && Regex.IsMatch(RHS, "[0-9.]*"))
                 return "C";//cirlce
-            else if (LHS.Contains("arg(z") & Regex.IsMatch(RHS, "[0-9.]"))
+            else if (LHS.Contains("arg") & Regex.IsMatch(RHS, "[0-9.]*"))
                 return "H";//halfline
             else
                 return "U";//undefined

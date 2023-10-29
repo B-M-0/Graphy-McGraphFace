@@ -7,6 +7,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -287,11 +289,46 @@ namespace Interface
                 Graph.Refresh();
             }
         }
-
-        public void UpdateGraph_ComplexLoci()
+        public void UpdateGraph_ComplexLoci(string input)
         {
             Graph.Plot.Clear();
             ResetGraph_Clicked();
+
+            string I = InputHandling.IdentifyLoci(input);
+            string[] expression = input.Split('=');
+            List<string> LHS;
+            List<string> RHS;
+            LHS = InputHandling.infixToPostfix(expression[0].Split(' '));
+            RHS = InputHandling.infixToPostfix(expression[1].Split(' '));
+
+            switch (I)
+            {
+                case "H":
+                    Tuple<ComplexNumber,Rational> HalflineStats = InputHandling.ComplexLociParse_H(LHS, RHS);
+                    double centerX = -HalflineStats.Item1.real;
+                    double centerY = -HalflineStats.Item1.imaginary;
+                    double angle = HalflineStats.Item2;
+                    //center
+                    Graph.Plot.AddCircle(centerX, centerY, 0.05, lineWidth: (float)2);
+                    //Loci
+                    var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
+                    Graph.Plot.AddFunction(func, lineWidth: 2);
+                    break;
+                case "C":
+                    Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ComplexLociParse_C(LHS, RHS);
+                    centerX = -CircleStats.Item1.real;
+                    centerY = -CircleStats.Item1.imaginary;
+                    double radius = CircleStats.Item2;
+                    //center
+                    Graph.Plot.AddCircle(centerX, centerY, 0.05,lineWidth: (float)2);
+                    //Loci
+                    Graph.Plot.AddCircle(centerX, centerY, radius);    
+                    break;
+                case "B":
+                    break;
+            }
+
+            
 
 
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
@@ -299,7 +336,7 @@ namespace Interface
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
+            Graph.Refresh();    
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -474,27 +511,24 @@ namespace Interface
                     UpdateRender(id, BitmapToImageSource(convertLatexToPng(Latex)));
                 }
                 catch
-                { //RenderError}   
+                {
+                    UpdateRender(id, null);
                 }
                 Graph.Plot.Clear();
 
-
-
                 try
                 {
-                    List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace(inputs[id])).Split(' '));
-
-                    functions[id] = new Function(output);
+                    string input_string = InputHandling.formatInput(Global.removeWhiteSpace(inputs[id]));
+                    List<string> expression = InputHandling.infixToPostfix(input_string.Split(' '));
+                    functions[id] = new Function(expression);
                     valid[id] = true;
-
 
                     if (currentPage == 1)
                         UpdateGraph_functions();
                     else if (currentPage == 2)
                         UpdateGraph_transformations();
                     else if (currentPage == 4)
-                        UpdateGraph_ComplexLoci();
-
+                        UpdateGraph_ComplexLoci(input_string);
                 }
                 catch (Exception exception)
                 {
@@ -502,14 +536,9 @@ namespace Interface
                 }
 
                 if (currentPage == 1)
-                {
                     valid_function = valid;
-                }
                 else
-                {
                     valid_transformation = valid;
-                }
-
             }
         }
 
