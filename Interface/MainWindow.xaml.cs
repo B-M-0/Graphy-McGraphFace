@@ -341,8 +341,16 @@ namespace Interface
                     //MidPoint mp_? == midpoint_?
                     double mp_x = (x_1 + x_2) / 2;
                     double mp_y = (y_1 + y_2) / 2;
-                    func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
-                    Graph.Plot.AddFunction(func, lineWidth: 2);
+
+                    if (y_2 == y_1)
+                    {
+                        Graph.Plot.AddVerticalLine(x: mp_x);
+                    }
+                    else
+                    {
+                        func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
+                        Graph.Plot.AddFunction(func, lineWidth: 2);
+                    }
                     break;
             }
 
