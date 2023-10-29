@@ -7,6 +7,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -287,11 +289,64 @@ namespace Interface
                 Graph.Refresh();
             }
         }
-
-        public void UpdateGraph_ComplexLoci()
+        public void UpdateGraph_ComplexLoci(string input)
         {
             Graph.Plot.Clear();
             ResetGraph_Clicked();
+
+            string I = InputHandling.IdentifyLoci(input);
+            string[] expression = input.Split('=');
+            List<string> LHS;
+            List<string> RHS;
+            LHS = InputHandling.infixToPostfix(expression[0].Split(' '));
+            RHS = InputHandling.infixToPostfix(expression[1].Split(' '));
+
+            switch (I)
+            {
+                case "H":
+                    Tuple<ComplexNumber,Rational> HalflineStats = InputHandling.ComplexLociParse_Halfline(LHS, RHS);
+                    double centerX = -HalflineStats.Item1.real;
+                    double centerY = -HalflineStats.Item1.imaginary;
+                    double angle = HalflineStats.Item2;
+                    //center
+                    Graph.Plot.AddCircle(centerX, centerY, 0.05, lineWidth: (float)2);
+                    //Loci
+                    var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
+                    Graph.Plot.AddFunction(func, lineWidth: 2);
+                    break;
+                case "C":
+                    Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ComplexLociParse_Circle(LHS, RHS);
+                    centerX = -CircleStats.Item1.real;
+                    centerY = -CircleStats.Item1.imaginary;
+                    double radius = CircleStats.Item2;
+                    //center
+                    Graph.Plot.AddCircle(centerX, centerY, 0.05,lineWidth: (float)2);
+                    //Loci
+                    Graph.Plot.AddCircle(centerX, centerY, radius);    
+                    break;
+                case "B":
+                    Tuple<ComplexNumber, ComplexNumber> BisectorStats = InputHandling.ComplexLociParse_Bisector(LHS, RHS);
+                    double x_1 = -BisectorStats.Item1.real;
+                    double y_1 = -BisectorStats.Item1.imaginary;
+                    double x_2 = -BisectorStats.Item2.real;
+                    double y_2 = -BisectorStats.Item2.imaginary;
+
+                    double gradient;
+                    double dy = y_2 - y_1;
+                    double dx = x_2 - x_1;
+                    if (dy == 0 || dx == 0)
+                        gradient = 0;
+                    else
+                     gradient = -(dx / dy);
+                    //MidPoint mp_? == midpoint_?
+                    double mp_x = (x_1 + x_2) / 2;
+                    double mp_y = (y_1 + y_2) / 2;
+                    func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
+                    Graph.Plot.AddFunction(func, lineWidth: 2);
+                    break;
+            }
+
+            
 
 
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
@@ -299,7 +354,7 @@ namespace Interface
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
+            Graph.Refresh();    
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
@@ -474,27 +529,24 @@ namespace Interface
                     UpdateRender(id, BitmapToImageSource(convertLatexToPng(Latex)));
                 }
                 catch
-                { //RenderError}   
+                {
+                    UpdateRender(id, null);
                 }
                 Graph.Plot.Clear();
 
-
-
                 try
                 {
-                    List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace(inputs[id])).Split(' '));
-
-                    functions[id] = new Function(output);
+                    string input_string = InputHandling.formatInput(Global.removeWhiteSpace(inputs[id]));
+                    List<string> expression = InputHandling.infixToPostfix(input_string.Split(' '));
+                    functions[id] = new Function(expression);
                     valid[id] = true;
-
 
                     if (currentPage == 1)
                         UpdateGraph_functions();
                     else if (currentPage == 2)
                         UpdateGraph_transformations();
                     else if (currentPage == 4)
-                        UpdateGraph_ComplexLoci();
-
+                        UpdateGraph_ComplexLoci(input_string);
                 }
                 catch (Exception exception)
                 {
@@ -502,14 +554,9 @@ namespace Interface
                 }
 
                 if (currentPage == 1)
-                {
                     valid_function = valid;
-                }
                 else
-                {
                     valid_transformation = valid;
-                }
-
             }
         }
 

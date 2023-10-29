@@ -10,7 +10,28 @@ namespace Interface
     public class Global
     {
 
+        public static double HalfLine(double X,double angle, double y_1, double x_1)
+        {
+            double M = Math.Tan(angle);
+            if(((angle < Math.PI/2 && angle > -Math.PI/2) && X < x_1) || ((angle > Math.PI / 2 || angle < -Math.PI / 2) && X > x_1))
+            { 
+          
+                return double.NaN;
+            }
+            
+            double Y = M*(X - x_1) + y_1;
 
+            return Y;
+        }
+        public static double Line(double X, double M, double y_1, double x_1)
+        {
+            double Y = M * (X - x_1) + y_1;
+
+            return Y;
+        }
+
+        public static Dictionary<string,Surd> LociDictionary_S = new Dictionary<string,Surd>();
+        public static Dictionary<string, ComplexNumber> LociDictionary_C = new Dictionary<string, ComplexNumber>();
 
         public static int ThemeIndex = 6;
         public static int angleFormatIndex= 0;

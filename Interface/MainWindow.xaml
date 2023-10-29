@@ -89,7 +89,7 @@
 
 
         <Label Name="AngleMeasurementLabel"  Content="Angle Measurement:" Grid.Column="2" Grid.Row="3" FontSize="22" Margin="0,0,0,20" Visibility="Collapsed"/>
-        <ComboBox  Name="AngleMeasurement" SelectionChanged="AngleMeasurement_SelectionChanged" Grid.Column="2" Grid.Row="3" Visibility="Collapsed" FontSize="18" Margin="0,30,0,0" Height="30" >
+        <ComboBox  Name="AngleMeasurement" Text="Radians" SelectionChanged="AngleMeasurement_SelectionChanged" Grid.Column="2" Grid.Row="3" Visibility="Collapsed" FontSize="18" Margin="0,30,0,0" Height="30" >
             <ComboBoxItem Content="Radians"/>
             <ComboBoxItem Content="Degrees"/>
             <ComboBoxItem Content="Gradians"/>
