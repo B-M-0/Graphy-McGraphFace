@@ -35,13 +35,13 @@ namespace Interface
             return InputHandling.evaluatePostfix(postFixFunction, Variables, ref validinput);
         }
 
-        public ComplexNumber Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, double x = 1)
+        public ComplexNumber Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval, double x = 1)
         {
             if (!Variables.ContainsKey("z"))
                 Variables.Add("z", x);
             else
                 Variables["z"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval);
+            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval , ref  Surdval);
         }
 
 

@@ -24,7 +24,8 @@ namespace Interface
             "arccosh", "arcsinh", "arctanh",
             "\\M" , "\\V", "det" ,"dot","cross"
         };
-        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval)
+       
+        public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval)
         {
             Variables = Global.defineConstants();
             Stack<string> stack = new Stack<string>();
@@ -59,7 +60,8 @@ namespace Interface
                         operand1 = operand1_R.Decimal();
                         key = GenerateKey(Variables);
                         Variables.Add(key, new Rational(Math.Sqrt(operand1)));
-
+                        if (operand1_R.isFloat == false)
+                            SurdVariables.Add("#" + key, Surd.Sqrt(operand1_R));
                         stack.Push(key);
                         break;
                     case "exp":
@@ -179,29 +181,68 @@ namespace Interface
                         stack.Push(key);
                         break;
                     case "+":
-                        operand1_C = Variables[stack.Pop()];
-                        operand2_C = Variables[stack.Pop()];
+                        operand1Str = stack.Pop();
+                        operand2Str = stack.Pop();
+
+                        operand1_C = Variables[operand1Str];
+                        operand2_C = Variables[operand2Str];
 
                         key = GenerateKey(Variables);
                         Variables.Add(key, operand2_C + operand1_C);
 
+                        if (!SurdVariables.TryGetValue("#" + operand1Str, out operand1_S))
+                            operand1_S = operand1_C.real;
+                        if (!SurdVariables.TryGetValue("#" + operand2Str, out operand2_S))
+                            operand2_S = operand2_C.real;
+
+                        if (operand1_S.isIrrational || operand2_S.isIrrational)
+                            SurdVariables.Add("#" + key, operand2_S + operand1_S);
+
                         stack.Push(key);
                         break;
                     case "-":
-                        operand1_C = Variables[stack.Pop()];
-                        try { operand2_C = Variables[stack.Pop()]; }
-                        catch { operand2_C = 0; }
+                        operand1Str = stack.Pop();
+                        operand2Str = "";
+                        operand1_C = Variables[operand1Str];
+
+
+                        if (stack.Count() == 0)
+                            operand2_C = 0;
+                        else
+                        {
+                            operand2Str = stack.Pop();
+                            operand2_C = Variables[operand2Str];
+                        }
                         key = GenerateKey(Variables);
                         Variables.Add(key, operand2_C - operand1_C);
 
+                        if (!SurdVariables.TryGetValue("#" + operand1Str, out operand1_S))
+                            operand1_S = operand1_C.real;
+                        if (!SurdVariables.TryGetValue("#" + operand2Str, out operand2_S))
+                            operand2_S = operand2_C.real;
+
+                        if (operand1_S.isIrrational || operand2_S.isIrrational)
+                            SurdVariables.Add("#" + key, operand2_S - operand1_S);
                         stack.Push(key);
                         break;
                     case "*":
-                        operand1_C = Variables[stack.Pop()];
-                        operand2_C = Variables[stack.Pop()];
+                        operand1Str = stack.Pop();
+                        operand2Str = stack.Pop();
+
+                        operand1_C = Variables[operand1Str];
+                        operand2_C = Variables[operand2Str];
 
                         key = GenerateKey(Variables);
                         Variables.Add(key, operand2_C * operand1_C);
+
+                        if (!SurdVariables.TryGetValue("#" + operand1Str, out operand1_S))
+                            operand1_S = operand1_C.real;
+                        if (!SurdVariables.TryGetValue("#" + operand2Str, out operand2_S))
+                            operand2_S = operand2_C.real;
+
+                        if (operand1_S.isIrrational || operand2_S.isIrrational)
+                            SurdVariables.Add("#" + key, operand2_S * operand1_S);
+
 
                         stack.Push(key);
                         break;
@@ -235,7 +276,7 @@ namespace Interface
 
                         try
                         {
-                            if (Regex.IsMatch(element, "[0-9]*i"))
+                            if (Regex.IsMatch(element, "[0-9]*i") && element != "\\pi")
                             {
                                 if (element == "i")
                                     temp *= new ComplexNumber(0, 1);
@@ -267,6 +308,8 @@ namespace Interface
             {
                 output = Variables[outputstr];
                 Variables.Clear();
+                SurdVariables.TryGetValue("#" + outputstr, out Surdval);
+                SurdVariables.Clear();
                 return output;
             }
             else
@@ -824,6 +867,7 @@ namespace Interface
                         case '\\':
                         case 'a':
                         case 'd':
+                        case 'm':
                         case 's':
                         case 'c':
                         case 't':
@@ -886,6 +930,10 @@ namespace Interface
 
         public static List<string> infixToPostfix(string[] infix)
         {
+            var temp = infix.ToList();
+            while (temp.Remove("")) ;
+
+            infix = temp.ToArray();
             bool isOperator(string operator_)
             {
                 return operator_ == "^" || operator_ == "*" || operator_ == "/" || operator_ == "+" || operator_ == "-" || operator_ == ",";

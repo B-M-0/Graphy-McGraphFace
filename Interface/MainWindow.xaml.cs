@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ScottPlot.Styles;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
@@ -58,11 +59,15 @@ namespace Interface
         int universial_lower_bound = -10;
         double universial_step = 0.1;
 
+        string result;
+        string alt_result;
+        bool showAltForm = false;
+
         string[] function_inputs = new string[input_count];
         string[] transformation_inputs = new string[input_count];
         string[] complex_inputs = new string[input_count];
 
-        static public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+        static public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
         public Dictionary<string, Vector> Vectors = new Dictionary<string, Vector>();
 
@@ -71,7 +76,7 @@ namespace Interface
         /// <summary>
         /// reffactor later
         /// </summary>
-        public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+        public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.E }, { "\\pi",Math.PI} };
         public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
         public Dictionary<string, Surd> SurdVars = new Dictionary<string, Surd>();
 
@@ -98,12 +103,15 @@ namespace Interface
         {
             //Modes f ==> functions, c ==> calcuations
             string temp = "";
-            foreach (char character in input)
+            for (int i = 0; i <input.Length; i++)
             {
+                char character = input[i];
                 switch (character)
                 {
                     case 'i':
-                        temp += " i ";
+                        if (i != 0 && input[i - 1] != 'p')
+                            temp += " i ";
+                        else temp += "i ";
                         break;
                     case ' ':
                     case '*':
@@ -383,11 +391,12 @@ namespace Interface
                 string inputText = (sender as TextBox).Text;
                 string Latex = formatLatex(inputText, "c");
                 Calculation_InputRender0.Source = BitmapToImageSource(convertLatexToPng(Latex));
-
+                Calculation_OutputRender0.Source = null;
+                "sd".ToString();
                 List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace((sender as TextBox).Text)).Split(' '));
 
                 Function f = new Function(output);
-                string result = "=";
+                result = "=";
                 if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
                 {
                     double decialVal = 0;
@@ -401,12 +410,28 @@ namespace Interface
                 else
                 {
                     double decimalVal = 0;
-                    ComplexNumber resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal);
+                    Surd Surdval = 0;
+                    ComplexNumber resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal,Surdval: ref Surdval);
+                    
+                    if (resultVAl.isComplex())
+                    {
+                        ToggleModuloButton.Visibility = Visibility.Visible;
+                        alt_result = resultVAl.ModulousArgumentForm();
+                    }
+                    else if (Surdval != null && Surdval != 0.0)
+                    {
+                        ToggleModuloButton.Visibility = Visibility.Visible;
+                        alt_result = Surdval.ToLatex();
+                    }
+
+
+                    else
+                        ToggleModuloButton.Visibility = Visibility.Collapsed;
 
                     if (resultVAl == null)
                         result += Math.Round(decimalVal, Global.decimalPlaces).ToString();
                     else if (resultVAl.imaginary.isFloat || resultVAl.real.isFloat)
-                        result = "\\approx" + resultVAl.LatexFormat_float();
+                        result = "\\approx" + (resultVAl.LatexFormat_float());
                     else if (resultVAl.LatexFormat_frac() != resultVAl.LatexFormat_float())
                         result += resultVAl.LatexFormat_frac() + "=" + resultVAl.LatexFormat_float();
                     else
@@ -416,7 +441,7 @@ namespace Interface
                 Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
             }
             catch
-            { //RenderErrorlhudyugywgygey}   
+             { //RenderErrorlhudyugywgygey}   
             }
         }
 
@@ -594,6 +619,7 @@ namespace Interface
         {
             ResetGraph.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
+            ToggleModuloButton.Visibility = Visibility.Collapsed;
             Calculation_InputRender0.Visibility = Visibility.Collapsed;
             Calculation_Input0.Visibility = Visibility.Collapsed;
             Calculation_InputBackDrop0.Visibility = Visibility.Collapsed;
@@ -741,6 +767,20 @@ namespace Interface
         {
             Global.ThemeIndex = Theme.SelectedIndex;
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+        }
+
+        private void ToggleModulo(object sender, RoutedEventArgs e)
+        {
+            if (!showAltForm)
+            {
+                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(alt_result));
+                showAltForm = true;    
+            }
+            else
+            { 
+                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
+                showAltForm = false;
+            }
         }
     }
 }

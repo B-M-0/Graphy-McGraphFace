@@ -25,11 +25,8 @@ namespace Interface
             }
             return array;
         }
-
         public int rows, columns;
         public Rational[,] Values;
-
-
 
         public Matrix(Rational[,] MatrixElements) : this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
         {

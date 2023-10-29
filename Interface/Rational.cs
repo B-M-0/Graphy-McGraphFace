@@ -1,61 +1,60 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interface
-{ 
-    public class Rational 
+{
+    public class Rational
     {
         public bool isInteger = false;
         public bool isFloat = false;
-        private int numerator ;
+        public bool isSurd = false;
+
+        private List<Surd> Irrationals;
+        private int numerator;
         private int denominator;
         private double Decimalval;
 
         public static implicit operator double(Rational A)
         {
-            if(A == null)
+            if (A == null)
                 return 0;
-            return A.Decimalval = (double)A.numerator / (double)A.denominator;
-           
+            return A.Decimalval;
+
         }
         //as
         public static implicit operator Rational(double A)
         {
-            double B = Math.Round(A,Global.decimalPlaces);
-            return new Rational(B).Simplify();
+            return new Rational(A).Simplify();
         }
-        public static explicit operator Rational(int A)
+        public static implicit operator Rational(int A)
         {
             return new Rational(A).Simplify();
         }
 
         public static explicit operator int(Rational A)
         {
-            return (int) (double) A;
+            return (int)(double)A;
         }
 
         public static implicit operator string(Rational A)
         {
-            
-               if (A.isInteger)
-                    return $"{A.numerator}";
-                else
-                    return $"{A.numerator}/{A.denominator}";    
+
+            if (A.isInteger)
+                return $"{A.numerator}";
+            else
+                return $"{A.numerator}/{A.denominator}";
         }
         public string LatexFormat()
         {
             Simplify();
             string sign = "";
             if (numerator < 0) sign = "-";
-            
-            if(isInteger)
+
+            if (isInteger)
                 return numerator.ToString();
-            else if(isFloat)
-                return this.Decimal().ToString();  
-            else 
+            else if (isFloat)
+                return this.Decimal().ToString();
+            else
                 return $"{sign}\\frac{{{Math.Abs(numerator)}}}{{{denominator}}}";
         }
         public Rational(int numerator, int denominator = 1)
@@ -80,12 +79,12 @@ namespace Interface
         public Rational(double Decimal)
         {
             // truncates to (k)dp
-            this.Decimalval = Math.Round(Decimal,Global.decimalPlaces + 5);
+            this.Decimalval = Math.Round(Decimal, Global.decimalPlaces + 5);
             if (!Decimal.ToString().Contains('.'))
             {
                 this.isInteger = true;
                 numerator = (int)Decimal;
-                denominator = 1; 
+                denominator = 1;
             }
             else if (Decimalval.ToString().Split('.')[1].Length > Global.decimalPlaces)
             {
@@ -112,7 +111,7 @@ namespace Interface
                 this.numerator = X.numerator;
                 this.denominator = X.denominator;
             }
-               
+
         }
 
         public Rational Simplify()
@@ -142,6 +141,7 @@ namespace Interface
             return new Rational(denominator, numerator);
         }
 
+      
         public static Rational operator +(Rational A, Rational B)
         {
             Rational result;
@@ -158,7 +158,7 @@ namespace Interface
         {
             Rational result;
 
-            if(A.isFloat || B.isFloat)
+            if (A.isFloat || B.isFloat)
                 result = new Rational(A.Decimalval - B.Decimalval);
             else if (A.denominator == B.denominator)
                 result = new Rational(A.numerator - B.numerator, A.denominator);
@@ -183,36 +183,36 @@ namespace Interface
         }
         public static Rational operator /(Rational A, Rational B)
         {
-            if(A.isFloat|| B.isFloat)
-                return A.Decimalval / B.Decimalval; 
+            if (A.isFloat || B.isFloat)
+                return A.Decimalval / B.Decimalval;
             else
                 return A * B.reciprocal();
         }
         public static Rational operator ^(Rational A, double power)
         {
-            Rational result = new Rational((int)Math.Pow(A.numerator, power),(int)Math.Pow(A.denominator, power));
+            Rational result = new Rational((int)Math.Pow(A.numerator, power), (int)Math.Pow(A.denominator, power));
             return result.Simplify();
         }
 
         public double Decimal()
         {
-            return Math.Round(Decimalval,Global.decimalPlaces);
+            return Math.Round(Decimalval, Global.decimalPlaces);
         }
 
 
 
         public int Numerator()
-        { 
+        {
             return this.numerator;
         }
-        public int Denominator() 
-        { 
-            return this.denominator; 
+        public int Denominator()
+        {
+            return this.denominator;
         }
 
 
         private void signHandling()
-        {   
+        {
             if (this.numerator < 0 && this.denominator < 0)
             {
                 this.numerator = Math.Abs(this.numerator);
@@ -229,6 +229,6 @@ namespace Interface
                 isInteger = true;
             }
         }
-               
+
     }
 }

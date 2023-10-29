@@ -46,13 +46,15 @@ namespace Interface
             string temp = "";
             if (imaginary < 0 || real == 0)
                 sign = "";
+            if (imaginary == -1)
+                sign = "-";
 
             if (real != 0)
                 temp += real.LatexFormat();
 
             if (imaginary == 0)
                 return temp;
-            else if (imaginary == 1)
+            else if (imaginary == 1 || imaginary == -1)
                 return temp += sign + " i";
             else
                 return temp += sign + imaginary.LatexFormat()+ " i";
@@ -87,6 +89,11 @@ namespace Interface
             double temp = (A.real ^ 2) + (A.imaginary ^ 2);
             return Math.Sqrt(temp);  
         }
+        public static Surd Exact_Abs(ComplexNumber A)
+        {
+            Rational temp = (A.real ^ 2) + (A.imaginary ^ 2);
+            return Surd.Sqrt(temp);
+        }
         public static double Arg(ComplexNumber A)
         {
             double angle = Math.Atan(Math.Abs(A.imaginary) / Math.Abs(A.real));
@@ -107,6 +114,13 @@ namespace Interface
             else 
                 return angle - Math.PI;   
         }
+        public string ModulousArgumentForm()
+        {
+            var arg = Arg(this);
+            var mod = Exact_Abs(this); 
+            return $"{mod.ToLatex()} ( \\cos({Math.Round(arg, Global.decimalPlaces)}) + i \\sin({Math.Round(arg,Global.decimalPlaces)}) )"; 
+        }
+
         public ComplexNumber Conjugate()
         { 
             return new ComplexNumber(real, (-1) * imaginary);  

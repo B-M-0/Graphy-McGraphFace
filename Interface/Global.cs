@@ -65,12 +65,12 @@ namespace Interface
         }*/
         static public Dictionary<string, ComplexNumber> defineConstants()
         {
-            return new Dictionary<string, ComplexNumber> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+            return new Dictionary<string, ComplexNumber> { { "e", Math.E }, { "\\pi", Math.PI } };
         }
 
         static public Dictionary<string, double> defineConstants<T>()
         {
-           return new Dictionary<string, double> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
+           return new Dictionary<string, double> { { "e",Math.E }, { "\\pi", Math.PI } };
         }
 
 

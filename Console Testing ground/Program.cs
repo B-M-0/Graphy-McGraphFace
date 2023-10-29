@@ -83,8 +83,8 @@ namespace ConsoleApplication2
 
             // convertLatexToPng("Test1", @"e^{i \theta} = \cos(\theta) + i \sin(\theta)");
             //convertLatexToPng("Test1",@"\hat{ g} (f) =  \int_{ -\infty}^{\infty}g(t) e ^{ -2 \pi i f t}\, dt");
-            convertLatexToPng("Test1", "\\Hut");
-        drawimage("Test1.png");
+            convertLatexToPng("Test1", "hi dude");
+            drawimage("Test1.png");
 
         
         }
