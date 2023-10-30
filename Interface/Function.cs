@@ -37,6 +37,7 @@ namespace Interface
 
         public ComplexNumber Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval, double x = 1)
         {
+            Variables = Global.defineConstants();
             if (!Variables.ContainsKey("z"))
                 Variables.Add("z", x);
             else

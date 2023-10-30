@@ -11,7 +11,7 @@ namespace Interface
     {
 
         //For Testing
-        public SquareMatrix(int a = 2, bool empty = false) : base(a, a)
+        public SquareMatrix(int a = 2, bool empty = true) : base(a, a)
         {
             //Test values
             if (!empty)
@@ -40,6 +40,20 @@ namespace Interface
             }
             this.Values = A.Values;
         }
+        public SquareMatrix(Vector[] vectors)
+        {
+            rows = vectors.Length;
+            columns = vectors.Length;
+            Values = new Rational[vectors.Length,vectors.Length];
+            for (int i = 0; i < vectors.Length; i++)
+            {
+                for (int j = 0; j < vectors.Length; j++)
+                {
+                    this.Values[j, i] = vectors[i].Values[j];
+                }
+            }
+        }
+
         //Identity Matrix
         public static SquareMatrix I(int dimension)
         {
@@ -52,8 +66,6 @@ namespace Interface
         }
         //
         
-
-
         public static SquareMatrix operator ^(SquareMatrix A, int Power)
         {
             SquareMatrix B = A;
@@ -76,7 +88,6 @@ namespace Interface
             }
             return B;
         }
-
         public static SquareMatrix operator ^(SquareMatrix A, string Operation)
         {
             SquareMatrix B;
@@ -157,6 +168,17 @@ namespace Interface
             return determinant(Minor);
         }
 
+        public Vector getColumn(int columnIndex) 
+        {
+            Vector output = new Vector(this.columns);
+            for (int i = 0; i < this.columns; i++)
+            {
+                output.Values[i] = this.Values[i,columnIndex]; 
+            }
+            return output;
+        }
+
+
         public static SquareMatrix Minor(SquareMatrix A)
         {
             //Calculates a matrix of minor elements
@@ -202,13 +224,29 @@ namespace Interface
         }
 
         //fix this
-        public (Vector, Rational) Eigen(SquareMatrix A)
+        public void QR_Decomposition()
         {
-            Vector EigenVector = new Vector(A.rows);
-            Rational EigenValue = 1;
+            SquareMatrix A = this;
+            Vector[] a = new Vector[A.columns];
+            for (int i = 0; i < A.columns; i++)
+                a[i] = A.getColumn(i);
+
+            Vector[] e = Vector.Gram_Schmidt_orthonormalization(a);
+
+            SquareMatrix Q = new SquareMatrix(e);
+            SquareMatrix R = new SquareMatrix((Transpose(Q)) * A);
+
+        }
+
+        public List<(Vector, Rational)> EigenStuff(SquareMatrix A)
+        {
+            // k == lambda
+            //Av = kv hence Av - kv = 0, v(A - kI) = 0 and |A - kI| = 0
+            Rational[] eigenValues = new Rational[A.rows];
 
 
-            return (EigenVector, EigenValue);
+
+            return null;
         }
 
 

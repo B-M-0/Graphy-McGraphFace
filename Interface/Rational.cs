@@ -86,7 +86,7 @@ namespace Interface
                 numerator = (int)Decimal;
                 denominator = 1;
             }
-            else if (Decimalval.ToString().Split('.')[1].Length > Global.decimalPlaces)
+            else if (Decimalval.ToString().Split('.')[1].Length > Global.decimalPlaces || Decimalval > 10000000)
             {
                 isFloat = true;
                 numerator = 0;

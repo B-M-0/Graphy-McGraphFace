@@ -22,8 +22,7 @@ namespace Interface
         };
 
         public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval)
-        {
-            Variables = Global.defineConstants();
+        {           
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
             {
@@ -713,7 +712,7 @@ namespace Interface
                         B = Matrices[operand2];
                         V1 = new Vector(A.Values);
                         V2 = new Vector(B.Values);
-                        V3 = V2 + V1;
+                        V3 = Vector.cross(V2 ,V1);
                         C = new Matrix(V3.GetValues());
                         key = GenerateKey(Matrices);
                         Matrices.Add(key, C);

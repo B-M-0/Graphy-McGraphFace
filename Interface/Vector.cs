@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -8,7 +9,7 @@ namespace Interface
 {
     public class Vector : Matrix
     {
-        Rational[] Values;
+        public new Rational[] Values;
 
         public Rational[] GetValues() { return Values; }    
 
@@ -30,7 +31,6 @@ namespace Interface
 
 
         // returns the dot product of two vectors
-
         public static double operator *(Vector A, Vector B)
         {
             if (A.rows != B.rows)
@@ -46,9 +46,55 @@ namespace Interface
 
             return sum;
         }
+        //
+
+        public static Vector operator *(double scalar, Vector A)
+        {
+            Vector B = new Vector(A.rows);
+            for (int i = 0; i < A.rows; i++)
+            {
+                B.Values[i] = A.Values[i] * scalar;
+            }
+            return B;
+        }
+        public static Vector operator *(Vector A, double scalar)
+        {
+            return scalar * A;
+        }
+        public static Vector operator *(Rational scalar, Vector A)
+        {
+            Vector B = new Vector(A.rows);
+            for (int i = 0; i < A.rows; i++)
+            {
+                B.Values[i] = A.Values[i] * scalar;
+            }
+            return B;
+        }
+        public static Vector operator *(Vector A, Rational scalar)
+        {
+            return scalar * A;
+        }
+        public static Vector operator -(Vector A, Vector B)
+        {
+            Vector C = new Vector(A.rows);
+            for (int i = 0; i < A.rows; i++)
+            {
+                C.Values[i] = A.Values[i] - B.Values[i]; 
+            }
+            return C;
+        }
+        public static Vector operator +(Vector A, Vector B)
+        {
+            Vector C = new Vector(A.rows);
+            for (int i = 0; i < A.rows; i++)
+            {
+                C.Values[i] = A.Values[i] + B.Values[i];
+            }
+            return C;
+        }
 
         // returns the cross product of two vectors
-        public static Vector operator +(Vector A, Vector B)
+        public static Vector cross(Vector A, Vector B)
         {
            
             if (A.rows == 3 && B.rows == 3)
@@ -63,6 +109,9 @@ namespace Interface
             return null;
         }
 
+      
+
+
 
         public double Magnitude()
         {
@@ -71,12 +120,55 @@ namespace Interface
             {
                 sum += element * element;
             }
-            return Math.Round(Math.Sqrt(sum));
+            double root = Math.Sqrt(sum);
+            return Math.Round(root);
+        }
+
+        public static Vector proj(Vector u, Vector v)
+        {
+            return ((u * v) / (u * u)) * u;
+        }
+
+        public static Vector[] Gram_Schmidt_orthogonalization(Vector[] v)
+        {
+            Vector[] u = new Vector[v.Length];
+            for (int i = 0; i < v.Length; i++)
+            {
+                u[i] = v[i];
+                for (int j = 0; j < i; j++)
+                {
+                    u[i] = u[i] - proj(u[j], v[i]);
+                }
+            }
+            return u;
+        }
+        public static Vector[] Gram_Schmidt_orthonormalization(Vector[] v)
+        {
+            Vector[] u = new Vector[v.Length];
+            Vector[] e = new Vector[v.Length];
+            for (int i = 0; i < v.Length; i++)
+            {
+                u[i] = v[i];
+                for (int j = 0; j < i; j++)
+                {
+                    u[i] = u[i] - proj(u[j], v[i]);
+                }
+                Rational scalar;
+                double absU = u[i].Magnitude();
+                if (absU % 1 == 0)
+                    scalar = new Rational(1, (int)absU);
+                else
+                    scalar = 1 / absU;
+                 
+                Vector temp = scalar * u[i];
+                e[i] = temp;
+            }
+            return e;
         }
         //public Vector UnitVector()
         //{ 
-            
-        
+
+
         //}
 
     }
