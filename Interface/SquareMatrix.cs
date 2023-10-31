@@ -57,7 +57,8 @@ namespace Interface
         //Identity Matrix
         public static SquareMatrix I(int dimension)
         {
-            SquareMatrix I = new SquareMatrix(dimension, true);
+            dimension = dimension % 12;
+            SquareMatrix I = new SquareMatrix(dimension, empty:true);
             for (int i = 0; i < dimension; i++)
             {
                 I.Values[i, i] = 1;
@@ -224,9 +225,8 @@ namespace Interface
         }
 
         //fix this
-        public void QR_Decomposition()
+        public static (SquareMatrix,SquareMatrix) QR_Decomposition(SquareMatrix A)
         {
-            SquareMatrix A = this;
             Vector[] a = new Vector[A.columns];
             for (int i = 0; i < A.columns; i++)
                 a[i] = A.getColumn(i);
@@ -235,19 +235,21 @@ namespace Interface
 
             SquareMatrix Q = new SquareMatrix(e);
             SquareMatrix R = new SquareMatrix((Transpose(Q)) * A);
-
+            return (Q, R);
         }
-
-        public List<(Vector, Rational)> EigenStuff(SquareMatrix A)
+        public static SquareMatrix QR_Q(SquareMatrix A)
         {
-            // k == lambda
-            //Av = kv hence Av - kv = 0, v(A - kI) = 0 and |A - kI| = 0
-            Rational[] eigenValues = new Rational[A.rows];
-
-
-
-            return null;
+            return QR_Decomposition(A).Item1;
         }
+        public static SquareMatrix QR_R(SquareMatrix A)
+        {
+            return QR_Decomposition(A).Item2;
+        }
+
+        /// <summary>
+        /// pain
+        /// </summary>
+        
 
 
         public SquareMatrix Inverse()

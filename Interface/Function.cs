@@ -50,10 +50,10 @@ namespace Interface
         {
             return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors, ref decimalval);
         }
-
+        /*
         public Matrix Evaluate( Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double decimalval)
         {
             return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors, ref decimalval);
-        }
+        }*/
     }
 }

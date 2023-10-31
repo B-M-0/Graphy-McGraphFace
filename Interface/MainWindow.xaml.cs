@@ -119,10 +119,10 @@ namespace Interface
                     case ' ':
                     case '*':
                         if (Mode == "c")
-                            temp += "\\cdot";
+                            temp += " \\cdot ";
                         break;
                     case '_':
-                        temp += '-';
+                        temp += " -";
                         break;
                     default:
                         temp += character;
@@ -137,7 +137,7 @@ namespace Interface
         {
             var parser = WpfTeXFormulaParser.Instance;
             var formula = parser.Parse(latex);
-            var png_Data = formula.RenderToPng(190.0, 1.0, 1.0, "Arial");
+            var png_Data = formula.RenderToPng(190.0, 4.0, 2.0, "Arial");
 
             Bitmap Image;
             using (MemoryStream ms = new MemoryStream(png_Data))
@@ -158,9 +158,9 @@ namespace Interface
         {
             //scuffed test environment
             //\start
-            List<List<int>> mtxlist = new List<List<int>> { new List<int>{ 12, -51, 4 }, new List<int> { 6, 167, -68 }, new List<int> { -4, 24, -41 } };    
+            List<List<int>> mtxlist = new List<List<int>> { new List<int> { 12, -51, 4 }, new List<int> { 6, 167, -68 }, new List<int> { -4, 24, -41 } };
             SquareMatrix a = new SquareMatrix(Matrix.Convert2DListToArray(mtxlist));
-            a.QR_Decomposition();
+            var b = SquareMatrix.QR_Decomposition(a);
 
             // \end
             InitializeComponent();
@@ -477,7 +477,7 @@ namespace Interface
 
                 Function f = new Function(output);
                 result = "=";
-                if (inputText.Contains("\\M") || Regex.IsMatch(inputText, "[A-Z]+$"))
+                if (inputText.Contains("\\M") || inputText.Contains("I(") || Regex.IsMatch(inputText, "[A-Z]+$"))
                 {
                     double decialVal = 0;
                     Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors, ref decialVal);
@@ -485,7 +485,6 @@ namespace Interface
                         result += decialVal.ToString();
                     else
                         result += Alfa.MatrixToLatex();
-                    var beta = 1 + 2;
                 }
                 else
                 {

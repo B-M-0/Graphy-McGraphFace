@@ -203,10 +203,10 @@ namespace Interface
                 {
                     for (int column = 0; column < C.columns; column++)
                     {
-                        double sum = 0;
+                        Rational sum = 0;
                         for (int i = 0; i < A.columns; i++)
                         {
-                            sum += (double)(A.Values[row, i] * B.Values[i, column]);
+                            sum += (A.Values[row, i] * B.Values[i, column]);
                         }
                         C.Values[row, column] = sum;
                     }
@@ -332,11 +332,11 @@ namespace Interface
                 {
                     if(this.Values[row, column] == null)    
                         return "format error";
-                    Latex += (string)this.Values[row, column] + "&";
+                    Latex += this.Values[row, column].LatexFormat() + "&";
                 }
                 if (this.Values[row, this.columns-1] == null)
                     return "format error";
-                Latex += (string)this.Values[row, this.columns - 1] + @"\\";
+                Latex += this.Values[row, this.columns - 1].LatexFormat() + @"\\";
             }
 
             return Latex + "}";

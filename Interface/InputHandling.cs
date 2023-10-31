@@ -11,6 +11,7 @@ namespace Interface
         static Random random = new Random();
         static List<string> FunctionCodes = new List<string>()
         {
+            "QRr", "QRq", "I",
             "\\sqrt","abs",
             "mod", "arg",
             "cos", "sin", "tan",
@@ -22,7 +23,7 @@ namespace Interface
         };
 
         public static ComplexNumber evaluatePostfix(List<string> expression, Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval)
-        {           
+        {
             Stack<string> stack = new Stack<string>();
             foreach (string element in expression)
             {
@@ -465,13 +466,225 @@ namespace Interface
             double output = double.Parse(stack.Pop());
             return output;
         }
+        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
+        {
+            Stack<string> stack = new Stack<string>();
+            foreach (string element in expression)
+            {
+                string operand1, operand2;
+                Matrix A, B, C;
+                SquareMatrix sqA;
+                Vector V1, V2, V3;
+                double a, b;
+                string key;
+                switch (element)
+                {
+                    case "I":
+                        operand1 = stack.Pop();
+                        A = SquareMatrix.I(int.Parse(operand1));
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, A);
+                        stack.Push(key);
+                        break;
+                    case @"\M":
+                        operand1 = stack.Pop();
+                        Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, NewMatrix);
+                        stack.Push(key);
+                        break;
+                    case "cross":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand1];
+                        B = Matrices[operand2];
+                        V1 = new Vector(A.Values);
+                        V2 = new Vector(B.Values);
+                        V3 = Vector.cross(V2, V1);
+                        C = new Matrix(V3.GetValues());
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, C);
+                        stack.Push(key);
+                        break;
+                    case "dot":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand1];
+                        B = Matrices[operand2];
+                        V1 = new Vector(A.Values);
+                        V2 = new Vector(B.Values);
+                        a = V2 * V1;
+                        stack.Push(a.ToString());
+                        break;
+                    case "det":
+                        operand1 = stack.Pop();
+                        A = Matrices[operand1];
+                        sqA = new SquareMatrix(A);
+                        stack.Push(((double)SquareMatrix.determinant(sqA)).ToString());
+                        break;
+                    case "QRr":
+                        operand1 = stack.Pop();
+                        A = Matrices[operand1];
+                        sqA = new SquareMatrix(A);
+                        key = GenerateKey(Matrices);
+
+                        sqA = SquareMatrix.QR_R(sqA);
+                        Matrices.Add(key, sqA);
+                        stack.Push(key);
+                        break;
+                    case "QRq":
+                        operand1 = stack.Pop();
+                        A = Matrices[operand1];
+                        sqA = new SquareMatrix(A);
+                        key = GenerateKey(Matrices);
+
+                        sqA = SquareMatrix.QR_Q(sqA);
+                        Matrices.Add(key, sqA);
+                        stack.Push(key);
+                        break;
+                    case "+":
+
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
+                        {
+                            stack.Push((double.Parse(operand2) + double.Parse(operand1)).ToString());
+                        }
+                        else
+                        {
+                            A = Matrices[operand1];
+                            B = Matrices[operand2];
+                            C = B + A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        break;
+                    case "-":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
+                        {
+                            stack.Push((double.Parse(operand2) - double.Parse(operand1)).ToString());
+                        }
+                        else
+                        {
+                            A = Matrices[operand1];
+                            B = Matrices[operand2];
+                            C = B - A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        break;
+                    case "*":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        if (Regex.IsMatch(operand1, "[A-Z]") && Regex.IsMatch(operand2, "[A-Z]"))
+                        {
+                            try
+                            {
+                                A = Matrices[operand1];
+                                B = Matrices[operand2];
+                                C = B * A;
+                                Matrices.Add(operand2 + operand1, C);
+                                stack.Push(operand2 + operand1);
+                            }
+                            catch (NullReferenceException e)
+                            {
+                                string msg = e.Message;
+                            }
+                        }
+                        else if (Regex.IsMatch(operand1, "[A-Z]"))
+                        {
+                            A = Matrices[operand1];
+                            C = double.Parse(operand2) * A;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        else if (Regex.IsMatch(operand2, "[A-Z]"))
+                        {
+                            B = Matrices[operand2];
+                            C = double.Parse(operand1) * B;
+                            key = GenerateKey(Matrices);
+                            Matrices.Add(key, C);
+                            stack.Push(key);
+                        }
+                        else
+                        {
+                            a = double.Parse(operand1);
+                            b = double.Parse(operand2);
+                            stack.Push((b * a).ToString());
+                            break;
+                        }
+                        break;
+                    case "/":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        a = double.Parse(operand1);
+                        b = double.Parse(operand2);
+                        stack.Push((b / a).ToString());
+                        break;
+                    case "^":
+                        operand1 = stack.Pop();
+                        operand2 = stack.Pop();
+                        A = Matrices[operand2];
+                        int power = int.Parse(operand1);
+                        C = new SquareMatrix(A) ^ power;
+                        key = GenerateKey(Matrices);
+                        Matrices.Add(key, C);
+                        stack.Push(key);
+                        break;
+                    default:
+                        string temp = "";
+                        bool negative = false;
+
+                        if (element[0] == '_' && element.Contains("\\\\") == false)
+                        {
+                            negative = true;
+                            temp = element.Substring(1);
+                        }
+                        else
+                            temp = element;
+
+                        if (Regex.IsMatch(element, "[a-z]+$"))
+                            temp = Variables[temp].ToString();
 
 
-        public static Tuple<ComplexNumber , Rational > ComplexLociParse_Halfline(List<string> LHS, List<string> RHS)
+                        if (negative)
+                        {
+                            temp = ((-1) * double.Parse(temp)).ToString();
+                        }
+                        stack.Push(temp);
+
+                        break;
+                }
+            }
+
+
+            string outputstr = stack.Pop();
+            Matrix output;
+            if (Regex.IsMatch(outputstr, "[A-Z]+$"))
+            {
+                output = Matrices[outputstr];
+                Variables.Clear();
+                return output;
+            }
+            else
+            {
+                DecimalVal = double.Parse(outputstr);
+                Variables.Clear();
+                return null;
+            }
+        }
+
+
+        public static Tuple<ComplexNumber, Rational> ComplexLociParse_Halfline(List<string> LHS, List<string> RHS)
         {
             LHS.Remove("arg");
-            double decimalval = 0;  
-            Surd placeholderSurd = 0;   
+            double decimalval = 0;
+            Surd placeholderSurd = 0;
             Function LHS_exp = new Function(LHS);
             Function RHS_exp = new Function(RHS);
             ComplexNumber Angle = RHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd);
@@ -489,7 +702,6 @@ namespace Interface
             ComplexNumber Center = LHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd, 0);
             return Tuple.Create(Center, Radius.real);
         }
-
         public static Tuple<ComplexNumber, ComplexNumber> ComplexLociParse_Bisector(List<string> LHS, List<string> RHS)
         {
             LHS.Remove("mod");
@@ -502,8 +714,6 @@ namespace Interface
             ComplexNumber Z_1 = LHS_exp.Evaluate(Global.LociDictionary_S, Global.LociDictionary_C, ref decimalval, ref placeholderSurd, 0);
             return Tuple.Create(Z_1, Z_2);
         }
-
-
         static public string IdentifyLoci(string input)
         {
             var temp = input.Split('=');
@@ -539,339 +749,6 @@ namespace Interface
             return key;
         }
 
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
-        {
-            Stack<string> stack = new Stack<string>();
-            foreach (string element in expression)
-            {
-                string operand1, operand2;
-                Matrix A, B, C;
-                double a, b;
-                string key;
-                switch (element)
-                {
-
-                    case @"\M":
-                        operand1 = stack.Pop();
-                        Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
-                        key = GenerateKey(Matrices);
-                        Matrices.Add(key, NewMatrix);
-                        stack.Push(key);
-                        break;
-                    case "det":
-                        operand1 = stack.Pop();
-                        A = Matrices[operand1];
-                        break;
-                    case "+":
-
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
-                        {
-                            stack.Push((operand2 + operand1).ToString());
-                        }
-                        else
-                        {
-                            A = Matrices[operand1];
-                            B = Matrices[operand2];
-                            C = B + A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        break;
-                    case "-":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
-                        {
-                            stack.Push((operand2 + operand1).ToString());
-                        }
-                        else
-                        {
-                            A = Matrices[operand1];
-                            B = Matrices[operand2];
-                            C = B - A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        break;
-                    case "*":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[A-Z]") && Regex.IsMatch(operand2, "[A-Z]"))
-                        {
-                            try
-                            {
-                                A = Matrices[operand1];
-                                B = Matrices[operand2];
-                                C = B * A;
-                                Matrices.Add(operand2 + operand1, C);
-                                stack.Push(operand2 + operand1);
-                            }
-                            catch (NullReferenceException e)
-                            {
-                                string msg = e.Message;
-                            }
-                        }
-                        else if (Regex.IsMatch(operand1, "[A-Z]"))
-                        {
-                            A = Matrices[operand1];
-                            C = double.Parse(operand2) * A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        else if (Regex.IsMatch(operand2, "[A-Z]"))
-                        {
-                            B = Matrices[operand2];
-                            C = double.Parse(operand1) * B;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        else
-                        {
-                            a = double.Parse(operand1);
-                            b = double.Parse(operand2);
-                            stack.Push((b * a).ToString());
-                            break;
-                        }
-                        break;
-                    case "/":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        a = double.Parse(operand1);
-                        b = double.Parse(operand2);
-                        stack.Push((b / a).ToString());
-                        break;
-                    case "^":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        A = Matrices[operand2];
-                        int power = int.Parse(operand1);
-                        C = new SquareMatrix(A) ^ power;
-                        key = GenerateKey(Matrices);
-                        Matrices.Add(key, C);
-                        stack.Push(key);
-                        break;
-                    default:
-                        string temp = "";
-                        bool negative = false;
-
-                        if (element[0] == '_' && element.Contains("\\\\") == false)
-                        {
-                            negative = true;
-                            temp = element.Substring(1);
-                        }
-                        else
-                            temp = element;
-
-                        if (Regex.IsMatch(element, "[a-z]+$"))
-                            temp = Variables[temp].ToString();
-
-
-                        if (negative)
-                        {
-                            temp = ((-1) * double.Parse(temp)).ToString();
-                        }
-                        stack.Push(temp);
-
-                        break;
-                }
-
-            }
-
-            return Matrices[stack.Pop()];
-        }
-        public static Matrix evaluatePostfixMatrix(List<string> expression, Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double DecimalVal)
-        {
-            Stack<string> stack = new Stack<string>();
-            foreach (string element in expression)
-            {
-                string operand1, operand2;
-                Matrix A, B, C;
-                SquareMatrix sqA;
-                Vector V1, V2, V3;
-                double a, b;
-                string key;
-                switch (element)
-                {
-                    case @"\M":
-                        operand1 = stack.Pop();
-                        Matrix NewMatrix = Matrix.LatexToMatrix(operand1);
-                        key = GenerateKey(Matrices);
-                        Matrices.Add(key, NewMatrix);
-                        stack.Push(key);
-                        break;
-                    case "cross":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        A = Matrices[operand1];
-                        B = Matrices[operand2];
-                        V1 = new Vector(A.Values);
-                        V2 = new Vector(B.Values);
-                        V3 = Vector.cross(V2 ,V1);
-                        C = new Matrix(V3.GetValues());
-                        key = GenerateKey(Matrices);
-                        Matrices.Add(key, C);
-                        stack.Push(key);
-                        break;
-                    case "dot":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        A = Matrices[operand1];
-                        B = Matrices[operand2];
-                        V1 = new Vector(A.Values);
-                        V2 = new Vector(B.Values);
-                        a = V2 * V1;
-                        stack.Push(a.ToString());
-                        break;
-                    case "det":
-                        operand1 = stack.Pop();
-                        A = Matrices[operand1];
-                        sqA = new SquareMatrix(A);
-                        stack.Push(((double)SquareMatrix.determinant(sqA)).ToString());
-                        break;
-                    case "+":
-
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
-                        {
-                            stack.Push((operand2 + operand1).ToString());
-                        }
-                        else
-                        {
-                            A = Matrices[operand1];
-                            B = Matrices[operand2];
-                            C = B + A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        break;
-                    case "-":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[0-9]+$") && Regex.IsMatch(operand2, "[0-9]+$"))
-                        {
-                            stack.Push((operand2 + operand1).ToString());
-                        }
-                        else
-                        {
-                            A = Matrices[operand1];
-                            B = Matrices[operand2];
-                            C = B - A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        break;
-                    case "*":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        if (Regex.IsMatch(operand1, "[A-Z]") && Regex.IsMatch(operand2, "[A-Z]"))
-                        {
-                            try
-                            {
-                                A = Matrices[operand1];
-                                B = Matrices[operand2];
-                                C = B * A;
-                                Matrices.Add(operand2 + operand1, C);
-                                stack.Push(operand2 + operand1);
-                            }
-                            catch (NullReferenceException e)
-                            {
-                                string msg = e.Message;
-                            }
-                        }
-                        else if (Regex.IsMatch(operand1, "[A-Z]"))
-                        {
-                            A = Matrices[operand1];
-                            C = double.Parse(operand2) * A;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        else if (Regex.IsMatch(operand2, "[A-Z]"))
-                        {
-                            B = Matrices[operand2];
-                            C = double.Parse(operand1) * B;
-                            key = GenerateKey(Matrices);
-                            Matrices.Add(key, C);
-                            stack.Push(key);
-                        }
-                        else
-                        {
-                            a = double.Parse(operand1);
-                            b = double.Parse(operand2);
-                            stack.Push((b * a).ToString());
-                            break;
-                        }
-                        break;
-                    case "/":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        a = double.Parse(operand1);
-                        b = double.Parse(operand2);
-                        stack.Push((b / a).ToString());
-                        break;
-                    case "^":
-                        operand1 = stack.Pop();
-                        operand2 = stack.Pop();
-                        A = Matrices[operand2];
-                        int power = int.Parse(operand1);
-                        C = new SquareMatrix(A) ^ power;
-                        key = GenerateKey(Matrices);
-                        Matrices.Add(key, C);
-                        stack.Push(key);
-                        break;
-                    default:
-                        string temp = "";
-                        bool negative = false;
-
-                        if (element[0] == '_' && element.Contains("\\\\") == false)
-                        {
-                            negative = true;
-                            temp = element.Substring(1);
-                        }
-                        else
-                            temp = element;
-
-                        if (Regex.IsMatch(element, "[a-z]+$"))
-                            temp = Variables[temp].ToString();
-
-
-                        if (negative)
-                        {
-                            temp = ((-1) * double.Parse(temp)).ToString();
-                        }
-                        stack.Push(temp);
-
-                        break;
-                }
-
-            }
-
-
-            string outputstr = stack.Pop();
-            Matrix output;
-            if (Regex.IsMatch(outputstr, "[A-Z]+$"))
-            {
-                output = Matrices[outputstr];
-                Variables.Clear();
-                return output;
-            }
-            else
-            {
-                DecimalVal = double.Parse(outputstr);
-                Variables.Clear();
-                return null;
-            }
-        }
-
         public static string formatInput(string input)
         {
             string function;
@@ -897,11 +774,16 @@ namespace Interface
                                 }
                             }
                             break;
+                        case 'I':
+                            input = input.Substring(0, i) + "I " + input.Substring(i + 1);
+                            i++;
+                            break;
                         case '\\':
                         case 'a':
                         case 'd':
                         case 'm':
                         case 's':
+                        case 'Q':
                         case 'c':
                         case 't':
                         case 'e':

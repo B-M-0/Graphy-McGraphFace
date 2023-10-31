@@ -141,7 +141,7 @@ namespace Interface
             return new Rational(denominator, numerator);
         }
 
-      
+
         public static Rational operator +(Rational A, Rational B)
         {
             Rational result;
