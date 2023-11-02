@@ -54,7 +54,7 @@
         <Rectangle Name="Input2RenderBackDrop" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="8" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke"/>
 
 
-        <WpfPlot Name="Graph" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="6" Grid.RowSpan="10" BorderThickness="14" />
+        <WpfPlot Name="Graph" Grid.Column="2" Grid.Row="1" Grid.ColumnSpan="6" Grid.RowSpan="10" BorderThickness="14" LayoutUpdated="GraphChanged"/>
 
 
         <TextBox Name ="Function_Input0" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row ="4" FontSize="24" FontStyle="Italic" Visibility ="Collapsed" Margin="5,2" TextChanged="TextBox0_TextChanged"/>
@@ -137,6 +137,6 @@
             </StackPanel>
         </Button>
         
-
+        
     </Grid>
 </Window>

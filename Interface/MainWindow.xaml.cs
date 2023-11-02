@@ -22,7 +22,6 @@ namespace Interface
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
-
     class AngleTypes : ObservableCollection<string>
     {
         public AngleTypes()
@@ -57,6 +56,8 @@ namespace Interface
         bool[] valid_transformation = new bool[input_count];
         bool[] valid_complex = new bool[input_count];
 
+        static Tuple<string, double> axisBound;
+        
         int currentPage = 1;
         int universial_range = 20;
         int universial_lower_bound = -10;
@@ -873,6 +874,23 @@ namespace Interface
             { 
                 Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
                 showAltForm = false;
+            }
+        }
+
+        private void GraphChanged(object sender, EventArgs e)
+        {
+            if (currentPage == 4)
+            {
+                switch (axisBound.Item1)
+                {
+                    case "Upper":
+                        Graph.Plot.GetAxisLimits(0);
+                        if(ax)
+                        {
+                            
+                        }
+                    break;
+                }
             }
         }
     }
