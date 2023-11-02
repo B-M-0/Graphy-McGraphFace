@@ -23,7 +23,6 @@ namespace Interface
     /// </summary>
     /// 
 
-
     class AngleTypes : ObservableCollection<string>
     {
         public AngleTypes()
@@ -44,14 +43,15 @@ namespace Interface
         Function function0;
         Function function1;
         Function function2;
-
+    
         Function[] transformations = new Function[input_count];
 
         Function transformation0;
         Function transformation1;
         Function transformation2;
 
-
+        List<string>[] Loci = new List<string>[input_count];    
+                            
 
         bool[] valid_function = new bool[input_count];
         bool[] valid_transformation = new bool[input_count];
@@ -315,6 +315,9 @@ namespace Interface
                 LHS = InputHandling.infixToPostfix(expression[0].Split(' '));
                 RHS = InputHandling.infixToPostfix(expression[1].Split(' '));
                 // Types :: HalfLine (H), Bisector (B), Circle (C), Undefined (U)
+
+                List<string> Loci = new List<string> { typeOfLoci};
+
                 try
                 {
                     switch (typeOfLoci)
@@ -329,6 +332,10 @@ namespace Interface
                             //Loci
                             var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
                             Graph.Plot.AddFunction(func, lineWidth: 2);
+
+                            Loci.Add(angle.ToString());
+                            Loci.Add(centerY.ToString());
+                            Loci.Add(centerX.ToString());
                             break;
                         case "C":
                             Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ComplexLociParse_Circle(LHS, RHS);
@@ -339,6 +346,10 @@ namespace Interface
                             Graph.Plot.AddCircle(centerX, centerY, 0.05, lineWidth: (float)2);
                             //Loci
                             Graph.Plot.AddCircle(centerX, centerY, radius);
+
+                            Loci.Add(centerX.ToString());
+                            Loci.Add(centerY.ToString());
+                            Loci.Add(radius.ToString());
                             break;
                         case "B":
                             Tuple<ComplexNumber, ComplexNumber> BisectorStats = InputHandling.ComplexLociParse_Bisector(LHS, RHS);
@@ -361,11 +372,17 @@ namespace Interface
                             if (y_2 == y_1)
                             {
                                 Graph.Plot.AddVerticalLine(x: mp_x);
+                                Loci.Add("H");
+                                Loci.Add(mp_x.ToString());
                             }
                             else
                             {
                                 func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
                                 Graph.Plot.AddFunction(func, lineWidth: 2);
+                                Loci.Add("L");
+                                Loci.Add(gradient.ToString());
+                                Loci.Add(mp_y.ToString());
+                                Loci.Add(mp_x.ToString());
                             }
                             break;
                     }
