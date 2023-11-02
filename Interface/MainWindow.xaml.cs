@@ -1,4 +1,6 @@
-﻿using ScottPlot.Styles;
+﻿using ScottPlot;
+using ScottPlot.Plottable;
+using ScottPlot.Styles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -34,7 +36,7 @@ namespace Interface
 
     public partial class MainWindow : Window
     {
-
+        Random r = new Random();
         static int input_count = 3;
 
         Function[] functions = new Function[input_count];
@@ -48,20 +50,19 @@ namespace Interface
         Function transformation0;
         Function transformation1;
         Function transformation2;
+       
+        double[] axisBounds = new double[input_count];
+        IPlottable[] Locus = new IPlottable[input_count];
+       
+        bool[] Loci_plotted = new bool[input_count];
+        bool[] Loci_isHalfLine = new bool[input_count];
 
-        List<string>[] Loci = new List<string>[input_count];    
-                            
 
         bool[] valid_function = new bool[input_count];
         bool[] valid_transformation = new bool[input_count];
         bool[] valid_complex = new bool[input_count];
 
-        static Tuple<string, double> axisBound;
-        
         int currentPage = 1;
-        int universial_range = 20;
-        int universial_lower_bound = -10;
-        double universial_step = 0.1;
 
         string result;
         string alt_result;
@@ -71,6 +72,7 @@ namespace Interface
         string[] transformation_inputs = new string[input_count];
         string[] complex_inputs = new string[input_count];
         string[] parsed_complex_inputs = new string[input_count];
+
         static public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
         public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
         public Dictionary<string, Vector> Vectors = new Dictionary<string, Vector>();
@@ -81,7 +83,7 @@ namespace Interface
         /// reffactor later
         /// </summary>
         public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.E }, { "\\pi",Math.PI} };
-        public Dictionary<string, Matrix> RAtionalMatrices = new Dictionary<string, Matrix>();
+        public Dictionary<string, Matrix> RationalMatrices = new Dictionary<string, Matrix>();
         public Dictionary<string, Surd> SurdVars = new Dictionary<string, Surd>();
 
 
@@ -231,7 +233,7 @@ namespace Interface
 
             }
 
-            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+            Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
             Graph.Refresh();
         }
 
@@ -294,14 +296,13 @@ namespace Interface
 
                 }
 
-                Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+                Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
                 Graph.Refresh();
             }
         }
         public void UpdateGraph_ComplexLoci()
         {
             Graph.Plot.Clear();
-            ResetGraph_Clicked();
             
 
             for (int i = 0; i < complex_inputs.Length; i++) 
@@ -317,7 +318,8 @@ namespace Interface
                 RHS = InputHandling.infixToPostfix(expression[1].Split(' '));
                 // Types :: HalfLine (H), Bisector (B), Circle (C), Undefined (U)
 
-                List<string> Loci = new List<string> { typeOfLoci};
+                Loci_isHalfLine[i] = false;
+                Loci_plotted[i] = false;
 
                 try
                 {
@@ -329,14 +331,19 @@ namespace Interface
                             double centerY = -HalflineStats.Item1.imaginary;
                             double angle = HalflineStats.Item2;
                             //center
-                            Graph.Plot.AddCircle(centerX, centerY, 0.05, lineWidth: (float)2);
+                            Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
                             var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
-                            Graph.Plot.AddFunction(func, lineWidth: 2);
-
-                            Loci.Add(angle.ToString());
-                            Loci.Add(centerY.ToString());
-                            Loci.Add(centerX.ToString());
+                            
+                            var plt = new FunctionPlot(func);
+                            plt.LineWidth = 2;
+                            plt.Color = System.Drawing.Color.Red;
+                            Locus[i] = plt;
+                            Loci_isHalfLine[i] = true;
+                            Loci_plotted[i] = true ;
+                            Graph.Plot.Add(plt);
+                            axisBounds[i] = centerX;
+                            Graph.Plot.SetAxisLimits(centerX - 15 , centerX + 15, centerY - 15, centerY + 15);
                             break;
                         case "C":
                             Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ComplexLociParse_Circle(LHS, RHS);
@@ -344,13 +351,10 @@ namespace Interface
                             centerY = -CircleStats.Item1.imaginary;
                             double radius = CircleStats.Item2;
                             //center
-                            Graph.Plot.AddCircle(centerX, centerY, 0.05, lineWidth: (float)2);
+                            Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
                             Graph.Plot.AddCircle(centerX, centerY, radius);
 
-                            Loci.Add(centerX.ToString());
-                            Loci.Add(centerY.ToString());
-                            Loci.Add(radius.ToString());
                             break;
                         case "B":
                             Tuple<ComplexNumber, ComplexNumber> BisectorStats = InputHandling.ComplexLociParse_Bisector(LHS, RHS);
@@ -372,18 +376,12 @@ namespace Interface
 
                             if (y_2 == y_1)
                             {
-                                Graph.Plot.AddVerticalLine(x: mp_x);
-                                Loci.Add("H");
-                                Loci.Add(mp_x.ToString());
+                                Graph.Plot.AddVerticalLine(x: mp_x);                        
                             }
                             else
                             {
                                 func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
-                                Graph.Plot.AddFunction(func, lineWidth: 2);
-                                Loci.Add("L");
-                                Loci.Add(gradient.ToString());
-                                Loci.Add(mp_y.ToString());
-                                Loci.Add(mp_x.ToString());
+                                Graph.Plot.AddFunction(func, lineWidth: 2);                            
                             }
                             break;
                     }
@@ -822,7 +820,8 @@ namespace Interface
 
         private void ResetGraph_Clicked(object sender = null, RoutedEventArgs e = null)
         {
-            Graph.Plot.SetAxisLimits(-10, 10, -5, 5);
+            GraphChanged(null, null);
+            Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
@@ -876,20 +875,30 @@ namespace Interface
                 showAltForm = false;
             }
         }
-
+        
         private void GraphChanged(object sender, EventArgs e)
         {
-            if (currentPage == 4)
+            if (currentPage == 4 )
             {
-                switch (axisBound.Item1)
+                double error = Graph.Plot.GetAxisLimits(0).XSpan/30;
+
+                double maxX = Graph.Plot.GetAxisLimits(0).XMax;
+                double minX = Graph.Plot.GetAxisLimits(0).XMin;
+                for (int i = 0; i < input_count; i++)
                 {
-                    case "Upper":
-                        Graph.Plot.GetAxisLimits(0);
-                        if(ax)
-                        {
-                            
-                        }
-                    break;
+                   
+                    if (Loci_plotted[i] == true && (maxX <= axisBounds[i] + error ||  minX + error >= axisBounds[i]) && Loci_isHalfLine[i] == true)
+                    {
+                        Graph.Plot.Remove(Locus[i]);
+                        Loci_plotted[i] = false;
+                        Graph.Refresh();
+                    }         
+                    else if (Loci_plotted[i] == false && Loci_isHalfLine[i] == true && maxX >= axisBounds[i] + error && minX +error  <= axisBounds[i] )
+                    {
+                        Graph.Plot.Add(Locus[i]);
+                        Loci_plotted[i] = true;
+                    }
+                  
                 }
             }
         }
