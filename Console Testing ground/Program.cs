@@ -80,7 +80,8 @@ namespace ConsoleApplication2
 
         public static void Main(string[] args)
         {
-
+            Console.WriteLine(Math.Log(-1) + 1);
+            Console.ReadKey();
             // convertLatexToPng("Test1", @"e^{i \theta} = \cos(\theta) + i \sin(\theta)");
             //convertLatexToPng("Test1",@"\hat{ g} (f) =  \int_{ -\infty}^{\infty}g(t) e ^{ -2 \pi i f t}\, dt");
             convertLatexToPng("Test1", "hi dude");

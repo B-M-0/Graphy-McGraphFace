@@ -50,7 +50,10 @@ namespace Interface
         Function transformation0;
         Function transformation1;
         Function transformation2;
-       
+
+        FunctionPlot[] functionPlots = new FunctionPlot[input_count]; 
+        double[] asymptotes = new double[input_count];
+
         double[] axisBounds = new double[input_count];
         IPlottable[] Locus = new IPlottable[input_count];
        
@@ -228,9 +231,13 @@ namespace Interface
                     var func = new Func<double, double?>((x) => function.Evaluate(Vars, ref validinput, x));
                     valid_function[i] = validinput;
                     if (validinput)
-                        Graph.Plot.AddFunction(func, lineWidth: 2);
+                    {
+                        var plt = new FunctionPlot(func);
+                        functionPlots[i] = plt; 
+                        Graph.Plot.Add(plt);
+                        
+                    }
                 }
-
             }
 
             Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
@@ -291,9 +298,6 @@ namespace Interface
                         PlotMatrix(Matrices["U"]);
                         UPlotted = true;
                     }
-
-
-
                 }
 
                 Graph.Plot.SetAxisLimits(-15, 15, -15, 15);

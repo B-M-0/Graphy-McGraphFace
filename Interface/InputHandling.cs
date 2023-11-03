@@ -418,7 +418,7 @@ namespace Interface
                             operand1 = double.Parse(stack.Pop());
                             operand2 = double.Parse(stack.Pop());
                             if (operand1 == 0)
-                                stack.Push("0");
+                                stack.Push("NaN");
                             else
                                 stack.Push((operand2 / operand1).ToString());
                             break;
