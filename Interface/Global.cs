@@ -1,6 +1,7 @@
 ﻿using ScottPlot.Ticks.DateTimeTickUnits;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,34 +10,15 @@ namespace Interface
 {
     public class Global
     {
-
-        public static double HalfLine(double X,double angle, double y_1, double x_1)
-        {
-            double M = Math.Tan(angle);
-            if(((angle < Math.PI/2 && angle > -Math.PI/2) && X < x_1) || ((angle > Math.PI / 2 || angle < -Math.PI / 2) && X > x_1))
-            { 
-          
-                return double.NaN;
-            }
-            
-            double Y = M*(X - x_1) + y_1;
-
-            return Y;
-        }
-        public static double Line(double X, double M, double y_1, double x_1)
-        {
-            double Y = M * (X - x_1) + y_1;
-
-            return Y;
-        }
-
-        public static Dictionary<string,Surd> LociDictionary_S = new Dictionary<string,Surd>();
-        public static Dictionary<string, ComplexNumber> LociDictionary_C = new Dictionary<string, ComplexNumber>();
-
         public static int ThemeIndex = 6;
         public static int angleFormatIndex= 0;
+        public static int decimalPlaces = 7;
+        public static string[] colours = { "Red", "Green", "Teal", "OrangeRed", "Purple" }; 
+
+
         public static double InputAngleConversion(double input)
         {
+            
             switch (angleFormatIndex)
             {
                 case 0:
@@ -63,11 +45,7 @@ namespace Interface
                     return input;
             }
         }
-
-
-
-
-        static public string removeWhiteSpace(string input)
+        static public string RemoveWhiteSpace(string input)
         {
             string temp = "";
             foreach (char element in input)
@@ -78,22 +56,45 @@ namespace Interface
             return temp;
         }
 
-
-        static public int decimalPlaces = 7;
-        /*static public Dictionary<string,Rational> defineConstants()
+        public static double HalfLine(double X, double angle, double y_1, double x_1)
         {
-            return new Dictionary<string, Rational> { { "e", Math.Round(Math.E, Global.decimalPlaces) }, { "\\pi", Math.Round(Math.PI, Global.decimalPlaces) } };
-        }*/
-        static public Dictionary<string, ComplexNumber> defineConstants()
+            double M = Math.Tan(angle);
+            if (((angle < Math.PI / 2 && angle > -Math.PI / 2) && X < x_1) || ((angle > Math.PI / 2 || angle < -Math.PI / 2) && X > x_1))
+            {
+
+                return double.NaN;
+            }
+
+            double Y = M * (X - x_1) + y_1;
+
+            return Y;
+        }
+        public static double Line(double X, double M, double y_1, double x_1)
+        {
+            double Y = M * (X - x_1) + y_1;
+
+            return Y;
+        }
+
+
+        static public Dictionary<string, ComplexNumber> DefineConstants()
         {
             return new Dictionary<string, ComplexNumber> { { "e", Math.E }, { "\\pi", Math.PI } };
         }
-
-        static public Dictionary<string, double> defineConstants<T>()
+        static public Dictionary<string, double> DefineConstants<T>()
         {
            return new Dictionary<string, double> { { "e",Math.E }, { "\\pi", Math.PI } };
         }
+        static public Dictionary<string, Matrix> DefineCommonMatrices()
+        {
+            Dictionary<string, Matrix> matrices = new Dictionary<string, Matrix>();
 
+            Matrix UnitSquare = new Matrix(new double[2, 4] { { 0, 1, 1, 0 }, { 0, 0, 1, 1 } });
+            Matrix UnitTriangle = new Matrix(new double[2, 3] { { 0, 1, 0.5 }, { 0, 0, Math.Sqrt(3) / 2 } });
+            matrices.Add("U", UnitSquare);
+            matrices.Add("T", UnitTriangle);
+            return matrices;
+        }
 
     }
 }

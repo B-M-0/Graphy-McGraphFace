@@ -5,6 +5,8 @@ using System.Data;
 using System.Data.Common;
 using System.Linq;
 using System.Diagnostics;
+using System.Windows.Navigation;
+using System.Diagnostics.Eventing.Reader;
 
 namespace Interface
 {
@@ -12,6 +14,72 @@ namespace Interface
     public class Matrix
     {
         // NEEDS A CLEANING UP
+        
+        public readonly int rows, columns;
+        protected  Rational[,] values;
+
+        public Rational this[int row,int column]
+        { 
+            get => values[row, column];
+            set => values[row, column] = value;
+        }
+
+        public Matrix(Rational[,] matrixElements) : this(matrixElements.GetLength(0), matrixElements.GetLength(1))
+        {
+            _2DArrayToMatrix(matrixElements);
+        }
+        public Matrix(double[,] matrixElements) : this(matrixElements.GetLength(0), matrixElements.GetLength(1))
+        {
+            _2DArrayToMatrix(matrixElements);
+        }
+        public Matrix(int[,] matrixElements) : this(matrixElements.GetLength(0), matrixElements.GetLength(1))
+        {
+            _2DArrayToMatrix(matrixElements);
+        }
+
+        public Matrix(Rational[] vectorElements) : this(vectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.values[i, 0] = vectorElements[i];
+        }
+        public Matrix(double[] vectorElements) : this(vectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.values[i, 0] = vectorElements[i];
+        }
+        public Matrix(int[] vectorElements) : this(vectorElements.GetLength(0), 1)
+        {
+            for (int i = 0; i < this.rows; i++)
+                this.values[i, 0] = vectorElements[i];
+        }
+
+        public Matrix(Rational matrixElement) : this(1, 1)
+        {
+            _2DArrayToMatrix(new Rational[1, 1] { { matrixElement } });
+        }
+        public Matrix(double matrixElement) : this(1, 1)
+        {
+            _2DArrayToMatrix(new double[1, 1] { { matrixElement } });
+        }
+        public Matrix(int matrixElement) : this(1, 1)
+        {
+            _2DArrayToMatrix(new int[1, 1] { { matrixElement } });
+        }
+
+        public Matrix(int a = 2, int b = 2)
+        {
+            rows = a;
+            columns = b;
+            values = new Rational[rows, columns];
+            for (int i = 0; i < rows; i++)
+            {
+                for (int j = 0; j < columns; j++)
+                {
+                    values[i, j] = 0;
+                }
+            }
+        }
+       
         public static T[,] Convert2DListToArray<T>(List<List<T>> list)
         {
             T[,] array = new T[list.Count(), list[0].Count()];
@@ -25,117 +93,65 @@ namespace Interface
             }
             return array;
         }
-        public int rows, columns;
-        public Rational[,] Values;
-
-        public Matrix(Rational[,] MatrixElements) : this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
-        {
-            _2DArrayPopMtrx(MatrixElements);
-        }
-        public Matrix(double[,] MatrixElements) : this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
-        {
-            _2DArrayPopMtrx(MatrixElements);
-        }
-
-        public Matrix(int[,] MatrixElements) : this(MatrixElements.GetLength(0), MatrixElements.GetLength(1))
-        {
-            _2DArrayPopMtrx(MatrixElements);
-        }
-
-        public Matrix(Rational[] VectorElements) : this(VectorElements.GetLength(0), 1)
-        {
-            for (int i = 0; i < this.rows; i++)
-                this.Values[i, 0] = VectorElements[i];
-        }
-        public Matrix(double[] VectorElements) : this(VectorElements.GetLength(0), 1)
-        {
-            for (int i = 0; i < this.rows; i++)
-                this.Values[i, 0] = VectorElements[i];
-        }
-        public Matrix(int[] VectorElements) : this(VectorElements.GetLength(0), 1)
-        {
-            for (int i = 0; i < this.rows; i++)
-                this.Values[i, 0] = VectorElements[i];
-        }
-
-        public Matrix(Rational MatrixElement) : this(1, 1)
-        {
-            _2DArrayPopMtrx(new Rational[1, 1] { { MatrixElement } });
-        }
-        public Matrix(double MatrixElement) : this(1, 1)
-        {
-            _2DArrayPopMtrx(new double[1, 1] { { MatrixElement } });
-        }
-
-        public Matrix(int MatrixElement) : this(1, 1)
-        {
-            _2DArrayPopMtrx(new int[1, 1] { { MatrixElement } });
-        }
-
-
-        public Matrix(int a = 2, int b = 2)
-        {
-            rows = a;
-            columns = b;
-            Values = new Rational[rows, columns];
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < columns; j++)
-                {
-                    Values[i, j] = 0;
-                }
-            }
-        }
-
-
-
-
-
-        //Allows matrix to be poplated from console
-        public void CmdPopMtrx()
+        protected void _2DArrayToMatrix(Rational[,] matrixElements)
         {
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = Convert.ToInt32(Console.ReadLine());
+                    values[i, j] = matrixElements[i, j];
                 }
             }
         }
-        protected void _2DArrayPopMtrx(Rational[,] MatrixElements)
+        protected void _2DArrayToMatrix(int[,] matrixElements)
         {
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = MatrixElements[i, j];
+                    values[i, j] = matrixElements[i, j];
                 }
             }
         }
-        protected void _2DArrayPopMtrx(int[,] MatrixElements)
+        protected void _2DArrayToMatrix(double[,] matrixElements)
         {
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    Values[i, j] = MatrixElements[i, j];
-                }
-            }
-        }
-        protected void _2DArrayPopMtrx(double[,] MatrixElements)
-        {
-            for (int i = 0; i < rows; i++)
-            {
-                for (int j = 0; j < columns; j++)
-                {
-                    Values[i, j] = Math.Round(MatrixElements[i, j], Global.decimalPlaces);
+                    values[i, j] = Math.Round(matrixElements[i, j], Global.decimalPlaces);
                 }
             }
         }
 
+        public Vector GetColumn(int columnIndex)
+        {
+            Vector output = new Vector(this.columns);
+            for (int i = 0; i < this.columns; i++)
+            {
+                output[i] = this.values[i, columnIndex];
+            }
+            return output;
+        }
+        public  Rational[,] GetValues()
+        {
+            return this.values;
+        }
+
+        public bool ValuesNotNull()
+        {
+            foreach (Rational element in this.values)
+            {
+                if (element == null)
+                    return false;
+            }
+            return true;
+        }
+        
+        
         //Arithmetic operations.
 
-        //Adds two Matrices together and returns the result
+        //Addition
         public static Matrix operator +(Matrix A, Matrix B)
         {
             Matrix C;
@@ -148,7 +164,7 @@ namespace Interface
                 {
                     for (int j = 0; j < C.columns; j++)
                     {
-                        C.Values[i, j] = A.Values[i, j] + (B.Values[i, j]);
+                        C.values[i, j] = A.values[i, j] + (B.values[i, j]);
                     }
                 }
             }
@@ -159,7 +175,7 @@ namespace Interface
             return C;
         }
 
-        //Substracts two Matrices together and returns the result
+        //Subtraction
         public static Matrix operator -(Matrix A, Matrix B)
         {
             Matrix C;
@@ -172,7 +188,7 @@ namespace Interface
                 {
                     for (int j = 0; j < C.columns; j++)
                     {
-                        C.Values[i, j] = A.Values[i, j] - (B.Values[i, j]);
+                        C.values[i, j] = A.values[i, j] - (B.values[i, j]);
                     }
                 }
             }
@@ -183,19 +199,12 @@ namespace Interface
             return C;
         }
 
-        //Multiplies two Matrices together and returns the result
-
-        public static explicit operator string(Matrix A)
-        {
-            return A.MatrixToLatex();
-        }
-
-        //
+        //Matrix* Multiplication
         public static Matrix operator *(Matrix A, Matrix B)
         {
             Matrix C;
             
-            if (A.columns == B.rows)
+            if (A.columns == B.rows && A.ValuesNotNull() && B.ValuesNotNull())
             {
                 C = new Matrix(A.rows, B.columns);
 
@@ -206,9 +215,9 @@ namespace Interface
                         Rational sum = 0;
                         for (int i = 0; i < A.columns; i++)
                         {
-                            sum += (A.Values[row, i] * B.Values[i, column]);
+                            sum += (A.values[row, i] * B.values[i, column]);
                         }
-                        C.Values[row, column] = sum;
+                        C.values[row, column] = sum;
                     }
                 }
             }
@@ -216,26 +225,24 @@ namespace Interface
             {
                 throw new ArgumentException();
             }
-
             return C;
         }
 
-        //Multipy  by  scalar
-        public static Matrix operator *(Rational Scalar, Matrix A)
+        //Multiply  by  scalars
+        public static Matrix operator *(Rational scalar, Matrix A)
         {
             for (int i = 0; i < A.rows; i++)
             {
                 for (int j = 0; j < A.columns; j++)
                 {
-                    A.Values[i, j] = A.Values[i, j] * Scalar;
+                    A.values[i, j] = A.values[i, j] * scalar;
                 }
             }
             return A;
         }
-
-        public static Matrix operator *(Matrix A, Rational Scalar)
+        public static Matrix operator *(Matrix A, Rational scalar)
         {
-            return Scalar * A;
+            return scalar * A;
         }
 
 
@@ -243,7 +250,7 @@ namespace Interface
         //parses a set of sets in the form M:{{a,b,c},{d,e,f},{g,h,i}}
         public static Matrix StringToMatrix(string input)
         {
-            //Valiation
+            //Validation
             int openBracketCount = 0;
             int closedBracketCount = 0;
             foreach (char letter in input)
@@ -266,7 +273,7 @@ namespace Interface
                 if (input[i] == '}')
                 {
                     string sublistStr = input.Substring(pivot, (i - pivot) + 1);
-                    MatrixElements.Add(InputHandling.ListParse(sublistStr));
+                    MatrixElements.Add(InputHandling.ParseList(sublistStr));
                     if (sublistStr.Length != input.Length)
                     {
                         input = input.Substring(i + 2);
@@ -286,14 +293,16 @@ namespace Interface
             else
                 return new Matrix(Convert2DListToArray(MatrixElements));
         }
-
+        
+        /*public static explicit operator string(Matrix A)
+        {
+            return A.MatrixToLatex();
+        }*/
 
         static public Matrix LatexToMatrix(string input = @"\pmatrix{a&b\\c&d\\}")
         {
-
-            Console.WriteLine(input);
-
             int rowCount = 0;
+
             for (int i = 0; i < input.Length - 1; i++)
             {
                 if (input.Substring(i, 2) == @"\\")
@@ -324,24 +333,21 @@ namespace Interface
         public string MatrixToLatex()
         {
 
-          
             string Latex = @"\pmatrix{";
             for (int row = 0; row < this.rows; row++)
             {
                 for (int column = 0; column < this.columns - 1; column++)
                 {
-                    if(this.Values[row, column] == null)    
+                    if(this.values[row, column] == null)    
                         return "format error";
-                    Latex += this.Values[row, column].LatexFormat() + "&";
+                    Latex += this.values[row, column].LatexFormat() + "&";
                 }
-                if (this.Values[row, this.columns-1] == null)
+                if (this.values[row, this.columns-1] == null)
                     return "format error";
-                Latex += this.Values[row, this.columns - 1].LatexFormat() + @"\\";
+                Latex += this.values[row, this.columns - 1].LatexFormat() + @"\\";
             }
 
             return Latex + "}";
         }
     }
-
-
 }

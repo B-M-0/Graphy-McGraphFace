@@ -20,40 +20,27 @@ namespace Interface
         List<string> postFixFunction;
 
         public List<string> GetFunction()
-        { 
-            return postFixFunction; 
+        {
+            return postFixFunction;
         }
 
-        public double Evaluate(Dictionary<string, double> Variables, ref bool validinput ,  double x = 1)
+        public double Evaluate(Dictionary<string, double> variables, ref bool isValidInput, int functionID, ref List<double>[] asymptotes, double x = 1)
         {
-            if (!Variables.ContainsKey("x"))
-                Variables.Add("x", x);
-            else
-                Variables["x"] = x;
-            if (validinput == false)
+            variables["x"] = x;
+
+            if (isValidInput == false)
                 return 0;
-            return InputHandling.evaluatePostfix(postFixFunction, Variables, ref validinput);
+            return InputHandling.EvaluatePostfix(postFixFunction, variables, functionID, ref asymptotes, ref isValidInput);
         }
-
-        public ComplexNumber Evaluate(Dictionary<string, Surd> SurdVariables, Dictionary<string, ComplexNumber> Variables, ref double decimalval, ref Surd Surdval, double x = 1)
+        public ComplexNumber Evaluate(Dictionary<string, Surd> surdVariables, Dictionary<string, ComplexNumber> variables, ref double decimalVal, ref Surd surdVal, double z = 1)
         {
-            Variables = Global.defineConstants();
-            if (!Variables.ContainsKey("z"))
-                Variables.Add("z", x);
-            else
-                Variables["z"] = x;
-            return InputHandling.evaluatePostfix(postFixFunction, SurdVariables, Variables, ref decimalval , ref  Surdval);
+            variables = Global.DefineConstants();
+            variables["z"] = z;
+            return InputHandling.EvaluatePostfix(postFixFunction, surdVariables, variables, ref decimalVal, ref surdVal);
         }
-
-
-        public Matrix Evaluate(Dictionary<string, double> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors , ref double decimalval)
+        public Matrix Evaluate(Dictionary<string, double> variables, Dictionary<string, Matrix> matrices, Dictionary<string, Vector> vectors, ref double decimalVal)
         {
-            return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors, ref decimalval);
+            return InputHandling.EvaluatePostfix_Matrices(postFixFunction, variables, matrices, vectors, ref decimalVal);
         }
-        /*
-        public Matrix Evaluate( Dictionary<string, Rational> Variables, Dictionary<string, Matrix> Matrices, Dictionary<string, Vector> Vectors, ref double decimalval)
-        {
-            return InputHandling.evaluatePostfixMatrix(postFixFunction, Variables, Matrices, Vectors, ref decimalval);
-        }*/
     }
 }

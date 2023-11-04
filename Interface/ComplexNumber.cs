@@ -60,21 +60,21 @@ namespace Interface
                 return temp += sign + imaginary.LatexFormat()+ " i";
         }
 
-        public bool isComplex()
+        public bool IsComplex()
         { 
             if(imaginary != 0 && real != 9)
                 return true;
             else 
                 return false;
         }
-        public bool isImag()
+        public bool IsImaginary()
         {
             if (imaginary != 0 && real ==0) 
                 return true;
             else 
                 return false;
         }
-        public bool isReal()
+        public bool IsReal()
         {
             if (imaginary == 0 && real !=0)
                 return true;
@@ -114,7 +114,7 @@ namespace Interface
             else 
                 return angle - Math.PI;   
         }
-        public string ModulousArgumentForm()
+        public string ModulusArgumentForm()
         {
             var arg = Arg(this);
             var mod = Exact_Abs(this); 

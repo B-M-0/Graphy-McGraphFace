@@ -1,27 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace Interface
 {
     public class Rational
     {
-        public bool isInteger = false;
-        public bool isFloat = false;
-        public bool isSurd = false;
+        public readonly bool isInteger = false;
+        public readonly bool isFloat = false;
+        public readonly bool isSurd = false;
 
-        private List<Surd> Irrationals;
+
         private int numerator;
         private int denominator;
-        private double Decimalval;
+        private readonly double decimalVal;
 
         public static implicit operator double(Rational A)
         {
             if (A == null)
                 return 0;
-            return A.Decimalval;
-
+            else
+                return A.decimalVal;
         }
-        //as
+
         public static implicit operator Rational(double A)
         {
             return new Rational(A).Simplify();
@@ -30,7 +31,6 @@ namespace Interface
         {
             return new Rational(A).Simplify();
         }
-
         public static explicit operator int(Rational A)
         {
             return (int)(double)A;
@@ -69,24 +69,29 @@ namespace Interface
                 numerator = -(numerator);
                 denominator = Math.Abs(denominator);
             }
+            if (numerator == 0 || denominator == 1)
+            {
+                denominator = 1;
+                this.isInteger = true;
+            }
             this.numerator = numerator;
             this.denominator = denominator;
 
-            this.Decimalval = (double)numerator / (double)denominator;
+            this.decimalVal = (double)numerator / (double)denominator;
             signHandling();
         }
 
-        public Rational(double Decimal)
+        public Rational(double decimalValue)
         {
             // truncates to (k)dp
-            this.Decimalval = Math.Round(Decimal, Global.decimalPlaces + 5);
-            if (!Decimal.ToString().Contains('.'))
+            this.decimalVal = Math.Round(decimalValue, Global.decimalPlaces + 5);
+            if (!decimalValue.ToString().Contains('.'))
             {
                 this.isInteger = true;
-                numerator = (int)Decimal;
+                numerator = (int)decimalValue;
                 denominator = 1;
             }
-            else if (Decimalval.ToString().Split('.')[1].Length > Global.decimalPlaces || Decimalval > 10000000)
+            else if (decimalVal.ToString().Split('.')[1].Length > Global.decimalPlaces || decimalVal > 10000000)
             {
                 isFloat = true;
                 numerator = 0;
@@ -94,16 +99,16 @@ namespace Interface
             }
             else
             {
-                Decimal = Math.Round(Decimal, Global.decimalPlaces);
+                decimalValue = Math.Round(decimalValue, Global.decimalPlaces);
 
                 int denominator = 1;
-                while (Decimal % 1 != 0)
+                while (decimalValue % 1 != 0)
                 {
-                    Decimal = Math.Round(Decimal * 10, Global.decimalPlaces);
+                    decimalValue = Math.Round(decimalValue * 10, Global.decimalPlaces);
                     denominator *= 10;
                 }
 
-                this.numerator = (int)Decimal;
+                this.numerator = (int)decimalValue;
                 this.denominator = denominator;
 
 
@@ -136,9 +141,14 @@ namespace Interface
             signHandling();
             return result;
         }
-        public Rational reciprocal()
+        public Rational Reciprocal()
         {
-            return new Rational(denominator, numerator);
+            if(isFloat)
+                return 1 / this;
+            else if(this == 0)
+                return this;
+            else
+                return new Rational(denominator, numerator);
         }
 
 
@@ -146,7 +156,7 @@ namespace Interface
         {
             Rational result;
             if (A.isFloat || B.isFloat)
-                result = new Rational(A.Decimalval + B.Decimalval);
+                result = new Rational(A.decimalVal + B.decimalVal);
             else if (A.denominator == B.denominator)
                 result = new Rational(A.numerator + B.numerator, A.denominator);
             else
@@ -159,7 +169,7 @@ namespace Interface
             Rational result;
 
             if (A.isFloat || B.isFloat)
-                result = new Rational(A.Decimalval - B.Decimalval);
+                result = new Rational(A.decimalVal - B.decimalVal);
             else if (A.denominator == B.denominator)
                 result = new Rational(A.numerator - B.numerator, A.denominator);
             else
@@ -174,7 +184,7 @@ namespace Interface
             if (A == null || B == null)
                 return null;
             if (A.isFloat || B.isFloat)
-                return A.Decimalval * B.Decimalval;
+                return A.decimalVal * B.decimalVal;
             else
             {
                 Rational result = new Rational(A.numerator * B.numerator, A.denominator * B.denominator);
@@ -184,9 +194,9 @@ namespace Interface
         public static Rational operator /(Rational A, Rational B)
         {
             if (A.isFloat || B.isFloat)
-                return A.Decimalval / B.Decimalval;
+                return A.decimalVal / B.decimalVal;
             else
-                return A * B.reciprocal();
+                return A * B.Reciprocal();
         }
         public static Rational operator ^(Rational A, double power)
         {
@@ -196,10 +206,8 @@ namespace Interface
 
         public double Decimal()
         {
-            return Math.Round(Decimalval, Global.decimalPlaces);
+            return Math.Round(decimalVal, Global.decimalPlaces);
         }
-
-
 
         public int Numerator()
         {
@@ -209,7 +217,6 @@ namespace Interface
         {
             return this.denominator;
         }
-
 
         private void signHandling()
         {
@@ -223,11 +230,7 @@ namespace Interface
                 this.numerator = -(this.numerator);
                 this.denominator = Math.Abs(this.denominator);
             }
-            if (numerator == 0 || denominator == 1)
-            {
-                denominator = 1;
-                isInteger = true;
-            }
+            
         }
 
     }

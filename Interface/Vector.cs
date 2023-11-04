@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -9,23 +10,32 @@ namespace Interface
 {
     public class Vector : Matrix
     {
-        public new Rational[] Values;
-
-        public Rational[] GetValues() { return Values; }    
-
-        public Vector(int Dimensions) : base(Dimensions, 1)
-        {
-            if (Dimensions != 2 && Dimensions != 3)
-                throw new ArgumentException("Error: Stupid Dimensions Exception.");   
-            this.Values = new Rational[Dimensions];  
+        private new Rational[] values;
+        public Rational this[int index]
+        { 
+            get => values[index];   
+            set => values[index] = value;
         }
 
-        public Vector(Rational[,] Values) : base(Values.GetLength(0), 1)
+        public new Rational[] GetValues()
         {
-            this.Values = new Rational[Values.GetLength(0)];
-            for (int i = 0; i < Values.GetLength(0); i++)
+            return values;
+        }
+        
+
+        public Vector(int dimensions) : base(dimensions, 1)
+        {
+            if (dimensions != 2 && dimensions != 3)
+                throw new ArgumentException("Error: Stupid Dimensions Exception.");   
+            this.values = new Rational[dimensions];  
+        }
+
+        public Vector(Rational[,] values) : base(values.GetLength(0), 1)
+        {
+            this.values = new Rational[values.GetLength(0)];
+            for (int i = 0; i < values.GetLength(0); i++)
             {
-                this.Values[i] = Values[i, 0];
+                this.values[i] = values[i, 0];
             }
         }
 
@@ -41,7 +51,7 @@ namespace Interface
             double sum = 0;
             for (int i = 0; i < A.rows;i++)
             { 
-                sum += (double)(A.Values[i] * B.Values[i]);
+                sum += (double)(A.values[i] * B.values[i]);
             }  
 
             return sum;
@@ -53,7 +63,7 @@ namespace Interface
             Vector B = new Vector(A.rows);
             for (int i = 0; i < A.rows; i++)
             {
-                B.Values[i] = A.Values[i] * scalar;
+                B[i] = A[i] * scalar;
             }
             return B;
         }
@@ -66,7 +76,7 @@ namespace Interface
             Vector B = new Vector(A.rows);
             for (int i = 0; i < A.rows; i++)
             {
-                B.Values[i] = A.Values[i] * scalar;
+                B[i] = A[i] * scalar;
             }
             return B;
         }
@@ -79,7 +89,7 @@ namespace Interface
             Vector C = new Vector(A.rows);
             for (int i = 0; i < A.rows; i++)
             {
-                C.Values[i] = A.Values[i] - B.Values[i]; 
+                C[i] = A[i] - B[i]; 
             }
             return C;
         }
@@ -88,7 +98,7 @@ namespace Interface
             Vector C = new Vector(A.rows);
             for (int i = 0; i < A.rows; i++)
             {
-                C.Values[i] = A.Values[i] + B.Values[i];
+                C[i] = A[i] + B[i];
             }
             return C;
         }
@@ -100,12 +110,11 @@ namespace Interface
             if (A.rows == 3 && B.rows == 3)
             {
                 Vector C = new Vector(3);
-                C.Values[0] = A.Values[1] * B.Values[2] - A.Values[2] * B.Values[1];
-                C.Values[1] = A.Values[2] * B.Values[0] - A.Values[0] * B.Values[2];
-                C.Values[2] = A.Values[0] * B.Values[1] - A.Values[1] * B.Values[0];
+                C[0] = A[1] * B[2] - A[2] * B[1];
+                C[1] = A[2] * B[0] - A[0] * B[2];
+                C[2] = A[0] * B[1] - A[1] * B[0];
                 return C;
             }
-
             return null;
         }
 
@@ -116,7 +125,7 @@ namespace Interface
         public double Magnitude()
         {
             int sum = 0;
-            foreach (int element in Values)
+            foreach (int element in values)
             {
                 sum += element * element;
             }
@@ -124,12 +133,12 @@ namespace Interface
             return Math.Round(root);
         }
 
-        public static Vector proj(Vector u, Vector v)
+        public static Vector Proj(Vector u, Vector v)
         {
             return ((u * v) / (u * u)) * u;
         }
 
-        public static Vector[] Gram_Schmidt_orthogonalization(Vector[] v)
+        public static Vector[] GramSchmidtOrthogonalization(Vector[] v)
         {
             Vector[] u = new Vector[v.Length];
             for (int i = 0; i < v.Length; i++)
@@ -137,12 +146,12 @@ namespace Interface
                 u[i] = v[i];
                 for (int j = 0; j < i; j++)
                 {
-                    u[i] = u[i] - proj(u[j], v[i]);
+                    u[i] = u[i] - Proj(u[j], v[i]);
                 }
             }
             return u;
         }
-        public static Vector[] Gram_Schmidt_orthonormalization(Vector[] v)
+        public static Vector[] GramSchmidtOrthonormalization(Vector[] v)
         {
             Vector[] u = new Vector[v.Length];
             Vector[] e = new Vector[v.Length];
@@ -151,7 +160,7 @@ namespace Interface
                 u[i] = v[i];
                 for (int j = 0; j < i; j++)
                 {
-                    u[i] = u[i] - proj(u[j], v[i]);
+                    u[i] = u[i] - Proj(u[j], v[i]);
                 }
                 Rational scalar;
                 double absU = u[i].Magnitude();

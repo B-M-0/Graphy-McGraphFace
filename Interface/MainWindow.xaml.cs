@@ -37,22 +37,15 @@ namespace Interface
     public partial class MainWindow : Window
     {
         Random r = new Random();
+
         static int input_count = 3;
 
         Function[] functions = new Function[input_count];
 
-        Function function0;
-        Function function1;
-        Function function2;
-    
-        Function[] transformations = new Function[input_count];
-
-        Function transformation0;
-        Function transformation1;
-        Function transformation2;
+        string[] functionColors = new string[input_count];
 
         FunctionPlot[] functionPlots = new FunctionPlot[input_count]; 
-        double[] asymptotes = new double[input_count];
+        List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>()};
 
         double[] axisBounds = new double[input_count];
         IPlottable[] Locus = new IPlottable[input_count];
@@ -65,8 +58,8 @@ namespace Interface
         bool[] valid_transformation = new bool[input_count];
         bool[] valid_complex = new bool[input_count];
 
-        int currentPage = 1;
-
+        int currentPage = 0;
+        int lastPage = 0;
         string result;
         string alt_result;
         bool showAltForm = false;
@@ -76,21 +69,8 @@ namespace Interface
         string[] complex_inputs = new string[input_count];
         string[] parsed_complex_inputs = new string[input_count];
 
-        static public Dictionary<string, double> Vars = new Dictionary<string, double>() { { "e", Math.E }, { "\\pi", Math.PI } };
-        public Dictionary<string, Matrix> Matrices = new Dictionary<string, Matrix>();
-        public Dictionary<string, Vector> Vectors = new Dictionary<string, Vector>();
 
-
-
-        /// <summary>
-        /// reffactor later
-        /// </summary>
-        public Dictionary<string, ComplexNumber> RationalVars = new Dictionary<string, ComplexNumber>() { { "e", Math.E }, { "\\pi",Math.PI} };
-        public Dictionary<string, Matrix> RationalMatrices = new Dictionary<string, Matrix>();
-        public Dictionary<string, Surd> SurdVars = new Dictionary<string, Surd>();
-
-
-        public bool bracketsBalanced(string input)
+        public bool BracketsBalanced(string input)
         {
             int openCount = 0;
             int closedCount = 0;
@@ -108,7 +88,7 @@ namespace Interface
             }
             return openCount == closedCount;
         }
-        public string formatLatex(string input, string Mode = "f")
+        public string FormatLatex(string input, string mode = "f")
         {
             //Modes f ==> functions, c ==> calcuations
             string temp = "";
@@ -124,7 +104,7 @@ namespace Interface
                         break;
                     case ' ':
                     case '*':
-                        if (Mode == "c")
+                        if (mode == "c")
                             temp += " \\cdot ";
                         break;
                     case '_':
@@ -139,11 +119,11 @@ namespace Interface
                 temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
-        public static Bitmap convertLatexToPng(string latex)
+        public static Bitmap ConvertLatexToPng(string latex)
         {
             var parser = WpfTeXFormulaParser.Instance;
             var formula = parser.Parse(latex);
-            var png_Data = formula.RenderToPng(190.0, 4.0, 2.0, "Arial");
+            var png_Data = formula.RenderToPng(190.0, 4.0, 2.0, "Arial"); ;
 
             Bitmap Image;
             using (MemoryStream ms = new MemoryStream(png_Data))
@@ -154,23 +134,16 @@ namespace Interface
         }
         ImageSource BitmapToImageSource(Bitmap bitmap)
         {
-            BitmapSource bitmapsource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
+            BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
             //^ this line is stolen         
-            return bitmapsource;
+            return bitmapSource;
         }
 
 
         public MainWindow()
-        {
-            //scuffed test environment
-            //\start
-            List<List<int>> mtxlist = new List<List<int>> { new List<int> { 12, -51, 4 }, new List<int> { 6, 167, -68 }, new List<int> { -4, 24, -41 } };
-            SquareMatrix a = new SquareMatrix(Matrix.Convert2DListToArray(mtxlist));
-            var b = SquareMatrix.QR_Decomposition(a);
-
-            // \end
+        {          
             InitializeComponent();
-            Title.Source = BitmapToImageSource(convertLatexToPng("Graphy McGraphFace"));
+            Title.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
 
             OpenMainMenu();
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
@@ -179,16 +152,40 @@ namespace Interface
                 valid_function[i] = false;
                 valid_transformation[i] = false;
             }
-
-            Matrix UnitSquare = new Matrix(new double[2, 4] { { 0, 1, 1, 0 }, { 0, 0, 1, 1 } });
-            Matrix UnitTriangle = new Matrix(new double[2, 3] { { 0, 1, 0.5 }, { 0, 0, Math.Sqrt(3) / 2 } });
-            Matrices.Add("U", UnitSquare);
-            Matrices.Add("T", UnitTriangle);
-            UpdateGraph_functions();
         }
 
 
-        public void UpdateRender(int id, ImageSource Render)
+        public void PlotMatrix(Matrix M)
+        {
+            if (M.rows == 2)
+            {
+                double[] xs = new double[M.columns];
+                double[] ys = new double[M.columns];
+                for (int position = 0; position < M.columns; position++)
+                {
+                    xs[position] = M[0, position];
+                    ys[position] = M[1, position];
+
+                    if (M.columns > 2)
+                        Graph.Plot.AddPolygon(xs, ys, Graph.Plot.GetNextColor(.3), lineWidth: 2);
+
+                    Graph.Plot.AddScatter(xs, ys, lineWidth: 0, markerSize: 7, color: System.Drawing.Color.Black);
+                }
+            }
+        }
+
+        private void ResetGraph_Clicked(object sender = null, RoutedEventArgs e = null)
+        {
+            
+            Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
+            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
+            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
+
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            GraphChanged(null, null);
+            Graph.Refresh();
+        }
+        public void UpdateRenders(int id, ImageSource Render)
         {
             switch (id)
             {
@@ -203,19 +200,19 @@ namespace Interface
                     break;
             }
         }
-
         public void UpdateText()
         {
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             transformation_inputs = new string[] { Transformation_Input0.Text, Transformation_Input1.Text, Transformation_Input2.Text };
             complex_inputs = new string[] { Complex_Input0.Text, Complex_Input1.Text, Complex_Input2.Text };
         }
-
-        public void UpdateGraph_functions()
+        public void UpdateGraph_Functions()
         {
             Graph.Plot.Clear();
             UpdateText();
             ResetGraph_Clicked();
+
+            Dictionary<string,double> variables = Global.DefineConstants<double>();
 
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
 
@@ -226,16 +223,21 @@ namespace Interface
             {
                 if (valid_function[i] && function_inputs[i] != "")
                 {
+                    asymptotes[i].Clear();
                     bool validinput = true;
                     Function function = functions[i];
-                    var func = new Func<double, double?>((x) => function.Evaluate(Vars, ref validinput, x));
+                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validinput, i, ref asymptotes, x));
                     valid_function[i] = validinput;
                     if (validinput)
                     {
                         var plt = new FunctionPlot(func);
-                        functionPlots[i] = plt; 
+                        functionPlots[i] = plt;
+                        plt.Color = System.Drawing.Color.FromName(Global.colours[r.Next(0, Global.colours.Length)]);
                         Graph.Plot.Add(plt);
-                        
+                        foreach (double xVal in asymptotes[i])
+                        {
+                            Graph.Plot.AddVerticalLine(xVal, width: 2, color: System.Drawing.Color.Red ,style: LineStyle.Dot);
+                        }
                     }
                 }
             }
@@ -243,26 +245,7 @@ namespace Interface
             Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
             Graph.Refresh();
         }
-
-        public void PlotMatrix(Matrix M)
-        {
-            if (M.rows == 2)
-            {
-                double[] xs = new double[M.columns];
-                double[] ys = new double[M.columns];
-                for (int position = 0; position < M.columns; position++)
-                {
-                    xs[position] = M.Values[0, position];
-                    ys[position] = M.Values[1, position];
-
-                    if (M.columns > 2)
-                        Graph.Plot.AddPolygon(xs, ys, Graph.Plot.GetNextColor(.3), lineWidth: 2);
-
-                    Graph.Plot.AddScatter(xs, ys, lineWidth: 0, markerSize: 7, color: System.Drawing.Color.Black);
-                }
-            }
-        }
-        public void UpdateGraph_transformations()
+        public void UpdateGraph_Transformations()
         {
             Graph.Plot.Clear();
             ResetGraph_Clicked();
@@ -278,13 +261,18 @@ namespace Interface
                 if (valid_transformation[i])
                 {
                     Function function = functions[i];
-                    double decimalval = 0;
-                    Matrix Result = function.Evaluate(Vars, Matrices, Vectors, ref decimalval);
+                    double decimalVal = 0;
+
+                    Dictionary<string, double> variables = new Dictionary<string, double>(); 
+                    Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
+                    Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
+
+                    Matrix Result = function.Evaluate(variables, matrices, vectors, ref decimalVal);
                     for (int ResultRow = 0; ResultRow < Result.rows; ResultRow++)
                     {
                         for (int ResultColumn = 0; ResultColumn < Result.columns; ResultColumn++)
                         {
-                            if (Result.Values[ResultRow, ResultColumn] == null)
+                            if (Result[ResultRow, ResultColumn] == null)
                             {
                                 return;
                             }
@@ -295,7 +283,7 @@ namespace Interface
 
                     if (function.GetFunction().Contains("U") && !UPlotted)
                     {
-                        PlotMatrix(Matrices["U"]);
+                        PlotMatrix(matrices["U"]);
                         UPlotted = true;
                     }
                 }
@@ -318,8 +306,8 @@ namespace Interface
                 string[] expression = input.Split('=');
                 List<string> LHS;
                 List<string> RHS;
-                LHS = InputHandling.infixToPostfix(expression[0].Split(' '));
-                RHS = InputHandling.infixToPostfix(expression[1].Split(' '));
+                LHS = InputHandling.InfixToPostfix(expression[0].Split(' '));
+                RHS = InputHandling.InfixToPostfix(expression[1].Split(' '));
                 // Types :: HalfLine (H), Bisector (B), Circle (C), Undefined (U)
 
                 Loci_isHalfLine[i] = false;
@@ -330,7 +318,7 @@ namespace Interface
                     switch (typeOfLoci)
                     {
                         case "H":
-                            Tuple<ComplexNumber, Rational> HalflineStats = InputHandling.ComplexLociParse_Halfline(LHS, RHS);
+                            Tuple<ComplexNumber, Rational> HalflineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
                             double centerX = -HalflineStats.Item1.real;
                             double centerY = -HalflineStats.Item1.imaginary;
                             double angle = HalflineStats.Item2;
@@ -350,12 +338,12 @@ namespace Interface
                             Graph.Plot.SetAxisLimits(centerX - 15 , centerX + 15, centerY - 15, centerY + 15);
                             break;
                         case "C":
-                            Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ComplexLociParse_Circle(LHS, RHS);
+                            Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ParseComplexLoci_Circle(LHS, RHS);
                             centerX = -CircleStats.Item1.real;
                             centerY = -CircleStats.Item1.imaginary;
                             double radius = CircleStats.Item2;
                             //center
-                            Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
+                            Graph.Plot.AddCircle(centerX, centerY, radius/100, lineWidth: (float)2);
                             //Loci
                             Graph.Plot.AddCircle(centerX, centerY, radius);
 
@@ -401,7 +389,7 @@ namespace Interface
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
             Graph.Refresh();    
         }
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void SideBarButton_Clicked(object sender, RoutedEventArgs e)
         {
             if (SideBar.Visibility == Visibility.Collapsed && OpenSideBar.Visibility == Visibility.Visible)
             {
@@ -489,18 +477,25 @@ namespace Interface
             try
             {
                 string inputText = (sender as TextBox).Text;
-                string Latex = formatLatex(inputText, "c");
-                Calculation_InputRender0.Source = BitmapToImageSource(convertLatexToPng(Latex));
+                string Latex = FormatLatex(inputText, "c");
+
+                Dictionary<string, Surd> surdVariables = new Dictionary<string, Surd>();
+                Dictionary<string, ComplexNumber> complexVariables = new Dictionary<string, ComplexNumber>();
+                Dictionary<string, double> doubleVariables = new Dictionary<string, double>();
+                Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
+                Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
+
+                Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
                 Calculation_OutputRender0.Source = null;
                 "sd".ToString();
-                List<string> output = InputHandling.infixToPostfix(InputHandling.formatInput(Global.removeWhiteSpace((sender as TextBox).Text)).Split(' '));
+                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text)).Split(' '));
 
                 Function f = new Function(output);
                 result = "=";
                 if (inputText.Contains("\\M") || inputText.Contains("I(") || Regex.IsMatch(inputText, "[A-Z]+$"))
                 {
                     double decialVal = 0;
-                    Matrix Alfa = f.Evaluate(Vars, Matrices, Vectors, ref decialVal);
+                    Matrix Alfa = f.Evaluate(doubleVariables, matrices, vectors, ref decialVal);
                     if (Alfa is null)
                         result += decialVal.ToString();
                     else
@@ -508,27 +503,27 @@ namespace Interface
                 }
                 else
                 {
-                    double decimalVal = 0;
-                    Surd Surdval = 0;
-                    ComplexNumber resultVAl = f.Evaluate(SurdVariables: SurdVars, Variables: RationalVars, decimalval: ref decimalVal,Surdval: ref Surdval);
-                    
-                    if (resultVAl.isComplex())
+                    double decimalValue = 0;
+                    Surd surdValue = 0;
+                    ComplexNumber resultVAl = f.Evaluate(surdVariables, complexVariables, ref decimalValue, ref surdValue);
+
+                    if (resultVAl.IsComplex())
                     {
                         ToggleModuloButton.Visibility = Visibility.Visible;
-                        alt_result = resultVAl.ModulousArgumentForm();
+                        alt_result = resultVAl.ModulusArgumentForm();
                     }
-                    else if (Surdval != null && Surdval != 0.0)
+                    else if (surdValue != null && surdValue != 0.0)
                     {
                         ToggleModuloButton.Visibility = Visibility.Visible;
-                        alt_result = Surdval.ToLatex();
+                        alt_result = surdValue.ToLatex();
                     }
-
-
                     else
+                    {
                         ToggleModuloButton.Visibility = Visibility.Collapsed;
+                    }
 
                     if (resultVAl == null)
-                        result += Math.Round(decimalVal, Global.decimalPlaces).ToString();
+                        result += Math.Round(decimalValue, Global.decimalPlaces).ToString();
                     else if (resultVAl.imaginary.isFloat || resultVAl.real.isFloat)
                         result = "\\approx" + (resultVAl.LatexFormat_float());
                     else if (resultVAl.LatexFormat_frac() != resultVAl.LatexFormat_float())
@@ -537,10 +532,10 @@ namespace Interface
                         result += resultVAl.LatexFormat_frac();
 
                 }
-                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
+                Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(result));
             }
             catch
-             { //RenderErrorlhudyugywgygey}   
+            { //RenderErrorlhudyugywgygey}   
             }
         }
 
@@ -565,23 +560,23 @@ namespace Interface
                 valid = valid_complex;
             }
 
-            if (bracketsBalanced(inputs[id]))
+            if (BracketsBalanced(inputs[id]))
             {
                 try
                 {
-                    string Latex = formatLatex(inputs[id]);
-                    UpdateRender(id, BitmapToImageSource(convertLatexToPng(Latex)));
+                    string Latex = FormatLatex(inputs[id]);
+                    UpdateRenders(id, BitmapToImageSource(ConvertLatexToPng(Latex)));
                 }
                 catch
                 {
-                    UpdateRender(id, null);
+                    UpdateRenders(id, null);
                 }
                 Graph.Plot.Clear();
 
                 try
                 {
-                    string input_string = InputHandling.formatInput(Global.removeWhiteSpace(inputs[id]));
-                    List<string> expression = InputHandling.infixToPostfix(input_string.Split(' '));
+                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]));
+                    List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '));
                     if (currentPage == 4)
                         parsed_complex_inputs[id] = input_string;
                     else
@@ -589,9 +584,9 @@ namespace Interface
                     valid[id] = true;
 
                     if (currentPage == 1)
-                        UpdateGraph_functions();
+                        UpdateGraph_Functions();
                     else if (currentPage == 2)
-                        UpdateGraph_transformations();
+                        UpdateGraph_Transformations();
                     else if (currentPage == 4)
                         UpdateGraph_ComplexLoci();
                 }
@@ -742,7 +737,7 @@ namespace Interface
             GoToComplexPlane.Visibility = Visibility.Collapsed;
         }
 
-        private void ShowSettings()
+        public void ShowSettings()
         {
             GoToSettings.Visibility = Visibility.Collapsed;
 
@@ -751,13 +746,13 @@ namespace Interface
             Theme.Visibility = Visibility.Visible;
             ThemeLabel.Visibility = Visibility.Visible;
 
-            ReturnFromSettings.Visibility = Visibility.Visible;
+            ReturnToLast.Visibility = Visibility.Visible;
             GoToMainMenu.Visibility = Visibility.Visible;
         }
         public void HideSettings()
         {
             GoToMainMenu.Visibility = Visibility.Collapsed;
-            ReturnFromSettings.Visibility = Visibility.Collapsed;
+            ReturnToLast.Visibility = Visibility.Collapsed;
             GoToSettings.Visibility = Visibility.Visible;
             AngleMeasurement.Visibility = Visibility.Collapsed;
             AngleMeasurementLabel.Visibility = Visibility.Collapsed;
@@ -765,8 +760,25 @@ namespace Interface
             ThemeLabel.Visibility = Visibility.Collapsed;
         }
 
+        private void ShowHelp()
+        { 
+            GoToHelp.Visibility = Visibility.Collapsed;
+
+
+
+            ReturnToLast.Visibility = Visibility.Visible;
+            GoToMainMenu.Visibility = Visibility.Visible;
+        }
+        private void HideHelp() 
+        {
+            GoToMainMenu.Visibility = Visibility.Collapsed;
+            ReturnToLast.Visibility = Visibility.Collapsed;
+            GoToHelp.Visibility = Visibility.Visible;
+        }
+
         private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
         {
+            lastPage = currentPage;
             currentPage = 0;
 
             Title.Visibility = Visibility.Visible;
@@ -783,7 +795,9 @@ namespace Interface
         private void OpenFunctions(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
+            UpdateGraph_Functions();
             OpenSideBar.Content = ">";
+            lastPage = currentPage;
             currentPage = 1;
             HideMainMenu();
             ShowFunctions();
@@ -791,7 +805,9 @@ namespace Interface
         private void OpenTransformations(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
+            UpdateGraph_Transformations();
             OpenSideBar.Content = ">";
+            lastPage = currentPage;
             currentPage = 2;
             HideMainMenu();
             ShowTransformations();
@@ -799,6 +815,7 @@ namespace Interface
         private void OpenCalculations(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
+            lastPage = currentPage;
             currentPage = 3;
             HideMainMenu();
             ShowCalculations();
@@ -806,37 +823,46 @@ namespace Interface
         private void OpenComplexNumbers(object sender = null, RoutedEventArgs e = null)
         {
             ResetGraph_Clicked();
+            UpdateGraph_ComplexLoci();
             OpenSideBar.Content = ">";
+            lastPage = currentPage;
             currentPage = 4;
             HideMainMenu();
             ShowComplexPlane();
         }
-        private void OpenSettings(object sender, RoutedEventArgs e)
+        private void OpenSettings(object sender = null, RoutedEventArgs e = null)
         {
+            lastPage = currentPage;
+            currentPage = 7;
             HideCalculations();
             HideTransformations();
             HideFunctions();
             HideComplexPlane();
             HideMainMenu();
-
+            HideHelp();
             ShowSettings();
+
         }
-
-        private void ResetGraph_Clicked(object sender = null, RoutedEventArgs e = null)
+        private void OpenHelp(object sender = null, RoutedEventArgs e = null)
         {
-            GraphChanged(null, null);
-            Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
-            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
-            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
-
-            Graph.Refresh();
-        }
-        private void ExitSettings(object sender, RoutedEventArgs e)
-        {
+            lastPage = currentPage;
+            currentPage = 8;
+            HideCalculations();
+            HideTransformations();
+            HideFunctions();
+            HideComplexPlane();
+            HideMainMenu();
             HideSettings();
-            switch (currentPage)
+            ShowHelp();
+        }
+        private void ReturnToLastWindow(object sender, RoutedEventArgs e)
+        {
+            if (currentPage == 7)
+                HideSettings();
+            else
+                HideHelp();
+
+            switch (lastPage)
             {
                 case 1:
                     OpenFunctions();
@@ -850,12 +876,15 @@ namespace Interface
                 case 4:
                     OpenComplexNumbers();
                     break;
-                default:
-                    OpenMainMenu();
+                case 7:
+                    OpenSettings();
+                    break;
+                case 8:
+                    OpenHelp();
                     break;
             }
         }
-
+       
         private void AngleMeasurement_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             Global.angleFormatIndex = AngleMeasurement.SelectedIndex;
@@ -866,16 +895,16 @@ namespace Interface
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
         }
 
-        private void ToggleModulo(object sender, RoutedEventArgs e)
+        private void ToggleAlternateFormat(object sender, RoutedEventArgs e)
         {
             if (!showAltForm)
             {
-                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(alt_result));
+                Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(alt_result));
                 showAltForm = true;    
             }
             else
             { 
-                Calculation_OutputRender0.Source = BitmapToImageSource(convertLatexToPng(result));
+                Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(result));
                 showAltForm = false;
             }
         }
@@ -906,5 +935,7 @@ namespace Interface
                 }
             }
         }
+
+       
     }
 }
