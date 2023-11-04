@@ -40,14 +40,14 @@
 
         <Rectangle Name="TitleBackDrop" Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="2" Grid.RowSpan="5" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke" />
 
-        <Image Name="Title" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="3" Visibility="Collapsed" Margin="50,2" />
+        <Image Name="TitleText" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="3" Visibility="Collapsed" Margin="50,2" />
+        <Image Name="HelpInfo" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="6" Grid.RowSpan="9" Visibility="Collapsed"  Source="Images/Instructions.jpeg"/>
 
 
 
 
 
-
-        <Rectangle Name="SideBar"  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="21" VerticalAlignment="Stretch" Fill="#99000000" Visibility="Collapsed" />
+        <Rectangle Name="SideBar"  Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="21" VerticalAlignment="Stretch" Fill="Gray" Visibility="Collapsed" />
 
         <Rectangle Name="Input0RenderBackDrop" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="2" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke" />
         <Rectangle Name="Input1RenderBackDrop" Grid.Column="2" Grid.ColumnSpan="2" Grid.Row="5" Grid.RowSpan="2" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke"/>
@@ -133,11 +133,9 @@
 
         <Button Name="GoToSettings" Visibility="Visible" Grid.Column="1" Grid.Row="1" Width="50" Height="50"  Click="OpenSettings" Background="AliceBlue">
             <StackPanel>
-                <Image Visibility="Visible" Source="cog.jpg"/>
+                <Image Visibility="Visible" Source="Images/cog.jpg"/>
             </StackPanel>
         </Button>
-
-        <Button Name="GoToHelp" Content="?" Visibility="Visible" Grid.Column="1" Grid.Row="2" Width="50" Height="50"  Margin="0,0,0,20" Click="OpenHelp" Background="AliceBlue"></Button>
 
     </Grid>
 </Window>

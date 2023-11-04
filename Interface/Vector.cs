@@ -104,7 +104,7 @@ namespace Interface
         }
 
         // returns the cross product of two vectors
-        public static Vector cross(Vector A, Vector B)
+        public static Vector? cross(Vector A, Vector B)
         {
            
             if (A.rows == 3 && B.rows == 3)

@@ -187,7 +187,7 @@ namespace Interface
                         key = GenerateKey(variables);
                         variables.Add(key, operand2_Complex + operand1_Complex);
 
-                        if (!surdVariables.TryGetValue("#" + operand1_Str, out operand1_Surd))
+                        if (!surdVariables.TryGetValue("#" + operand1_Str, out  operand1_Surd))
                             operand1_Surd = operand1_Complex.real;
                         if (!surdVariables.TryGetValue("#" + operand2_Str, out operand2_Surd))
                             operand2_Surd = operand2_Complex.real;

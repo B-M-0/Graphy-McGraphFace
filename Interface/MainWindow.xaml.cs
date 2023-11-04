@@ -143,7 +143,7 @@ namespace Interface
         public MainWindow()
         {          
             InitializeComponent();
-            Title.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
+            TitleText.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
 
             OpenMainMenu();
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
@@ -174,7 +174,7 @@ namespace Interface
             }
         }
 
-        private void ResetGraph_Clicked(object sender = null, RoutedEventArgs e = null)
+        private void ResetGraph_Clicked(object? sender = null, RoutedEventArgs? e = null)
         {
             
             Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
@@ -389,7 +389,7 @@ namespace Interface
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
             Graph.Refresh();    
         }
-        private void SideBarButton_Clicked(object sender, RoutedEventArgs e)
+        private void SideBarButton_Clicked(object sender, RoutedEventArgs? e)
         {
             if (SideBar.Visibility == Visibility.Collapsed && OpenSideBar.Visibility == Visibility.Visible)
             {
@@ -722,6 +722,7 @@ namespace Interface
         {
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 4);
+            
             GoToFunctions.Visibility = Visibility.Visible;
             GoToTransformations.Visibility = Visibility.Visible;
             GoToCalculations.Visibility = Visibility.Visible;
@@ -729,7 +730,7 @@ namespace Interface
         }
         public void HideMainMenu()
         {
-            Title.Visibility = Visibility.Collapsed;
+            TitleText.Visibility = Visibility.Collapsed;
             TitleBackDrop.Visibility = Visibility.Collapsed;
             GoToFunctions.Visibility = Visibility.Collapsed;
             GoToTransformations.Visibility = Visibility.Collapsed;
@@ -746,6 +747,8 @@ namespace Interface
             Theme.Visibility = Visibility.Visible;
             ThemeLabel.Visibility = Visibility.Visible;
 
+            HelpInfo.Visibility = Visibility.Visible;   
+
             ReturnToLast.Visibility = Visibility.Visible;
             GoToMainMenu.Visibility = Visibility.Visible;
         }
@@ -756,32 +759,19 @@ namespace Interface
             GoToSettings.Visibility = Visibility.Visible;
             AngleMeasurement.Visibility = Visibility.Collapsed;
             AngleMeasurementLabel.Visibility = Visibility.Collapsed;
+            HelpInfo.Visibility = Visibility.Collapsed;
+
             Theme.Visibility = Visibility.Collapsed;
             ThemeLabel.Visibility = Visibility.Collapsed;
         }
 
-        private void ShowHelp()
-        { 
-            GoToHelp.Visibility = Visibility.Collapsed;
-
-
-
-            ReturnToLast.Visibility = Visibility.Visible;
-            GoToMainMenu.Visibility = Visibility.Visible;
-        }
-        private void HideHelp() 
-        {
-            GoToMainMenu.Visibility = Visibility.Collapsed;
-            ReturnToLast.Visibility = Visibility.Collapsed;
-            GoToHelp.Visibility = Visibility.Visible;
-        }
-
-        private void OpenMainMenu(object sender = null, RoutedEventArgs e = null)
+  
+        private void OpenMainMenu(object? sender = null, RoutedEventArgs? e = null)
         {
             lastPage = currentPage;
             currentPage = 0;
 
-            Title.Visibility = Visibility.Visible;
+            TitleText.Visibility = Visibility.Visible;
             TitleBackDrop.Visibility = Visibility.Visible;
 
             HideSettings();
@@ -789,10 +779,9 @@ namespace Interface
             HideTransformations();
             HideCalculations();
             HideComplexPlane();
-
             ShowMainMenu();
         }
-        private void OpenFunctions(object sender = null, RoutedEventArgs e = null)
+        private void OpenFunctions(object? sender = null, RoutedEventArgs? e = null)
         {
             ResetGraph_Clicked();
             UpdateGraph_Functions();
@@ -802,7 +791,7 @@ namespace Interface
             HideMainMenu();
             ShowFunctions();
         }
-        private void OpenTransformations(object sender = null, RoutedEventArgs e = null)
+        private void OpenTransformations(object? sender = null, RoutedEventArgs? e = null)
         {
             ResetGraph_Clicked();
             UpdateGraph_Transformations();
@@ -812,7 +801,7 @@ namespace Interface
             HideMainMenu();
             ShowTransformations();
         }
-        private void OpenCalculations(object sender = null, RoutedEventArgs e = null)
+        private void OpenCalculations(object? sender = null, RoutedEventArgs? e = null)
         {
             ResetGraph_Clicked();
             lastPage = currentPage;
@@ -820,7 +809,7 @@ namespace Interface
             HideMainMenu();
             ShowCalculations();
         }
-        private void OpenComplexNumbers(object sender = null, RoutedEventArgs e = null)
+        private void OpenComplexNumbers(object? sender = null, RoutedEventArgs? e = null)
         {
             ResetGraph_Clicked();
             UpdateGraph_ComplexLoci();
@@ -830,7 +819,7 @@ namespace Interface
             HideMainMenu();
             ShowComplexPlane();
         }
-        private void OpenSettings(object sender = null, RoutedEventArgs e = null)
+        private void OpenSettings(object? sender = null, RoutedEventArgs? e = null)
         {
             lastPage = currentPage;
             currentPage = 7;
@@ -839,28 +828,11 @@ namespace Interface
             HideFunctions();
             HideComplexPlane();
             HideMainMenu();
-            HideHelp();
             ShowSettings();
-
         }
-        private void OpenHelp(object sender = null, RoutedEventArgs e = null)
-        {
-            lastPage = currentPage;
-            currentPage = 8;
-            HideCalculations();
-            HideTransformations();
-            HideFunctions();
-            HideComplexPlane();
-            HideMainMenu();
+        private void ReturnToLastWindow(object? sender, RoutedEventArgs? e)
+        {        
             HideSettings();
-            ShowHelp();
-        }
-        private void ReturnToLastWindow(object sender, RoutedEventArgs e)
-        {
-            if (currentPage == 7)
-                HideSettings();
-            else
-                HideHelp();
 
             switch (lastPage)
             {
@@ -879,23 +851,23 @@ namespace Interface
                 case 7:
                     OpenSettings();
                     break;
-                case 8:
-                    OpenHelp();
+                default:
+                    OpenMainMenu();
                     break;
             }
         }
        
-        private void AngleMeasurement_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void AngleMeasurement_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             Global.angleFormatIndex = AngleMeasurement.SelectedIndex;
         }
-        private void Theme_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void Theme_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             Global.ThemeIndex = Theme.SelectedIndex;
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
         }
 
-        private void ToggleAlternateFormat(object sender, RoutedEventArgs e)
+        private void ToggleAlternateFormat(object? sender, RoutedEventArgs? e)
         {
             if (!showAltForm)
             {
@@ -909,7 +881,7 @@ namespace Interface
             }
         }
         
-        private void GraphChanged(object sender, EventArgs e)
+        private void GraphChanged(object? sender, EventArgs e)
         {
             if (currentPage == 4 )
             {
