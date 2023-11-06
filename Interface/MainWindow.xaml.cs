@@ -224,15 +224,15 @@ namespace Interface
                 if (valid_function[i] && function_inputs[i] != "")
                 {
                     asymptotes[i].Clear();
-                    bool validinput = true;
+                    bool validInput = true;
                     Function function = functions[i];
-                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validinput, i, ref asymptotes, x));
-                    valid_function[i] = validinput;
-                    if (validinput)
+                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validInput, i, ref asymptotes, x));
+                    valid_function[i] = validInput;
+                    if (validInput)
                     {
                         var plt = new FunctionPlot(func);
                         functionPlots[i] = plt;
-                        plt.Color = System.Drawing.Color.FromName(Global.colours[r.Next(0, Global.colours.Length)]);
+                        plt.Color = System.Drawing.Color.FromName(Global.colors[i]);
                         Graph.Plot.Add(plt);
                         foreach (double xVal in asymptotes[i])
                         {
@@ -318,10 +318,10 @@ namespace Interface
                     switch (typeOfLoci)
                     {
                         case "H":
-                            Tuple<ComplexNumber, Rational> HalflineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
-                            double centerX = -HalflineStats.Item1.real;
-                            double centerY = -HalflineStats.Item1.imaginary;
-                            double angle = HalflineStats.Item2;
+                            Tuple<ComplexNumber, Rational> halfLineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
+                            double centerX = -halfLineStats.Item1.real;
+                            double centerY = -halfLineStats.Item1.imaginary;
+                            double angle = halfLineStats.Item2;
                             //center
                             Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
@@ -487,7 +487,6 @@ namespace Interface
 
                 Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
                 Calculation_OutputRender0.Source = null;
-                "sd".ToString();
                 List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text)).Split(' '));
 
                 Function f = new Function(output);
@@ -783,21 +782,31 @@ namespace Interface
         }
         private void OpenFunctions(object? sender = null, RoutedEventArgs? e = null)
         {
-            ResetGraph_Clicked();
-            UpdateGraph_Functions();
-            OpenSideBar.Content = ">";
             lastPage = currentPage;
             currentPage = 1;
+
+            ResetGraph_Clicked();
+
+            for (int i = 0; i < input_count; i++)
+                TextChanged(i);
+
+            UpdateGraph_Functions();
+            OpenSideBar.Content = ">";
+           
             HideMainMenu();
             ShowFunctions();
         }
         private void OpenTransformations(object? sender = null, RoutedEventArgs? e = null)
         {
-            ResetGraph_Clicked();
-            UpdateGraph_Transformations();
-            OpenSideBar.Content = ">";
             lastPage = currentPage;
             currentPage = 2;
+
+            ResetGraph_Clicked();
+            UpdateGraph_Transformations();
+            for (int i = 0; i < input_count; i++)
+                TextChanged(i);
+            OpenSideBar.Content = ">";
+           
             HideMainMenu();
             ShowTransformations();
         }
@@ -811,11 +820,14 @@ namespace Interface
         }
         private void OpenComplexNumbers(object? sender = null, RoutedEventArgs? e = null)
         {
-            ResetGraph_Clicked();
-            UpdateGraph_ComplexLoci();
-            OpenSideBar.Content = ">";
             lastPage = currentPage;
             currentPage = 4;
+
+            ResetGraph_Clicked();
+            UpdateGraph_ComplexLoci();
+            for (int i = 0; i < input_count; i++)
+                TextChanged(i);
+            OpenSideBar.Content = ">";          
             HideMainMenu();
             ShowComplexPlane();
         }

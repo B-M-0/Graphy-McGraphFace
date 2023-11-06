@@ -13,7 +13,7 @@ namespace Interface
         public static int ThemeIndex = 6;
         public static int angleFormatIndex= 0;
         public static int decimalPlaces = 7;
-        public static string[] colours = { "Red", "Green", "Teal", "OrangeRed", "Purple" }; 
+        public static string[] colors = { "Red", "Green", "Blue" }; 
 
 
         public static double InputAngleConversion(double input)

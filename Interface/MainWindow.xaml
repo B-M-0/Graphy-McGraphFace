@@ -41,7 +41,7 @@
         <Rectangle Name="TitleBackDrop" Grid.Column="1" Grid.ColumnSpan="7" Grid.Row="2" Grid.RowSpan="5" Visibility="Collapsed" Margin="5,2" Fill="WhiteSmoke" />
 
         <Image Name="TitleText" Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="7" Grid.RowSpan="3" Visibility="Collapsed" Margin="50,2" />
-        <Image Name="HelpInfo" Grid.Column="2" Grid.Row="2" Grid.ColumnSpan="6" Grid.RowSpan="9" Visibility="Collapsed"  Source="Images/Instructions.jpeg"/>
+        <Image Name="HelpInfo" Grid.Column="3" Grid.Row="2" Grid.ColumnSpan="4" Grid.RowSpan="9" Visibility="Collapsed"  Source="Images/Instructions.jpeg"/>
 
 
 
