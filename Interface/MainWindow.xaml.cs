@@ -219,20 +219,21 @@ namespace Interface
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
-            for (int i = 0; i < input_count; i++)
+            for (int i = 0; i < 3; ++i)
             {
                 if (valid_function[i] && function_inputs[i] != "")
                 {
+                    bool validInput = valid_function[i];
                     asymptotes[i].Clear();
-                    bool validinput = true;
                     Function function = functions[i];
-                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validinput, i, ref asymptotes, x));
-                    valid_function[i] = validinput;
-                    if (validinput)
+                    
+
+                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validInput, i, ref asymptotes, x));;
+                    if (validInput)
                     {
                         var plt = new FunctionPlot(func);
                         functionPlots[i] = plt;
-                        plt.Color = System.Drawing.Color.FromName(Global.colours[r.Next(0, Global.colours.Length)]);
+                        plt.Color = System.Drawing.Color.FromName(Global.colours[i]);
                         Graph.Plot.Add(plt);
                         foreach (double xVal in asymptotes[i])
                         {
@@ -306,8 +307,8 @@ namespace Interface
                 string[] expression = input.Split('=');
                 List<string> LHS;
                 List<string> RHS;
-                LHS = InputHandling.InfixToPostfix(expression[0].Split(' '));
-                RHS = InputHandling.InfixToPostfix(expression[1].Split(' '));
+                LHS = InputHandling.InfixToPostfix(expression[0].Split(' '),ref valid_complex[i]);
+                RHS = InputHandling.InfixToPostfix(expression[1].Split(' '),ref valid_complex[i]);
                 // Types :: HalfLine (H), Bisector (B), Circle (C), Undefined (U)
 
                 Loci_isHalfLine[i] = false;
@@ -322,11 +323,13 @@ namespace Interface
                             double centerX = -HalflineStats.Item1.real;
                             double centerY = -HalflineStats.Item1.imaginary;
                             double angle = HalflineStats.Item2;
+                            if (angle > Math.PI || angle <= -Math.PI)
+                                break;
+
                             //center
                             Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
                             var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
-                            
                             var plt = new FunctionPlot(func);
                             plt.LineWidth = 2;
                             plt.Color = System.Drawing.Color.Red;
@@ -474,10 +477,11 @@ namespace Interface
 
         private void Calculation0_TextChanged(object sender, TextChangedEventArgs e)
         {
-            try
-            {
+           
                 string inputText = (sender as TextBox).Text;
                 string Latex = FormatLatex(inputText, "c");
+                bool validInput = true;
+
 
                 Dictionary<string, Surd> surdVariables = new Dictionary<string, Surd>();
                 Dictionary<string, ComplexNumber> complexVariables = new Dictionary<string, ComplexNumber>();
@@ -487,9 +491,12 @@ namespace Interface
 
                 Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
                 Calculation_OutputRender0.Source = null;
-                "sd".ToString();
-                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text)).Split(' '));
-
+            try 
+            { 
+                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text), ref validInput).Split(' '), ref validInput);
+                if (!validInput)
+                    throw new Exception("Invalid input");
+            
                 Function f = new Function(output);
                 result = "=";
                 if (inputText.Contains("\\M") || inputText.Contains("I(") || Regex.IsMatch(inputText, "[A-Z]+$"))
@@ -535,7 +542,8 @@ namespace Interface
                 Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(result));
             }
             catch
-            { //RenderErrorlhudyugywgygey}   
+            { 
+                
             }
         }
 
@@ -575,13 +583,22 @@ namespace Interface
 
                 try
                 {
-                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]));
-                    List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '));
+                    bool validInput = true;
+                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]),ref validInput);
+                    List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '),ref validInput);
                     if (currentPage == 4)
                         parsed_complex_inputs[id] = input_string;
                     else
                         functions[id] = new Function(expression);
-                    valid[id] = true;
+                    valid[id] = validInput;
+
+
+                    if (currentPage == 1)
+                        valid_function = valid;
+                    else if (currentPage == 2)
+                        valid_transformation = valid;
+                    else
+                        valid_complex = valid;
 
                     if (currentPage == 1)
                         UpdateGraph_Functions();
@@ -594,13 +611,7 @@ namespace Interface
                 {
                     Console.Error.WriteLine("Error when parsing formula: " + exception.Message);
                 }
-
-                if (currentPage == 1)
-                    valid_function = valid;
-                else if (currentPage == 2)
-                    valid_transformation = valid;
-                else
-                    valid_complex = valid;
+;
             }
         }
 
