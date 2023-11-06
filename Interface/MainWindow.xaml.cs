@@ -1,6 +1,5 @@
 ﻿using ScottPlot;
 using ScottPlot.Plottable;
-using ScottPlot.Styles;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,9 +8,6 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -44,12 +40,12 @@ namespace Interface
 
         string[] functionColors = new string[input_count];
 
-        FunctionPlot[] functionPlots = new FunctionPlot[input_count]; 
-        List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>()};
+        FunctionPlot[] functionPlots = new FunctionPlot[input_count];
+        List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>() };
 
         double[] axisBounds = new double[input_count];
         IPlottable[] Locus = new IPlottable[input_count];
-       
+
         bool[] Loci_plotted = new bool[input_count];
         bool[] Loci_isHalfLine = new bool[input_count];
 
@@ -92,7 +88,7 @@ namespace Interface
         {
             //Modes f ==> functions, c ==> calcuations
             string temp = "";
-            for (int i = 0; i <input.Length; i++)
+            for (int i = 0; i < input.Length; i++)
             {
                 char character = input[i];
                 switch (character)
@@ -119,13 +115,14 @@ namespace Interface
                 temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
-        public static Bitmap ConvertLatexToPng(string latex)
+        public static Bitmap? ConvertLatexToPng(string latex)
         {
+            Bitmap Image;
             var parser = WpfTeXFormulaParser.Instance;
             var formula = parser.Parse(latex);
+
             var png_Data = formula.RenderToPng(190.0, 4.0, 2.0, "Arial"); ;
 
-            Bitmap Image;
             using (MemoryStream ms = new MemoryStream(png_Data))
             {
                 Image = new Bitmap(ms);
@@ -141,7 +138,7 @@ namespace Interface
 
 
         public MainWindow()
-        {          
+        {
             InitializeComponent();
             TitleText.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
 
@@ -176,7 +173,7 @@ namespace Interface
 
         private void ResetGraph_Clicked(object? sender = null, RoutedEventArgs? e = null)
         {
-            
+
             Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
@@ -212,31 +209,32 @@ namespace Interface
             UpdateText();
             ResetGraph_Clicked();
 
-            Dictionary<string,double> variables = Global.DefineConstants<double>();
+            Dictionary<string, double> variables = Global.DefineConstants<double>();
 
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
-            for (int i = 0; i < input_count; i++)
+            for (int i = 0; i < 3; ++i)
             {
                 if (valid_function[i] && function_inputs[i] != "")
                 {
+                    bool validInput = valid_function[i];
                     asymptotes[i].Clear();
-                    bool validInput = true;
                     Function function = functions[i];
-                    var func = new Func<double, double?>((x) => function.Evaluate(variables,ref validInput, i, ref asymptotes, x));
-                    valid_function[i] = validInput;
+
+
+                    var func = new Func<double, double?>((x) => function.Evaluate(variables, ref validInput, i, ref asymptotes, x)); ;
                     if (validInput)
                     {
                         var plt = new FunctionPlot(func);
                         functionPlots[i] = plt;
-                        plt.Color = System.Drawing.Color.FromName(Global.colors[i]);
+                        plt.Color = System.Drawing.Color.FromName(Global.colours[i]);
                         Graph.Plot.Add(plt);
                         foreach (double xVal in asymptotes[i])
                         {
-                            Graph.Plot.AddVerticalLine(xVal, width: 2, color: System.Drawing.Color.Red ,style: LineStyle.Dot);
+                            Graph.Plot.AddVerticalLine(xVal, width: 2, color: System.Drawing.Color.Red, style: LineStyle.Dot);
                         }
                     }
                 }
@@ -263,7 +261,7 @@ namespace Interface
                     Function function = functions[i];
                     double decimalVal = 0;
 
-                    Dictionary<string, double> variables = new Dictionary<string, double>(); 
+                    Dictionary<string, double> variables = new Dictionary<string, double>();
                     Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
                     Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
 
@@ -295,9 +293,11 @@ namespace Interface
         public void UpdateGraph_ComplexLoci()
         {
             Graph.Plot.Clear();
-            
+            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
+            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
-            for (int i = 0; i < complex_inputs.Length; i++) 
+
+            for (int i = 0; i < complex_inputs.Length; i++)
             {
                 if (valid_complex[i] == false)
                     continue;
@@ -306,8 +306,8 @@ namespace Interface
                 string[] expression = input.Split('=');
                 List<string> LHS;
                 List<string> RHS;
-                LHS = InputHandling.InfixToPostfix(expression[0].Split(' '));
-                RHS = InputHandling.InfixToPostfix(expression[1].Split(' '));
+                LHS = InputHandling.InfixToPostfix(expression[0].Split(' '), ref valid_complex[i]);
+                RHS = InputHandling.InfixToPostfix(expression[1].Split(' '), ref valid_complex[i]);
                 // Types :: HalfLine (H), Bisector (B), Circle (C), Undefined (U)
 
                 Loci_isHalfLine[i] = false;
@@ -318,24 +318,26 @@ namespace Interface
                     switch (typeOfLoci)
                     {
                         case "H":
-                            Tuple<ComplexNumber, Rational> halfLineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
-                            double centerX = -halfLineStats.Item1.real;
-                            double centerY = -halfLineStats.Item1.imaginary;
-                            double angle = halfLineStats.Item2;
+                            Tuple<ComplexNumber, Rational> HalflineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
+                            double centerX = -HalflineStats.Item1.real;
+                            double centerY = -HalflineStats.Item1.imaginary;
+                            double angle = HalflineStats.Item2;
+                            if (angle > Math.PI || angle <= -Math.PI)
+                                break;
+
                             //center
                             Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
                             var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
-                            
                             var plt = new FunctionPlot(func);
                             plt.LineWidth = 2;
                             plt.Color = System.Drawing.Color.Red;
                             Locus[i] = plt;
                             Loci_isHalfLine[i] = true;
-                            Loci_plotted[i] = true ;
+                            Loci_plotted[i] = true;
                             Graph.Plot.Add(plt);
                             axisBounds[i] = centerX;
-                            Graph.Plot.SetAxisLimits(centerX - 15 , centerX + 15, centerY - 15, centerY + 15);
+                            Graph.Plot.SetAxisLimits(centerX - 15, centerX + 15, centerY - 15, centerY + 15);
                             break;
                         case "C":
                             Tuple<ComplexNumber, Rational> CircleStats = InputHandling.ParseComplexLoci_Circle(LHS, RHS);
@@ -343,7 +345,7 @@ namespace Interface
                             centerY = -CircleStats.Item1.imaginary;
                             double radius = CircleStats.Item2;
                             //center
-                            Graph.Plot.AddCircle(centerX, centerY, radius/100, lineWidth: (float)2);
+                            Graph.Plot.AddCircle(centerX, centerY, radius / 100, lineWidth: (float)2);
                             //Loci
                             Graph.Plot.AddCircle(centerX, centerY, radius);
 
@@ -368,26 +370,24 @@ namespace Interface
 
                             if (y_2 == y_1)
                             {
-                                Graph.Plot.AddVerticalLine(x: mp_x);                        
+                                Graph.Plot.AddVerticalLine(x: mp_x);
                             }
                             else
                             {
                                 func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
-                                Graph.Plot.AddFunction(func, lineWidth: 2);                            
+                                Graph.Plot.AddFunction(func, lineWidth: 2);
                             }
                             break;
                     }
                 }
-                catch 
-                { 
-                
+                catch
+                {
+
                 }
             }
             Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
 
-            Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
-            Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
-            Graph.Refresh();    
+            Graph.Refresh();
         }
         private void SideBarButton_Clicked(object sender, RoutedEventArgs? e)
         {
@@ -474,20 +474,25 @@ namespace Interface
 
         private void Calculation0_TextChanged(object sender, TextChangedEventArgs e)
         {
+
+            string inputText = (sender as TextBox).Text;
+            string Latex = FormatLatex(inputText, "c");
+            bool validInput = true;
+
+
+            Dictionary<string, Surd> surdVariables = new Dictionary<string, Surd>();
+            Dictionary<string, ComplexNumber> complexVariables = new Dictionary<string, ComplexNumber>();
+            Dictionary<string, double> doubleVariables = new Dictionary<string, double>();
+            Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
+            Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
+
+            Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
+            Calculation_OutputRender0.Source = null;
             try
             {
-                string inputText = (sender as TextBox).Text;
-                string Latex = FormatLatex(inputText, "c");
-
-                Dictionary<string, Surd> surdVariables = new Dictionary<string, Surd>();
-                Dictionary<string, ComplexNumber> complexVariables = new Dictionary<string, ComplexNumber>();
-                Dictionary<string, double> doubleVariables = new Dictionary<string, double>();
-                Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
-                Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
-
-                Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
-                Calculation_OutputRender0.Source = null;
-                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text)).Split(' '));
+                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text), ref validInput).Split(' '), ref validInput);
+                if (!validInput)
+                    throw new Exception("Invalid input");
 
                 Function f = new Function(output);
                 result = "=";
@@ -534,7 +539,8 @@ namespace Interface
                 Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(result));
             }
             catch
-            { //RenderErrorlhudyugywgygey}   
+            {
+
             }
         }
 
@@ -574,13 +580,22 @@ namespace Interface
 
                 try
                 {
-                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]));
-                    List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '));
+                    bool validInput = true;
+                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]), ref validInput);
+                    List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '), ref validInput);
                     if (currentPage == 4)
                         parsed_complex_inputs[id] = input_string;
                     else
                         functions[id] = new Function(expression);
-                    valid[id] = true;
+                    valid[id] = validInput;
+
+
+                    if (currentPage == 1)
+                        valid_function = valid;
+                    else if (currentPage == 2)
+                        valid_transformation = valid;
+                    else
+                        valid_complex = valid;
 
                     if (currentPage == 1)
                         UpdateGraph_Functions();
@@ -593,13 +608,7 @@ namespace Interface
                 {
                     Console.Error.WriteLine("Error when parsing formula: " + exception.Message);
                 }
-
-                if (currentPage == 1)
-                    valid_function = valid;
-                else if (currentPage == 2)
-                    valid_transformation = valid;
-                else
-                    valid_complex = valid;
+;
             }
         }
 
@@ -721,7 +730,7 @@ namespace Interface
         {
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 4);
-            
+
             GoToFunctions.Visibility = Visibility.Visible;
             GoToTransformations.Visibility = Visibility.Visible;
             GoToCalculations.Visibility = Visibility.Visible;
@@ -746,7 +755,7 @@ namespace Interface
             Theme.Visibility = Visibility.Visible;
             ThemeLabel.Visibility = Visibility.Visible;
 
-            HelpInfo.Visibility = Visibility.Visible;   
+            HelpInfo.Visibility = Visibility.Visible;
 
             ReturnToLast.Visibility = Visibility.Visible;
             GoToMainMenu.Visibility = Visibility.Visible;
@@ -764,7 +773,7 @@ namespace Interface
             ThemeLabel.Visibility = Visibility.Collapsed;
         }
 
-  
+
         private void OpenMainMenu(object? sender = null, RoutedEventArgs? e = null)
         {
             lastPage = currentPage;
@@ -843,7 +852,7 @@ namespace Interface
             ShowSettings();
         }
         private void ReturnToLastWindow(object? sender, RoutedEventArgs? e)
-        {        
+        {
             HideSettings();
 
             switch (lastPage)
@@ -868,7 +877,7 @@ namespace Interface
                     break;
             }
         }
-       
+
         private void AngleMeasurement_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
             Global.angleFormatIndex = AngleMeasurement.SelectedIndex;
@@ -884,42 +893,42 @@ namespace Interface
             if (!showAltForm)
             {
                 Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(alt_result));
-                showAltForm = true;    
+                showAltForm = true;
             }
             else
-            { 
+            {
                 Calculation_OutputRender0.Source = BitmapToImageSource(ConvertLatexToPng(result));
                 showAltForm = false;
             }
         }
-        
+
         private void GraphChanged(object? sender, EventArgs e)
         {
-            if (currentPage == 4 )
+            if (currentPage == 4)
             {
-                double error = Graph.Plot.GetAxisLimits(0).XSpan/30;
+                double error = Graph.Plot.GetAxisLimits(0).XSpan / 30;
 
                 double maxX = Graph.Plot.GetAxisLimits(0).XMax;
                 double minX = Graph.Plot.GetAxisLimits(0).XMin;
                 for (int i = 0; i < input_count; i++)
                 {
-                   
-                    if (Loci_plotted[i] == true && (maxX <= axisBounds[i] + error ||  minX + error >= axisBounds[i]) && Loci_isHalfLine[i] == true)
+
+                    if (Loci_plotted[i] == true && (maxX <= axisBounds[i] + error || minX + error >= axisBounds[i]) && Loci_isHalfLine[i] == true)
                     {
                         Graph.Plot.Remove(Locus[i]);
                         Loci_plotted[i] = false;
                         Graph.Refresh();
-                    }         
-                    else if (Loci_plotted[i] == false && Loci_isHalfLine[i] == true && maxX >= axisBounds[i] + error && minX +error  <= axisBounds[i] )
+                    }
+                    else if (Loci_plotted[i] == false && Loci_isHalfLine[i] == true && maxX >= axisBounds[i] + error && minX + error <= axisBounds[i])
                     {
                         Graph.Plot.Add(Locus[i]);
                         Loci_plotted[i] = true;
                     }
-                  
+
                 }
             }
         }
 
-       
+
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ScottPlot;
+using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -721,7 +722,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber radius = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd);
+            ComplexNumber radius = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
             ComplexNumber center = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(center, radius.real);
         }
@@ -736,7 +737,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber Z_2 = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd);
+            ComplexNumber Z_2 = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
             ComplexNumber Z_1 = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(Z_1, Z_2);
         }
@@ -768,10 +769,10 @@ namespace Interface
 
             return key;
         }
-        public static string FormatInput(string input)
+        public static string FormatInput(string input, ref bool inputIsValid)
         {
             string function;
-            for (int i = 0; i < input.Length; i++)
+            for (int i = 0; i < input.Length && inputIsValid; i++)
             {
                 try
                 {
@@ -850,7 +851,7 @@ namespace Interface
                 }
                 catch (Exception e)
                 {
-                    //Console.WriteLine(e.Message);
+                    inputIsValid = false;   
                 }
             }
 
@@ -862,13 +863,16 @@ namespace Interface
             return input;
         }
 
-        public static List<string> InfixToPostfix(string[] infix)
+        public static List<string> InfixToPostfix(string[] infix, ref bool validInput)
         {
             var temp = infix.ToList();
             while (temp.Remove("")) ;
 
             infix = temp.ToArray();
-            
+            bool IsOperator(string operator_)
+            {
+                return operator_ == "+" || operator_ == "-" || operator_ == "^" || operator_ == "," || operator_ == "*" || operator_ == "/" || operator_ == "=";
+            }
             bool IsFunction(string function_)
             {
                 return FunctionCodes.Contains(function_);
@@ -893,6 +897,10 @@ namespace Interface
                             return 0;
                 }
             }
+
+            if (IsOperator(infix[infix.Length - 1]) || infix[infix.Length - 1] == " ")
+                validInput = false;
+
 
             List<string> postfix = new List<string>();
             Stack<string> stack = new Stack<string>();
