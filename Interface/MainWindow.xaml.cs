@@ -32,23 +32,16 @@ namespace Interface
 
     public partial class MainWindow : Window
     {
-        Random r = new Random();
-
         static int input_count = 3;
 
         Function[] functions = new Function[input_count];
-
-        string[] functionColors = new string[input_count];
-
         FunctionPlot[] functionPlots = new FunctionPlot[input_count];
         List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>() };
 
         double[] axisBounds = new double[input_count];
         IPlottable[] Locus = new IPlottable[input_count];
-
         bool[] Loci_plotted = new bool[input_count];
         bool[] Loci_isHalfLine = new bool[input_count];
-
 
         bool[] valid_function = new bool[input_count];
         bool[] valid_transformation = new bool[input_count];
@@ -115,11 +108,12 @@ namespace Interface
                 temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
-        public static Bitmap? ConvertLatexToPng(string latex)
+        public static Bitmap ConvertLatexToPng(string latex)
         {
             Bitmap Image;
             var parser = WpfTeXFormulaParser.Instance;
             var formula = parser.Parse(latex);
+
 
             var png_Data = formula.RenderToPng(190.0, 4.0, 2.0, "Arial"); ;
 
@@ -127,6 +121,7 @@ namespace Interface
             {
                 Image = new Bitmap(ms);
             }
+
             return Image;
         }
         ImageSource BitmapToImageSource(Bitmap bitmap)
@@ -230,7 +225,7 @@ namespace Interface
                     {
                         var plt = new FunctionPlot(func);
                         functionPlots[i] = plt;
-                        plt.Color = System.Drawing.Color.FromName(Global.colours[i]);
+                        plt.Color = System.Drawing.Color.FromName(Global.colors[i]);
                         Graph.Plot.Add(plt);
                         foreach (double xVal in asymptotes[i])
                         {
@@ -318,11 +313,11 @@ namespace Interface
                     switch (typeOfLoci)
                     {
                         case "H":
-                            Tuple<ComplexNumber, Rational> HalflineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
-                            double centerX = -HalflineStats.Item1.real;
-                            double centerY = -HalflineStats.Item1.imaginary;
-                            double angle = HalflineStats.Item2;
-                            if (angle > Math.PI || angle <= -Math.PI)
+                            Tuple<ComplexNumber, Rational> halfLineStats = InputHandling.ParseComplexLoci_HalfLine(LHS, RHS);
+                            double centerX = -halfLineStats.Item1.real;
+                            double centerY = -halfLineStats.Item1.imaginary;
+                            double angle = halfLineStats.Item2;
+                            if (angle > Math.PI || angle <= -Math.PI || !LHS.Contains("z"))
                                 break;
 
                             //center
@@ -486,8 +481,20 @@ namespace Interface
             Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
             Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
 
-            Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
-            Calculation_OutputRender0.Source = null;
+
+            try
+            {
+                Calculation_OutputRender0.Source = null;
+                Calculation_InputRender0.Source = BitmapToImageSource(ConvertLatexToPng(Latex));
+            }
+            catch
+            {
+                Calculation_InputRender0.Source = null;
+            }
+            Graph.Plot.Clear();
+
+            
+            
             try
             {
                 List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text), ref validInput).Split(' '), ref validInput);
@@ -801,7 +808,7 @@ namespace Interface
 
             UpdateGraph_Functions();
             OpenSideBar.Content = ">";
-           
+
             HideMainMenu();
             ShowFunctions();
         }
@@ -815,7 +822,7 @@ namespace Interface
             for (int i = 0; i < input_count; i++)
                 TextChanged(i);
             OpenSideBar.Content = ">";
-           
+
             HideMainMenu();
             ShowTransformations();
         }
@@ -836,7 +843,7 @@ namespace Interface
             UpdateGraph_ComplexLoci();
             for (int i = 0; i < input_count; i++)
                 TextChanged(i);
-            OpenSideBar.Content = ">";          
+            OpenSideBar.Content = ">";
             HideMainMenu();
             ShowComplexPlane();
         }

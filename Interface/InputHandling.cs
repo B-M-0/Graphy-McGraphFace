@@ -9,8 +9,8 @@ namespace Interface
 {
     static class InputHandling
     {
-        static Random random = new Random();
-        static List<string> FunctionCodes = new List<string>()
+        static private Random random = new Random();
+        static private List<string> FunctionCodes = new List<string>()
         {
             "QRr", "QRq", "I",
             "\\sqrt","abs",
@@ -647,9 +647,14 @@ namespace Interface
                         operand1 = stack.Pop();
                         operand2 = stack.Pop();
                         A = matrices[operand2];
-                        int power = int.Parse(operand1);
-                        C = new SquareMatrix(A) ^ power;
-                        key = GenerateKey(matrices);
+                        if (operand1 == "T")
+                            C = new SquareMatrix(A) ^ "T";
+                        else
+                        {
+                            int power = int.Parse(operand1);
+                            C = new SquareMatrix(A) ^ power;
+                        }
+                                key = GenerateKey(matrices);
                         matrices.Add(key, C);
                         stack.Push(key);
                         break;
@@ -708,7 +713,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber Angle = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd);
+            ComplexNumber Angle = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
             ComplexNumber Center = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(Center, Angle.real);
         }
