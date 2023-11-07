@@ -95,7 +95,17 @@ namespace Interface
 
         public static Surd operator *(Surd A, Surd B)
         {
-            return (A.Surplus * B.Surplus + new Surd(A.Coefficient*B.Surplus, A.Root) + new Surd(A.Surplus*B.Coefficient, B.Root) + new Surd(B.Coefficient *A.Coefficient, A.Root * B.Root)).Simplify();
+            var a = (A.Surplus * B.Surplus + new Surd(A.Coefficient * B.Surplus, A.Root));
+            var b = new Surd(A.Surplus * B.Coefficient, B.Root);
+            var c = new Surd(B.Coefficient * A.Coefficient, A.Root * B.Root);
+            try
+            {
+                return a + b + c;
+            }
+            catch 
+            {
+                return a.Decimal() + b.Decimal() + c.Decimal();   
+            }
         }
         public static Surd operator *(Rational A, Surd B)
         {
@@ -139,6 +149,7 @@ namespace Interface
             return B + A;
         }
 
+        
         public static Surd operator +(Surd A, Surd B)
         {
             if (A.Root == B.Root || A.Root == 1 || B.Root == 1)

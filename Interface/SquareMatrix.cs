@@ -180,6 +180,12 @@ namespace Interface
         }
         public static SquareMatrix Cofactor(SquareMatrix A)
         {
+            A = A ^ "M";
+           
+            return ApplySignMatrix(A);
+        }
+        public static SquareMatrix ApplySignMatrix(SquareMatrix A)
+        {
             for (int row = 0; row < A.rows; row++)
             {
                 for (int column = 0; column < A.columns; column++)
@@ -189,6 +195,7 @@ namespace Interface
             }
             return A;
         }
+
         public static SquareMatrix Transpose(SquareMatrix A)
         {
             SquareMatrix B = new SquareMatrix(A.rows);
@@ -201,7 +208,6 @@ namespace Interface
         }
         public static SquareMatrix Adjugate(SquareMatrix A)
         {
-            A = A ^ "M";
             A = A ^ "C";
             A = A ^ "T";
             return A;
@@ -223,28 +229,7 @@ namespace Interface
             return (SquareMatrix)(detA.Reciprocal() * (this ^ "A"));
         }
 
-        //Factorisation A = QR
-        public static (SquareMatrix,SquareMatrix) QR_Decomposition(SquareMatrix A)
-        {
-            Vector[] a = new Vector[A.columns];
-            for (int i = 0; i < A.columns; i++)
-                a[i] = A.GetColumn(i);
-
-            Vector[] e = Vector.GramSchmidtOrthonormalization(a);
-
-            SquareMatrix Q = new SquareMatrix(e);
-            SquareMatrix R = new SquareMatrix((Transpose(Q)) * A);
-            return (Q, R);
-        }
-        public static SquareMatrix QR_Q(SquareMatrix A)
-        {
-            return QR_Decomposition(A).Item1;
-        }
-        public static SquareMatrix QR_R(SquareMatrix A)
-        {
-            return QR_Decomposition(A).Item2;
-        }
-
+      
 
     }
 }
