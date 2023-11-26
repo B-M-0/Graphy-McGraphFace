@@ -38,7 +38,7 @@ namespace Interface
                 case 0:
                     return input;
                 case 1:
-                    return input * 180 / Math.PI;
+                    return Math.Round(input * 180 / Math.PI,4);
                 case 2:
                     return input * 200/Math.PI;
                 default:

@@ -104,7 +104,7 @@ namespace Interface
             else if (A.real == 0 && A.imaginary > 0)
                 return Math.PI / 2;
             else if (A.real < 0 && A.imaginary > 0)
-                return 2 * Math.PI - angle;
+                return Math.PI - angle;
             else if (A.real < 0 && A.imaginary ==0)
                 return Math.PI;
             else if (A.real > 0 && A.imaginary < 0)

@@ -126,8 +126,8 @@ namespace Interface
 
         public Vector GetColumn(int columnIndex)
         {
-            Vector output = new Vector(this.columns);
-            for (int i = 0; i < this.columns; i++)
+            Vector output = new Vector(this.rows);
+            for (int i = 0; i < this.rows; i++)
             {
                 output[i] = this.values[i, columnIndex];
             }

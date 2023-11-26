@@ -164,7 +164,7 @@ namespace Interface
 
             return result.Simplify();
         }
-        public static Rational operator -(Rational A, Rational B)
+        public static Rational? operator -(Rational A, Rational B)
         {
             Rational result;
 
