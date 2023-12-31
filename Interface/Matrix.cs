@@ -12,9 +12,7 @@ namespace Interface
 {
 
     public class Matrix
-    {
-        // NEEDS A CLEANING UP
-        
+    {        
         public readonly int rows, columns;
         protected  Rational[,] values;
 

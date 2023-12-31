@@ -1,5 +1,4 @@
 ﻿using ScottPlot;
-using ScottPlot.Plottable;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,19 +38,25 @@ namespace Interface
                 switch (element)
                 {
                     case "arg":
+
                         operand1_Complex = variables[stack.Pop()];
                         key = GenerateKey(variables);
                         variables.Add(key, new Rational(ComplexNumber.Arg(operand1_Complex)));
 
                         stack.Push(key);
+
                         break;
                     case "abs":
                     case "mod":
-                        operand1_Complex = variables[stack.Pop()];
-                        key = GenerateKey(variables);
-                        variables.Add(key, new Rational(ComplexNumber.Abs(operand1_Complex)));
+                       
+                            operand1_Complex = variables[stack.Pop()];
+                            key = GenerateKey(variables);
+                            variables.Add(key, ComplexNumber.Abs(operand1_Complex));
+                       
+                            surdVariables.Add("#" + key, ComplexNumber.Exact_Abs(operand1_Complex));
 
-                        stack.Push(key);
+                            stack.Push(key);
+                        
                         break;
                     case "\\sqrt":
                         operand1_Rational = variables[stack.Pop()].real;
@@ -188,7 +193,7 @@ namespace Interface
                         key = GenerateKey(variables);
                         variables.Add(key, operand2_Complex + operand1_Complex);
 
-                        if (!surdVariables.TryGetValue("#" + operand1_Str, out  operand1_Surd))
+                        if (!surdVariables.TryGetValue("#" + operand1_Str, out operand1_Surd))
                             operand1_Surd = operand1_Complex.real;
                         if (!surdVariables.TryGetValue("#" + operand2_Str, out operand2_Surd))
                             operand2_Surd = operand2_Complex.real;
@@ -317,7 +322,7 @@ namespace Interface
                 return null;
             }
         }
-        public static double EvaluatePostfix(List<string> expression, Dictionary<string, double> variables,int functionId,ref List<double>[] asymptotes , ref bool validInput)
+        public static double EvaluatePostfix(List<string> expression, Dictionary<string, double> variables, int functionId, ref List<double>[] asymptotes, ref bool validInput)
         {
             validInput = true;
             Stack<string> stack = new Stack<string>();
@@ -355,15 +360,15 @@ namespace Interface
                             break;
                         case "sec":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1/Math.Cos(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Cos(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "csc":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1/Math.Sin(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Sin(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "cot":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1/Math.Tan(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Tan(Global.InputAngleConversion(operand1))).ToString());
                             break;
                         case "sinh":
                             operand1 = double.Parse(stack.Pop());
@@ -477,7 +482,7 @@ namespace Interface
             }
 
             double output = double.Parse(stack.Pop());
-            if (functionId < 3 &&output == double.NaN)
+            if (functionId < 3 && output == double.NaN)
             {
                 asymptotes[functionId].Add(variables["x"]);
             }
@@ -487,7 +492,7 @@ namespace Interface
         {
             Stack<string> stack = new Stack<string>();
             if (expression.Contains("\\M") == false)
-                    return SquareMatrix.Identity(1);
+                return SquareMatrix.Identity(1);
             foreach (string element in expression)
             {
                 string operand1, operand2;
@@ -540,7 +545,7 @@ namespace Interface
                         A = matrices[operand1];
                         squareMatrixA = new SquareMatrix(A);
                         stack.Push(((double)SquareMatrix.Determinant(squareMatrixA)).ToString());
-                        break;             
+                        break;
                     case "+":
 
                         operand1 = stack.Pop();
@@ -636,7 +641,7 @@ namespace Interface
                             int power = int.Parse(operand1);
                             C = new SquareMatrix(A) ^ power;
                         }
-                                key = GenerateKey(matrices);
+                        key = GenerateKey(matrices);
                         matrices.Add(key, C);
                         stack.Push(key);
                         break;
@@ -695,7 +700,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber Angle = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
+            ComplexNumber Angle = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             ComplexNumber Center = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(Center, Angle.real);
         }
@@ -709,7 +714,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber radius = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
+            ComplexNumber radius = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             ComplexNumber center = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(center, radius.real);
         }
@@ -724,7 +729,7 @@ namespace Interface
             Surd placeholderSurd = 0;
             Function LHS_expression = new Function(LHS);
             Function RHS_expression = new Function(RHS);
-            ComplexNumber Z_2 = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd,0);
+            ComplexNumber Z_2 = RHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             ComplexNumber Z_1 = LHS_expression.Evaluate(surdDictionary, complexDictionary, ref decimalValue, ref placeholderSurd, 0);
             return Tuple.Create(Z_1, Z_2);
         }
@@ -838,7 +843,7 @@ namespace Interface
                 }
                 catch (Exception e)
                 {
-                    inputIsValid = false;   
+                    inputIsValid = false;
                 }
             }
 
@@ -941,6 +946,6 @@ namespace Interface
 
             return terms;
         }
-     
+
     }
 }

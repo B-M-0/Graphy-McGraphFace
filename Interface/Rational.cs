@@ -8,55 +8,11 @@ namespace Interface
     {
         public readonly bool isInteger = false;
         public readonly bool isFloat = false;
-        public readonly bool isSurd = false;
-
 
         private int numerator;
         private int denominator;
         private readonly double decimalVal;
 
-        public static implicit operator double(Rational A)
-        {
-            if (A == null)
-                return 0;
-            else
-                return A.decimalVal;
-        }
-
-        public static implicit operator Rational(double A)
-        {
-            return new Rational(A).Simplify();
-        }
-        public static implicit operator Rational(int A)
-        {
-            return new Rational(A).Simplify();
-        }
-        public static explicit operator int(Rational A)
-        {
-            return (int)(double)A;
-        }
-
-        public static implicit operator string(Rational A)
-        {
-
-            if (A.isInteger)
-                return $"{A.numerator}";
-            else
-                return $"{A.numerator}/{A.denominator}";
-        }
-        public string LatexFormat()
-        {
-            Simplify();
-            string sign = "";
-            if (numerator < 0) sign = "-";
-
-            if (isInteger)
-                return numerator.ToString();
-            else if (isFloat)
-                return this.Decimal().ToString();
-            else
-                return $"{sign}\\frac{{{Math.Abs(numerator)}}}{{{denominator}}}";
-        }
         public Rational(int numerator, int denominator = 1)
         {
             if (numerator < 0 && denominator < 0)
@@ -80,7 +36,6 @@ namespace Interface
             this.decimalVal = (double)numerator / (double)denominator;
             signHandling();
         }
-
         public Rational(double decimalValue)
         {
             // truncates to (k)dp
@@ -143,14 +98,58 @@ namespace Interface
         }
         public Rational Reciprocal()
         {
-            if(isFloat)
+            if (isFloat)
                 return 1 / this;
-            else if(this == 0)
+            else if (this == 0)
                 return this;
             else
                 return new Rational(denominator, numerator);
         }
 
+
+
+        public static implicit operator double(Rational A)
+        {
+            if (A == null)
+                return 0;
+            else
+                return A.decimalVal;
+        }
+        public static implicit operator Rational(double A)
+        {
+            return new Rational(A).Simplify();
+        }
+        public static implicit operator Rational(int A)
+        {
+            return new Rational(A).Simplify();
+        }
+        public static explicit operator int(Rational A)
+        {
+            return (int)(double)A;
+        }
+
+        public static implicit operator string(Rational A)
+        {
+
+            if (A.isInteger)
+                return $"{A.numerator}";
+            else
+                return $"{A.numerator}/{A.denominator}";
+        }
+        public string LatexFormat()
+        {
+            Simplify();
+            string sign = "";
+            if (numerator < 0) sign = "-";
+
+            if (isInteger)
+                return numerator.ToString();
+            else if (isFloat)
+                return this.Decimal().ToString();
+            else
+                return $"{sign}\\frac{{{Math.Abs(numerator)}}}{{{denominator}}}";
+        }
+      
 
         public static Rational operator +(Rational A, Rational B)
         {

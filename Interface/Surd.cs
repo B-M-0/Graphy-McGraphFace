@@ -203,6 +203,9 @@ namespace Interface
 
         public string ToLatex()
         {
+            if (Root == 1)
+                return Coefficient.LatexFormat();
+
             if (Surplus == 0 && Coefficient == 0)
                 return "0";
             string sign = "+";

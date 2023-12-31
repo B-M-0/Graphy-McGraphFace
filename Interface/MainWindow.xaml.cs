@@ -30,36 +30,52 @@ namespace Interface
         }
     }
 
-    public partial class MainWindow : Window
+    public  partial class MainWindow : Window
     {
         static int input_count = 3;
 
-        Function[] functions = new Function[input_count];
-        FunctionPlot[] functionPlots = new FunctionPlot[input_count];
-        List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>() };
+        private Function[] functions = new Function[input_count];
+        private FunctionPlot[] functionPlots = new FunctionPlot[input_count];
+        private List<double>[] asymptotes = new List<double>[] { new List<double>(), new List<double>(), new List<double>() };
 
-        double[] axisBounds = new double[input_count];
-        IPlottable[] Locus = new IPlottable[input_count];
-        bool[] Loci_plotted = new bool[input_count];
-        bool[] Loci_isHalfLine = new bool[input_count];
+        private double[] axisBounds = new double[input_count];
+        private IPlottable[] Locus = new IPlottable[input_count];
+        private bool[] Loci_plotted = new bool[input_count];
+        private bool[] Loci_isHalfLine = new bool[input_count];
 
-        bool[] valid_function = new bool[input_count];
-        bool[] valid_transformation = new bool[input_count];
-        bool[] valid_complex = new bool[input_count];
+        private bool[] valid_function = new bool[input_count];
+        private bool[] valid_transformation = new bool[input_count];
+        private bool[] valid_complex = new bool[input_count];
 
-        int currentPage = 0;
-        int lastPage = 0;
-        string result;
-        string alt_result;
-        bool showAltForm = false;
+        private int currentPage = 0;
+        private int lastPage = 0;
+        private string result;
+        private string alt_result;
+        private bool showAltForm = false;
 
-        string[] function_inputs = new string[input_count];
-        string[] transformation_inputs = new string[input_count];
-        string[] complex_inputs = new string[input_count];
-        string[] parsed_complex_inputs = new string[input_count];
+        private string[] function_inputs = new string[input_count];
+        private string[] transformation_inputs = new string[input_count];
+        private string[] complex_inputs = new string[input_count];
+        private string[] parsed_complex_inputs = new string[input_count];
 
 
-        public bool BracketsBalanced(string input)
+      
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            TitleText.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
+
+            OpenMainMenu();
+            function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
+            for (int i = 0; i < valid_function.Length; i++)
+            {
+                valid_function[i] = false;
+                valid_transformation[i] = false;
+            }
+        }
+
+        private bool BracketsBalanced(string input)
         {
             int openCount = 0;
             int closedCount = 0;
@@ -77,7 +93,7 @@ namespace Interface
             }
             return openCount == closedCount;
         }
-        public string FormatLatex(string input, string mode = "f")
+        private string FormatLatex(string input, string mode = "f")
         {
             //Modes f ==> functions, c ==> calcuations
             string temp = "";
@@ -108,7 +124,7 @@ namespace Interface
                 temp = temp.Replace("\\M", "\\pmatrix");
             return temp;
         }
-        public static Bitmap ConvertLatexToPng(string latex)
+        private static Bitmap ConvertLatexToPng(string latex)
         {
             Bitmap Image;
             var parser = WpfTeXFormulaParser.Instance;
@@ -132,22 +148,7 @@ namespace Interface
         }
 
 
-        public MainWindow()
-        {
-            InitializeComponent();
-            TitleText.Source = BitmapToImageSource(ConvertLatexToPng("Graphy McGraphFace"));
-
-            OpenMainMenu();
-            function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
-            for (int i = 0; i < valid_function.Length; i++)
-            {
-                valid_function[i] = false;
-                valid_transformation[i] = false;
-            }
-        }
-
-
-        public void PlotMatrix(Matrix M)
+        private void PlotMatrix(Matrix M)
         {
             if (M.rows == 2)
             {
@@ -177,7 +178,7 @@ namespace Interface
             GraphChanged(null, null);
             Graph.Refresh();
         }
-        public void UpdateRenders(int id, ImageSource Render)
+        private void UpdateRenders(int id, ImageSource Render)
         {
             switch (id)
             {
@@ -192,13 +193,13 @@ namespace Interface
                     break;
             }
         }
-        public void UpdateText()
+        private void UpdateText()
         {
             function_inputs = new string[] { Function_Input0.Text, Function_Input1.Text, Function_Input2.Text };
             transformation_inputs = new string[] { Transformation_Input0.Text, Transformation_Input1.Text, Transformation_Input2.Text };
             complex_inputs = new string[] { Complex_Input0.Text, Complex_Input1.Text, Complex_Input2.Text };
         }
-        public void UpdateGraph_Functions()
+        private void UpdateGraph_Functions()
         {
             Graph.Plot.Clear();
             UpdateText();
@@ -238,7 +239,7 @@ namespace Interface
             Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
             Graph.Refresh();
         }
-        public void UpdateGraph_Transformations()
+        private void UpdateGraph_Transformations()
         {
             Graph.Plot.Clear();
             ResetGraph_Clicked();
@@ -249,6 +250,7 @@ namespace Interface
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
             bool UPlotted = false;
+            bool TPlotted = false;
             for (int i = 0; i < input_count; i++)
             {
                 if (valid_transformation[i])
@@ -279,13 +281,18 @@ namespace Interface
                         PlotMatrix(matrices["U"]);
                         UPlotted = true;
                     }
+                    if (function.GetFunction().Contains("T") && !TPlotted)
+                    {
+                        PlotMatrix(matrices["T"]);
+                        TPlotted = true;
+                    }
                 }
 
                 Graph.Plot.SetAxisLimits(-15, 15, -15, 15);
                 Graph.Refresh();
             }
         }
-        public void UpdateGraph_ComplexLoci()
+        private void UpdateGraph_ComplexLoci()
         {
             Graph.Plot.Clear();
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
@@ -551,7 +558,7 @@ namespace Interface
             }
         }
 
-        public void TextChanged(int id)
+        private void TextChanged(int id)
         {
             UpdateText();
             string[] inputs;
@@ -633,14 +640,14 @@ namespace Interface
         }
 
 
-        public void ShowFunctions()
+        private void ShowFunctions()
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-        public void HideFunctions()
+        private void HideFunctions()
         {
             Graph.Visibility = Visibility.Collapsed;
             SideBar.Visibility = Visibility.Collapsed;
@@ -659,14 +666,14 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-        public void ShowTransformations()
+        private void ShowTransformations()
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-        public void HideTransformations()
+        private void HideTransformations()
         {
             Graph.Visibility = Visibility.Collapsed;
             SideBar.Visibility = Visibility.Collapsed;
@@ -685,14 +692,14 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-        public void ShowComplexPlane()
+        private void ShowComplexPlane()
         {
             Graph.Visibility = Visibility.Visible;
             OpenSideBar.Visibility = Visibility.Visible;
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 6);
         }
-        public void HideComplexPlane()
+        private void HideComplexPlane()
         {
             Graph.Visibility = Visibility.Collapsed;
             SideBar.Visibility = Visibility.Collapsed;
@@ -711,7 +718,7 @@ namespace Interface
             OpenSideBar.Visibility = Visibility.Collapsed;
         }
 
-        public void ShowCalculations()
+        private void ShowCalculations()
         {
             GoToMainMenu.Visibility = Visibility.Visible;
 
@@ -721,7 +728,7 @@ namespace Interface
             Calculation_OutputRender0.Visibility = Visibility.Visible;
             Calculation_OutputBackDrop0.Visibility = Visibility.Visible;
         }
-        public void HideCalculations()
+        private void HideCalculations()
         {
             ResetGraph.Visibility = Visibility.Collapsed;
             GoToMainMenu.Visibility = Visibility.Collapsed;
@@ -733,7 +740,7 @@ namespace Interface
             Calculation_OutputBackDrop0.Visibility = Visibility.Collapsed;
         }
 
-        public void ShowMainMenu()
+        private void ShowMainMenu()
         {
             Grid.SetColumn(Graph, 2);
             Grid.SetColumnSpan(Graph, 4);
@@ -743,7 +750,7 @@ namespace Interface
             GoToCalculations.Visibility = Visibility.Visible;
             GoToComplexPlane.Visibility = Visibility.Visible;
         }
-        public void HideMainMenu()
+        private void HideMainMenu()
         {
             TitleText.Visibility = Visibility.Collapsed;
             TitleBackDrop.Visibility = Visibility.Collapsed;
@@ -753,7 +760,7 @@ namespace Interface
             GoToComplexPlane.Visibility = Visibility.Collapsed;
         }
 
-        public void ShowSettings()
+        private void ShowSettings()
         {
             GoToSettings.Visibility = Visibility.Collapsed;
 
@@ -767,7 +774,7 @@ namespace Interface
             ReturnToLast.Visibility = Visibility.Visible;
             GoToMainMenu.Visibility = Visibility.Visible;
         }
-        public void HideSettings()
+        private void HideSettings()
         {
             GoToMainMenu.Visibility = Visibility.Collapsed;
             ReturnToLast.Visibility = Visibility.Collapsed;
