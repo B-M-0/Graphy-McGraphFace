@@ -16,10 +16,7 @@ using WpfMath.Parsers;
 
 namespace Interface
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    /// 
+   
     class AngleTypes : ObservableCollection<string>
     {
         public AngleTypes()
