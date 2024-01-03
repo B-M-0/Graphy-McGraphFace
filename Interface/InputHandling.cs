@@ -31,6 +31,7 @@ namespace Interface
                 string operand1_Str, operand2_Str;
                 Rational operand1_Rational, operand2_Rational;
                 ComplexNumber operand1_Complex, operand2_Complex;
+                ComplexNumber temp;
                 Surd operand1_Surd, operand2_Surd;
                 double operand_Double;
                 string key;
@@ -259,16 +260,20 @@ namespace Interface
                         stack.Push(key);
                         break;
                     case "^":
-                        operand1_Rational = variables[stack.Pop()].real;
-                        operand2_Rational = variables[stack.Pop()].real;
+                        operand1_Complex = variables[stack.Pop()];
+                        operand2_Complex = variables[stack.Pop()];
 
                         key = GenerateKey(variables);
-                        variables.Add(key, operand2_Rational ^ operand1_Rational);
+                        if (operand2_Complex.imaginary == 0)
+                            temp = operand2_Complex.real ^ operand1_Complex.real;
+                        else
+                            temp = operand2_Complex ^ (int)(double)operand1_Complex.real;
+                        variables.Add(key, temp);
 
                         stack.Push(key);
                         break;
                     default:
-                        ComplexNumber temp = 1;
+                        temp = 1;
                         bool negative = false;
                         if (element.Contains("_"))
                         {
@@ -491,7 +496,7 @@ namespace Interface
         public static Matrix EvaluatePostfix_Matrices(List<string> expression, Dictionary<string, double> variables, Dictionary<string, Matrix> matrices, Dictionary<string, Vector> vectors, ref double decimalVal)
         {
             Stack<string> stack = new Stack<string>();
-            if (expression.Contains("\\M") == false)
+            if (expression.Contains("\\M") == false && expression.Contains("I") == false)
                 return SquareMatrix.Identity(1);
             foreach (string element in expression)
             {

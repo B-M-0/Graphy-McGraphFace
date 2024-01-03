@@ -157,6 +157,15 @@ namespace Interface
             return new ComplexNumber(C.real / (B * B.Conjugate()).real, C.imaginary / (B * B.Conjugate()).real);
         }
 
+        public static ComplexNumber operator ^(ComplexNumber A, int power)
+        {
+            ComplexNumber output = 1;
+            for (int i = 0; i < power; i++)
+                output *= A;
+
+
+            return output;
+        }
 
 
 

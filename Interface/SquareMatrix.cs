@@ -10,9 +10,11 @@ namespace Interface
     public class SquareMatrix : Matrix
     {
 
-        //For Testing
+        public readonly int order;
+
         public SquareMatrix(int a = 2, bool empty = true) : base(a, a)
         {
+            this.order = a;
             //Test values
             if (!empty)
             {
@@ -28,9 +30,9 @@ namespace Interface
             }
         }
         //Constructors
-        public SquareMatrix(Rational[,] matrixElements) : base(matrixElements) { }
-        public SquareMatrix(int[,] matrixElements) : base(matrixElements) { }
-        public SquareMatrix(double[,] matrixElements) : base(matrixElements) { }
+        public SquareMatrix(Rational[,] matrixElements) : base(matrixElements) { this.order = matrixElements.GetLength(0); }
+        public SquareMatrix(int[,] matrixElements) : base(matrixElements) { this.order = matrixElements.GetLength(0); }
+        public SquareMatrix(double[,] matrixElements) : base(matrixElements) { this.order = matrixElements.GetLength(0); }
         public SquareMatrix(Matrix A) : base(A.rows, A.columns)
         {
             if (A.rows != A.columns)
@@ -38,6 +40,7 @@ namespace Interface
                 throw new Exception("Matrix is not Square");
             }
             this.values = A.GetValues();
+            this.order = A.rows;
         }
         public SquareMatrix(Vector[] vectors): base(vectors.Length)
         {                
@@ -122,12 +125,12 @@ namespace Interface
             if (A.rows == 2)
             {
                 // Calculates the determinant if the matrix is 2x2
-                det = (A.values[0, 0] * A.values[1, 1]) - (A.values[1, 0] * A.values[0, 1]);
+                det = (A[0, 0] * A[1, 1]) - (A[1, 0] * A[0, 1]);
             }
             else if (A.rows == 1)
             {
                 //if the matrix is a 1x1 it returns the sole element as the determinant
-                det = A.values[0, 0];
+                det = A[0, 0];
             }
             else
             {
@@ -190,7 +193,7 @@ namespace Interface
             {
                 for (int column = 0; column < A.columns; column++)
                 {
-                    A.values[row, column] = (int)Math.Pow(-1, row + column + 2) * A.values[row, column];
+                    A[row, column] = (int)Math.Pow(-1, row + column + 2) * A[row, column];
                 }
             }
             return A;
@@ -199,10 +202,10 @@ namespace Interface
         public static SquareMatrix Transpose(SquareMatrix A)
         {
             SquareMatrix B = new SquareMatrix(A.rows);
-            int matrixOrder = A.rows;
-            for (int i = 0; i < A.values.Length; i++)
+            int matrixOrder = A.order;
+            for (int i = 0; i < matrixOrder * matrixOrder; i++)
             {
-                B.values[i % matrixOrder, i / matrixOrder] = A.values[i / matrixOrder, i % matrixOrder];
+                B[i % matrixOrder, i / matrixOrder] = A[i / matrixOrder, i % matrixOrder];
             }
             return B;
         }
