@@ -122,12 +122,12 @@ namespace Interface
             if (A.rows == 2)
             {
                 // Calculates the determinant if the matrix is 2x2
-                det = (A.values[0, 0] * A.values[1, 1]) - (A.values[1, 0] * A.values[0, 1]);
+                det = (A[0, 0] * A[1, 1]) - (A[1, 0] * A[0, 1]);
             }
             else if (A.rows == 1)
             {
                 //if the matrix is a 1x1 it returns the sole element as the determinant
-                det = A.values[0, 0];
+                det = A[0, 0];
             }
             else
             {
@@ -190,7 +190,7 @@ namespace Interface
             {
                 for (int column = 0; column < A.columns; column++)
                 {
-                    A.values[row, column] = (int)Math.Pow(-1, row + column + 2) * A.values[row, column];
+                    A[row, column] = (int)Math.Pow(-1, row + column + 2) * A[row, column];
                 }
             }
             return A;

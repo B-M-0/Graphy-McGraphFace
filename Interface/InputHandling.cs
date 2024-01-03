@@ -491,7 +491,7 @@ namespace Interface
         public static Matrix EvaluatePostfix_Matrices(List<string> expression, Dictionary<string, double> variables, Dictionary<string, Matrix> matrices, Dictionary<string, Vector> vectors, ref double decimalVal)
         {
             Stack<string> stack = new Stack<string>();
-            if (expression.Contains("\\M") == false)
+            if (expression.Contains("\\M") == false && expression.Contains("I") == false)
                 return SquareMatrix.Identity(1);
             foreach (string element in expression)
             {

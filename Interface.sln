@@ -7,7 +7,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interface", "Interface\Inte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Console Testing ground", "Console Testing ground\Console Testing ground.csproj", "{7DAD50CC-19B6-4FAA-9A15-03C4DC436E7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfTestingGrounds", "WpfTestingGrounds\WpfTestingGrounds.csproj", "{52642B6F-24E0-41A8-9F0B-57A51D0F8971}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfTestingGrounds", "WpfTestingGrounds\WpfTestingGrounds.csproj", "{52642B6F-24E0-41A8-9F0B-57A51D0F8971}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{172D8B13-82CD-4388-A3D7-B8A8488B70A3}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
