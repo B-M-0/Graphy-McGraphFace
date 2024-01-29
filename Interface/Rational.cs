@@ -8,7 +8,6 @@ namespace Interface
     {
         public readonly bool isInteger = false;
         public readonly bool isFloat = false;
-
         private int numerator;
         private int denominator;
         private readonly double decimalVal;
@@ -39,14 +38,14 @@ namespace Interface
         public Rational(double decimalValue)
         {
             // truncates to (k)dp
-            this.decimalVal = Math.Round(decimalValue, Global.decimalPlaces + 5);
+            this.decimalVal = Math.Round(decimalValue, Utilities.decimalPlaces + 5);
             if (!decimalValue.ToString().Contains('.'))
             {
                 this.isInteger = true;
                 numerator = (int)decimalValue;
                 denominator = 1;
             }
-            else if (decimalVal.ToString().Split('.')[1].Length > Global.decimalPlaces || decimalVal > 10000000)
+            else if (decimalVal.ToString().Split('.')[1].Length > Utilities.decimalPlaces || decimalVal > 10000000)
             {
                 isFloat = true;
                 numerator = 0;
@@ -54,12 +53,12 @@ namespace Interface
             }
             else
             {
-                decimalValue = Math.Round(decimalValue, Global.decimalPlaces);
+                decimalValue = Math.Round(decimalValue, Utilities.decimalPlaces);
 
                 int denominator = 1;
                 while (decimalValue % 1 != 0)
                 {
-                    decimalValue = Math.Round(decimalValue * 10, Global.decimalPlaces);
+                    decimalValue = Math.Round(decimalValue * 10, Utilities.decimalPlaces);
                     denominator *= 10;
                 }
 
@@ -205,7 +204,7 @@ namespace Interface
 
         public double Decimal()
         {
-            return Math.Round(decimalVal, Global.decimalPlaces);
+            return Math.Round(decimalVal, Utilities.decimalPlaces);
         }
 
         public int Numerator()

@@ -80,7 +80,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Sin(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Sin(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -88,7 +88,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Cos(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Cos(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -96,7 +96,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Tan(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Tan(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -104,7 +104,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Sinh(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Sinh(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -112,7 +112,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Cosh(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Cosh(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -120,7 +120,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Math.Tanh(Global.InputAngleConversion(operand_Double))));
+                        variables.Add(key, new Rational(Math.Tanh(Utilities.InputAngleConversion(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -128,7 +128,7 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Asin(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Asin(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -136,21 +136,21 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Acos(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Acos(operand_Double))));
                         stack.Push(key);
                         break;
                     case "arctan":
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Atan(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Atan(operand_Double))));
                         stack.Push(key);
                         break;
                     case "arcsinh":
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Asinh(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Asinh(operand_Double))));
 
                         stack.Push(key);
                         break;
@@ -158,14 +158,14 @@ namespace Interface
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Acosh(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Acosh(operand_Double))));
                         stack.Push(key);
                         break;
                     case "arctanh":
                         operand1_Rational = variables[stack.Pop()].real;
                         operand_Double = operand1_Rational.Decimal();
                         key = GenerateKey(variables);
-                        variables.Add(key, new Rational(Global.OutputAngleConversion(Math.Atanh(operand_Double))));
+                        variables.Add(key, new Rational(Utilities.OutputAngleConversion(Math.Atanh(operand_Double))));
                         stack.Push(key);
                         break;
                     case "log":
@@ -353,63 +353,63 @@ namespace Interface
                             break;
                         case "sin":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Sin(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Sin(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "cos":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Cos(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Cos(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "tan":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Tan(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Tan(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "sec":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1 / Math.Cos(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Cos(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "csc":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1 / Math.Sin(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Sin(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "cot":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((1 / Math.Tan(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((1 / Math.Tan(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "sinh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Sinh(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Sinh(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "cosh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Cosh(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Cosh(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "tanh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push((Math.Tanh(Global.InputAngleConversion(operand1))).ToString());
+                            stack.Push((Math.Tanh(Utilities.InputAngleConversion(operand1))).ToString());
                             break;
                         case "arcsin":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Asin(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Asin(operand1)).ToString());
                             break;
                         case "arccos":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Acos(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Acos(operand1)).ToString());
                             break;
                         case "arctan":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Atan(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Atan(operand1)).ToString());
                             break;
                         case "arcsinh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Asinh(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Asinh(operand1)).ToString());
                             break;
                         case "arccosh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Acosh(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Acosh(operand1)).ToString());
                             break;
                         case "arctanh":
                             operand1 = double.Parse(stack.Pop());
-                            stack.Push(Global.OutputAngleConversion(Math.Atanh(operand1)).ToString());
+                            stack.Push(Utilities.OutputAngleConversion(Math.Atanh(operand1)).ToString());
                             break;
                         case "log":
                             operand1 = double.Parse(stack.Pop());

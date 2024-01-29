@@ -118,7 +118,7 @@ namespace Interface
         {
             var arg = Arg(this);
             var mod = Exact_Abs(this); 
-            return $"{mod.ToLatex()} ( \\cos({Math.Round(arg, Global.decimalPlaces)}) + i \\sin({Math.Round(arg,Global.decimalPlaces)}) )"; 
+            return $"{mod.ToLatex()} ( \\cos({Math.Round(arg, Utilities.decimalPlaces)}) + i \\sin({Math.Round(arg,Utilities.decimalPlaces)}) )"; 
         }
 
         public ComplexNumber Conjugate()

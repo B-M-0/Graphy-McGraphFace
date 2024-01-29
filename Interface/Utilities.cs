@@ -1,14 +1,9 @@
-﻿using ScottPlot.Ticks.DateTimeTickUnits;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Interface
 {
-    public class Global
+    public class Utilities
     {
         public static int ThemeIndex = 6;
         public static int angleFormatIndex= 0;

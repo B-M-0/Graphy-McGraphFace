@@ -34,7 +34,7 @@ namespace Interface
         }
         public ComplexNumber Evaluate(Dictionary<string, Surd> surdVariables, Dictionary<string, ComplexNumber> variables, ref double decimalVal, ref Surd surdVal, double z = 1)
         {
-            variables = Global.DefineConstants();
+            variables = Utilities.DefineConstants();
             variables["z"] = z;
             return InputHandling.EvaluatePostfix(postFixFunction, surdVariables, variables, ref decimalVal, ref surdVal);
         }

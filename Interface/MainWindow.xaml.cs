@@ -171,7 +171,7 @@ namespace Interface
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
 
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Utilities.ThemeIndex]);
             GraphChanged(null, null);
             Graph.Refresh();
         }
@@ -202,9 +202,9 @@ namespace Interface
             UpdateText();
             ResetGraph_Clicked();
 
-            Dictionary<string, double> variables = Global.DefineConstants<double>();
+            Dictionary<string, double> variables = Utilities.DefineConstants<double>();
 
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Utilities.ThemeIndex]);
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
@@ -223,7 +223,7 @@ namespace Interface
                     {
                         var plt = new FunctionPlot(func);
                         functionPlots[i] = plt;
-                        plt.Color = System.Drawing.Color.FromName(Global.colors[i]);
+                        plt.Color = System.Drawing.Color.FromName(Utilities.colors[i]);
                         Graph.Plot.Add(plt);
                         foreach (double xVal in asymptotes[i])
                         {
@@ -242,7 +242,7 @@ namespace Interface
             ResetGraph_Clicked();
             //Update();
 
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Utilities.ThemeIndex]);
 
             Graph.Plot.AddHorizontalLine(y: 0, color: System.Drawing.Color.Black);
             Graph.Plot.AddVerticalLine(x: 0, color: System.Drawing.Color.Black);
@@ -256,7 +256,7 @@ namespace Interface
                     double decimalVal = 0;
 
                     Dictionary<string, double> variables = new Dictionary<string, double>();
-                    Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
+                    Dictionary<string, Matrix> matrices = Utilities.DefineCommonMatrices();
                     Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
 
                     Matrix Result = function.Evaluate(variables, matrices, vectors, ref decimalVal);
@@ -327,7 +327,7 @@ namespace Interface
                             //center
                             Graph.Plot.AddCircle(centerX, centerY, 0.25, lineWidth: (float)2);
                             //Loci
-                            var func = new Func<double, double?>((x) => Global.HalfLine(x, angle, centerY, centerX));
+                            var func = new Func<double, double?>((x) => Utilities.HalfLine(x, angle, centerY, centerX));
                             var plt = new FunctionPlot(func);
                             plt.LineWidth = 2;
                             plt.Color = System.Drawing.Color.Red;
@@ -373,7 +373,7 @@ namespace Interface
                             }
                             else
                             {
-                                func = new Func<double, double?>((x) => Global.Line(x, gradient, mp_y, mp_x));
+                                func = new Func<double, double?>((x) => Utilities.Line(x, gradient, mp_y, mp_x));
                                 Graph.Plot.AddFunction(func, lineWidth: 2);
                             }
                             break;
@@ -384,7 +384,7 @@ namespace Interface
 
                 }
             }
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Utilities.ThemeIndex]);
 
             Graph.Refresh();
         }
@@ -482,7 +482,7 @@ namespace Interface
             Dictionary<string, Surd> surdVariables = new Dictionary<string, Surd>();
             Dictionary<string, ComplexNumber> complexVariables = new Dictionary<string, ComplexNumber>();
             Dictionary<string, double> doubleVariables = new Dictionary<string, double>();
-            Dictionary<string, Matrix> matrices = Global.DefineCommonMatrices();
+            Dictionary<string, Matrix> matrices = Utilities.DefineCommonMatrices();
             Dictionary<string, Vector> vectors = new Dictionary<string, Vector>();
 
 
@@ -501,7 +501,7 @@ namespace Interface
             
             try
             {
-                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Global.RemoveWhiteSpace((sender as TextBox).Text), ref validInput).Split(' '), ref validInput);
+                List<string> output = InputHandling.InfixToPostfix(InputHandling.FormatInput(Utilities.RemoveWhiteSpace((sender as TextBox).Text), ref validInput).Split(' '), ref validInput);
                 if (!validInput)
                     throw new Exception("Invalid input");
 
@@ -538,7 +538,7 @@ namespace Interface
                     }
 
                     if (resultVAl == null)
-                        result += Math.Round(decimalValue, Global.decimalPlaces).ToString();
+                        result += Math.Round(decimalValue, Utilities.decimalPlaces).ToString();
                     else if (resultVAl.imaginary.isFloat || resultVAl.real.isFloat)
                         result = "\\approx" + (resultVAl.LatexFormat_float());
                     else if (resultVAl.LatexFormat_frac() != resultVAl.LatexFormat_float())
@@ -592,7 +592,7 @@ namespace Interface
                 try
                 {
                     bool validInput = true;
-                    string input_string = InputHandling.FormatInput(Global.RemoveWhiteSpace(inputs[id]), ref validInput);
+                    string input_string = InputHandling.FormatInput(Utilities.RemoveWhiteSpace(inputs[id]), ref validInput);
                     List<string> expression = InputHandling.InfixToPostfix(input_string.Split(' '), ref validInput);
                     if (currentPage == 4)
                         parsed_complex_inputs[id] = input_string;
@@ -891,12 +891,12 @@ namespace Interface
 
         private void AngleMeasurement_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            Global.angleFormatIndex = AngleMeasurement.SelectedIndex;
+            Utilities.angleFormatIndex = AngleMeasurement.SelectedIndex;
         }
         private void Theme_SelectionChanged(object? sender, SelectionChangedEventArgs e)
         {
-            Global.ThemeIndex = Theme.SelectedIndex;
-            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Global.ThemeIndex]);
+            Utilities.ThemeIndex = Theme.SelectedIndex;
+            Graph.Plot.Style(ScottPlot.Style.GetStyles()[Utilities.ThemeIndex]);
         }
 
         private void ToggleAlternateFormat(object? sender, RoutedEventArgs? e)

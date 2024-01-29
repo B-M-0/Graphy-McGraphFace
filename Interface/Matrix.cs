@@ -117,7 +117,7 @@ namespace Interface
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    values[i, j] = Math.Round(matrixElements[i, j], Global.decimalPlaces);
+                    values[i, j] = Math.Round(matrixElements[i, j], Utilities.decimalPlaces);
                 }
             }
         }
