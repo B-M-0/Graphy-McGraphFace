@@ -5,6 +5,7 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <AssemblyTitle>Graphy McGraphFace</AssemblyTitle>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,45 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="cog.jpg" />
-    <None Remove="EPQ - NEA.png" />
-    <None Remove="temp.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="bin\Debug\net6.0-windows\Interface.deps.json" />
-    <Content Include="bin\Debug\net6.0-windows\Interface.runtimeconfig.json" />
-    <Content Include="bin\Release\net6.0-windows\Interface.deps.json" />
-    <Content Include="bin\Release\net6.0-windows\Interface.runtimeconfig.json" />
     <Resource Include="Images\Instructions.jpeg" />
-    <Resource Include="Images\cog.jpg" />
     <Resource Include="Images\Instructions.png" />
-    <Resource Include="Images\temp.jpg" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="bin\Debug\net6.0-windows\Interface.dll" />
-    <None Include="bin\Debug\net6.0-windows\Interface.exe" />
-    <None Include="bin\Debug\net6.0-windows\Interface.pdb" />
-    <None Include="bin\Debug\net6.0-windows\Microsoft.Win32.SystemEvents.dll" />
-    <None Include="bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll" />
-    <None Include="bin\Debug\net6.0-windows\runtimes\win\lib\net6.0\System.Drawing.Common.dll" />
-    <None Include="bin\Debug\net6.0-windows\ScottPlot.dll" />
-    <None Include="bin\Debug\net6.0-windows\ScottPlot.WPF.dll" />
-    <None Include="bin\Debug\net6.0-windows\System.Drawing.Common.dll" />
-    <None Include="bin\Debug\net6.0-windows\WpfMath.dll" />
-    <None Include="bin\Debug\net6.0-windows\XamlMath.Shared.dll" />
-    <None Include="bin\Release\net6.0-windows\Interface.dll" />
-    <None Include="bin\Release\net6.0-windows\Interface.exe" />
-    <None Include="bin\Release\net6.0-windows\Interface.pdb" />
-    <None Include="bin\Release\net6.0-windows\Microsoft.Win32.SystemEvents.dll" />
-    <None Include="bin\Release\net6.0-windows\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll" />
-    <None Include="bin\Release\net6.0-windows\runtimes\win\lib\net6.0\System.Drawing.Common.dll" />
-    <None Include="bin\Release\net6.0-windows\ScottPlot.dll" />
-    <None Include="bin\Release\net6.0-windows\ScottPlot.WPF.dll" />
-    <None Include="bin\Release\net6.0-windows\System.Drawing.Common.dll" />
-    <None Include="bin\Release\net6.0-windows\WpfMath.dll" />
-    <None Include="bin\Release\net6.0-windows\XamlMath.Shared.dll" />
+    <Resource Include="Images\cog.jpg" />
   </ItemGroup>
 
   <ItemGroup>

@@ -140,7 +140,7 @@ namespace Interface
         ImageSource BitmapToImageSource(Bitmap bitmap)
         {
             BitmapSource bitmapSource = Imaging.CreateBitmapSourceFromHBitmap(bitmap.GetHbitmap(), IntPtr.Zero, Int32Rect.Empty, BitmapSizeOptions.FromEmptyOptions());
-            //^ this line is stolen         
+            // Converts a GDI+ bitmap into a WPF ImageSource for display         
             return bitmapSource;
         }
 
