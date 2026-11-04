@@ -1,6 +1,6 @@
 # Graphy McGraphFace
 
-[![Build](https://github.com/B-M-0/Interface/actions/workflows/build.yml/badge.svg)](https://github.com/B-M-0/Interface/actions/workflows/build.yml)
+[![Build](https://github.com/B-M-0/Graphy-McGraphFace/actions/workflows/build.yml/badge.svg)](https://github.com/B-M-0/Graphy-McGraphFace/actions/workflows/build.yml)
 
 A desktop maths visualiser for A-level Further Maths topics, written in C# with WPF. You type an expression, it's rendered as typeset LaTeX as you type, and the result is plotted or evaluated live.
 
@@ -39,8 +39,8 @@ text input ──► FormatInput ──► InfixToPostfix ──► EvaluatePost
 You need Windows, because WPF only runs there, and the .NET 6 SDK or later.
 
 ```bash
-git clone https://github.com/B-M-0/Interface.git
-cd Interface
+git clone https://github.com/B-M-0/Graphy-McGraphFace.git
+cd Graphy-McGraphFace
 dotnet run --project Interface
 ```
 
