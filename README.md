@@ -2,9 +2,9 @@
 
 [![Build](https://github.com/B-M-0/Interface/actions/workflows/build.yml/badge.svg)](https://github.com/B-M-0/Interface/actions/workflows/build.yml)
 
-A desktop maths visualiser for Further Maths topics, written in C# with WPF. You type an expression, it's rendered as typeset LaTeX as you type, and the result is plotted or evaluated live.
+A desktop maths visualiser for A-level Further Maths topics, written in C# with WPF. You type an expression, it's rendered as typeset LaTeX as you type, and the result is plotted or evaluated live.
 
-I built it as a coursework project. The expression parser, the evaluator and the number types (rationals, surds, complex numbers, matrices and vectors) are written from scratch. The only libraries are ScottPlot for the plot canvas and WpfMath for LaTeX rendering.
+I built it as my A-level Computer Science coursework (NEA) project. The expression parser, the evaluator and the number types (rationals, surds, complex numbers, matrices and vectors) are written from scratch. The only libraries are ScottPlot for the plot canvas and WpfMath for LaTeX rendering.
 
 ## Features
 
